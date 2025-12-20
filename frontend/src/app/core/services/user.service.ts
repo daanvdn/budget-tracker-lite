@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { User } from '../models';
+import { environment } from '../../../environments/environment';
+import { User } from '../../shared/models/models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'http://localhost:8000/users';
+  private apiUrl = `${environment.apiUrl}/users`;
 
   constructor(private http: HttpClient) {}
 
@@ -19,12 +20,12 @@ export class UserService {
     return this.http.get<User>(`${this.apiUrl}/${id}`);
   }
 
-  createUser(user: User): Observable<User> {
-    return this.http.post<User>(this.apiUrl, user);
+  createUser(name: string): Observable<User> {
+    return this.http.post<User>(this.apiUrl, { name });
   }
 
-  updateUser(id: number, user: Partial<User>): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/${id}`, user);
+  updateUser(id: number, name: string): Observable<User> {
+    return this.http.put<User>(`${this.apiUrl}/${id}`, { name });
   }
 
   deleteUser(id: number): Observable<void> {

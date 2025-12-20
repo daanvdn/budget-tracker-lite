@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Beneficiary } from '../models';
+import { environment } from '../../../environments/environment';
+import { Beneficiary } from '../../shared/models/models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BeneficiaryService {
-  private apiUrl = 'http://localhost:8000/beneficiaries';
+  private apiUrl = `${environment.apiUrl}/beneficiaries`;
 
   constructor(private http: HttpClient) {}
 
@@ -19,12 +20,12 @@ export class BeneficiaryService {
     return this.http.get<Beneficiary>(`${this.apiUrl}/${id}`);
   }
 
-  createBeneficiary(beneficiary: Beneficiary): Observable<Beneficiary> {
-    return this.http.post<Beneficiary>(this.apiUrl, beneficiary);
+  createBeneficiary(name: string): Observable<Beneficiary> {
+    return this.http.post<Beneficiary>(this.apiUrl, { name });
   }
 
-  updateBeneficiary(id: number, beneficiary: Partial<Beneficiary>): Observable<Beneficiary> {
-    return this.http.put<Beneficiary>(`${this.apiUrl}/${id}`, beneficiary);
+  updateBeneficiary(id: number, name: string): Observable<Beneficiary> {
+    return this.http.put<Beneficiary>(`${this.apiUrl}/${id}`, { name });
   }
 
   deleteBeneficiary(id: number): Observable<void> {

@@ -4,27 +4,23 @@ __pycache__/
 *$py.class
 *.so
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Virtual Environment
+env/
 venv/
 ENV/
-env/
 .venv
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Angular
+/frontend/dist/
+/frontend/.angular/
+/frontend/out-tsc/
 
 # IDEs
 .vscode/
@@ -32,28 +28,25 @@ env/
 *.swp
 *.swo
 *~
-
-# OS
 .DS_Store
-Thumbs.db
 
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
-
-# Angular
-frontend/node_modules/
-frontend/dist/
-frontend/.angular/
-frontend/coverage/
-
-# Environment variables
+# Environment
 .env
 .env.local
+
+# Data
+/data/
+*.db
+*.sqlite
+
+# Logs
+*.log
+
+# Testing
+coverage/
+.coverage
+htmlcov/
+.pytest_cache/
+
+# OS
+Thumbs.db
