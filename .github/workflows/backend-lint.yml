@@ -46,4 +46,4 @@ jobs:
     - name: Check import sorting with isort
       working-directory: ./backend
       run: |
-        isort --check-only --profile=black --line-length=120 src tests
+        isort --check-only --profile=black src tests

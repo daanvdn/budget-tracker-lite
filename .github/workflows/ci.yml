@@ -54,6 +54,16 @@ jobs:
       run: |
         flake8 src tests --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 src tests --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
+        
+    - name: Check code formatting with black
+      working-directory: ./backend
+      run: |
+        black --check --line-length=120 src tests
+        
+    - name: Check import sorting with isort
+      working-directory: ./backend
+      run: |
+        isort --check-only --profile=black src tests
 
   frontend-tests:
     name: Frontend Unit Tests
