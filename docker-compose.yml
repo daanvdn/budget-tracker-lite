@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: budget-tracker-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/data
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///data/budget_tracker.db
+    restart: unless-stopped
+    networks:
+      - budget-tracker-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: budget-tracker-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - budget-tracker-network
+
+networks:
+  budget-tracker-network:
+    driver: bridge
+
+volumes:
+  data:
