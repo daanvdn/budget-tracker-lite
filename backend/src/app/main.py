@@ -11,8 +11,9 @@ from .models import User, Category, Beneficiary, Transaction, CategoryType, Tran
 
 async def seed_data():
     """Seed initial data if database is empty"""
+    from sqlalchemy import select
+    
     async with AsyncSessionLocal() as db:
-        from sqlalchemy import select
         
         # Check if data already exists
         result = await db.execute(select(User))

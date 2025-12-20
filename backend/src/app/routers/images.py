@@ -8,9 +8,6 @@ from ..config import settings
 
 router = APIRouter(prefix="/images", tags=["images"])
 
-# Ensure upload directory exists
-settings.upload_dir.mkdir(parents=True, exist_ok=True)
-
 
 @router.post("/upload")
 async def upload_image(file: UploadFile = File(...)):
@@ -18,6 +15,9 @@ async def upload_image(file: UploadFile = File(...)):
     Upload an image file
     Returns the path that can be stored in transaction
     """
+    # Ensure upload directory exists
+    settings.upload_dir.mkdir(parents=True, exist_ok=True)
+    
     # Validate file type
     if not file.content_type or not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File must be an image")
