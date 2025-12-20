@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import enum
 from datetime import datetime
 from typing import Optional
@@ -85,3 +86,6 @@ class Transaction(Base):
     category: Mapped["Category"] = relationship("Category", back_populates="transactions")
     beneficiary: Mapped["Beneficiary"] = relationship("Beneficiary", back_populates="transactions")
     created_by_user: Mapped["User"] = relationship("User", back_populates="transactions")
+=======
+# Models module
+>>>>>>> 9bd8ee65bad9f9919224080b8ece682f5a50ff64

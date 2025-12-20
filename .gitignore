@@ -12,7 +12,12 @@ ENV/
 dist/
 build/
 
-# Node
+# Database
+*.db
+*.db-journal
+*.sqlite
+
+# Node.js
 node_modules/
 npm-debug.log
 yarn-error.log
@@ -28,7 +33,10 @@ yarn-error.log
 *.swp
 *.swo
 *~
+
+# OS
 .DS_Store
+Thumbs.db
 
 # Environment
 .env
@@ -36,8 +44,6 @@ yarn-error.log
 
 # Data
 /data/
-*.db
-*.sqlite
 
 # Logs
 *.log
@@ -47,6 +53,3 @@ coverage/
 .coverage
 htmlcov/
 .pytest_cache/
-
-# OS
-Thumbs.db

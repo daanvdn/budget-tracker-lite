@@ -1,338 +1,477 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatTableModule } from '@angular/material/table';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { TransactionService } from '../../core/services/transaction.service';
-import { CategoryService } from '../../core/services/category.service';
-import { BeneficiaryService } from '../../core/services/beneficiary.service';
-import { UserService } from '../../core/services/user.service';
-import { Transaction, TransactionType, Category, Beneficiary, User } from '../../shared/models/models';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { TransactionService, Transaction, TransactionCreate } from '../../../core/services/transaction.service';
+import { AuthService, User } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-transactions',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    MatTableModule,
-    MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatDialogModule,
-    MatSnackBarModule
-  ],
+  imports: [CommonModule, ReactiveFormsModule],
   template: `
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>Transactions</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <button mat-raised-button color="primary" (click)="toggleForm()">
-          <mat-icon>add</mat-icon>
-          {{ showForm ? 'Cancel' : 'Add Transaction' }}
-        </button>
+    <div class="transactions-container">
+      <header class="header">
+        <h1>Budget Tracker</h1>
+        <div class="user-info" *ngIf="currentUser">
+          <span>Welcome, {{ currentUser.name }}</span>
+          <button class="btn btn-secondary" (click)="logout()">Logout</button>
+        </div>
+      </header>
 
-        <form *ngIf="showForm" [formGroup]="transactionForm" (ngSubmit)="onSubmit()" class="transaction-form">
-          <mat-form-field class="form-field-full-width">
-            <mat-label>Type</mat-label>
-            <mat-select formControlName="type" required>
-              <mat-option value="expense">Expense</mat-option>
-              <mat-option value="income">Income</mat-option>
-            </mat-select>
-          </mat-form-field>
+      <div class="content">
+        <div class="transaction-form-section">
+          <h2>Add Transaction</h2>
+          <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="description">Description</label>
+                <input
+                  type="text"
+                  id="description"
+                  formControlName="description"
+                  class="form-control"
+                />
+              </div>
 
-          <mat-form-field class="form-field-full-width">
-            <mat-label>Amount</mat-label>
-            <input matInput type="number" formControlName="amount" required>
-          </mat-form-field>
+              <div class="form-group">
+                <label for="amount">Amount</label>
+                <input
+                  type="number"
+                  id="amount"
+                  formControlName="amount"
+                  class="form-control"
+                  step="0.01"
+                />
+              </div>
+            </div>
 
-          <mat-form-field class="form-field-full-width">
-            <mat-label>Description</mat-label>
-            <input matInput formControlName="description" required>
-          </mat-form-field>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="category">Category</label>
+                <input
+                  type="text"
+                  id="category"
+                  formControlName="category"
+                  class="form-control"
+                />
+              </div>
 
-          <mat-form-field class="form-field-full-width">
-            <mat-label>Date</mat-label>
-            <input matInput [matDatepicker]="picker" formControlName="transaction_date" required>
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
-          </mat-form-field>
+              <div class="form-group">
+                <label for="type">Type</label>
+                <select id="type" formControlName="type" class="form-control">
+                  <option value="income">Income</option>
+                  <option value="expense">Expense</option>
+                </select>
+              </div>
+            </div>
 
-          <mat-form-field class="form-field-full-width">
-            <mat-label>Category</mat-label>
-            <mat-select formControlName="category_id" required>
-              <mat-option *ngFor="let category of categories" [value]="category.id">
-                {{ category.name }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+            <div class="error-message" *ngIf="errorMessage">
+              {{ errorMessage }}
+            </div>
 
-          <mat-form-field class="form-field-full-width">
-            <mat-label>Beneficiary</mat-label>
-            <mat-select formControlName="beneficiary_id" required>
-              <mat-option *ngFor="let beneficiary of beneficiaries" [value]="beneficiary.id">
-                {{ beneficiary.name }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field class="form-field-full-width">
-            <mat-label>Created By</mat-label>
-            <mat-select formControlName="created_by_user_id" required>
-              <mat-option *ngFor="let user of users" [value]="user.id">
-                {{ user.name }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <div class="form-actions">
-            <button mat-raised-button color="primary" type="submit" [disabled]="!transactionForm.valid">
-              {{ editingId ? 'Update' : 'Create' }}
+            <button type="submit" class="btn btn-primary" [disabled]="transactionForm.invalid || loading">
+              {{ loading ? 'Adding...' : 'Add Transaction' }}
             </button>
-            <button mat-button type="button" (click)="cancelEdit()">Cancel</button>
+          </form>
+        </div>
+
+        <div class="transactions-list-section">
+          <h2>Transactions</h2>
+          
+          <div class="summary" *ngIf="transactions.length > 0">
+            <div class="summary-item income">
+              <span class="label">Total Income:</span>
+              <span class="value">\${{ totalIncome.toFixed(2) }}</span>
+            </div>
+            <div class="summary-item expense">
+              <span class="label">Total Expenses:</span>
+              <span class="value">\${{ totalExpenses.toFixed(2) }}</span>
+            </div>
+            <div class="summary-item balance">
+              <span class="label">Balance:</span>
+              <span class="value" [class.negative]="balance < 0">\${{ balance.toFixed(2) }}</span>
+            </div>
           </div>
-        </form>
 
-        <table mat-table [dataSource]="transactions" class="transactions-table">
-          <ng-container matColumnDef="date">
-            <th mat-header-cell *matHeaderCellDef>Date</th>
-            <td mat-cell *matCellDef="let transaction">{{ transaction.transaction_date | date:'short' }}</td>
-          </ng-container>
+          <div class="transactions-list" *ngIf="transactions.length > 0; else noTransactions">
+            <div class="transaction-item" *ngFor="let transaction of transactions" [class]="transaction.type">
+              <div class="transaction-info">
+                <div class="transaction-description">{{ transaction.description }}</div>
+                <div class="transaction-category">{{ transaction.category }}</div>
+                <div class="transaction-date">{{ formatDate(transaction.date) }}</div>
+              </div>
+              <div class="transaction-amount" [class]="transaction.type">
+                {{ transaction.type === 'income' ? '+' : '-' }}\${{ transaction.amount.toFixed(2) }}
+              </div>
+              <button class="btn-delete" (click)="deleteTransaction(transaction.id)">Delete</button>
+            </div>
+          </div>
 
-          <ng-container matColumnDef="type">
-            <th mat-header-cell *matHeaderCellDef>Type</th>
-            <td mat-cell *matCellDef="let transaction">
-              <span [class.income]="transaction.type === 'income'" [class.expense]="transaction.type === 'expense'">
-                {{ transaction.type }}
-              </span>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="amount">
-            <th mat-header-cell *matHeaderCellDef>Amount</th>
-            <td mat-cell *matCellDef="let transaction">{{ transaction.amount | currency }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="description">
-            <th mat-header-cell *matHeaderCellDef>Description</th>
-            <td mat-cell *matCellDef="let transaction">{{ transaction.description }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="category">
-            <th mat-header-cell *matHeaderCellDef>Category</th>
-            <td mat-cell *matCellDef="let transaction">{{ transaction.category.name }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="beneficiary">
-            <th mat-header-cell *matHeaderCellDef>Beneficiary</th>
-            <td mat-cell *matCellDef="let transaction">{{ transaction.beneficiary.name }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let transaction">
-              <button mat-icon-button (click)="editTransaction(transaction)">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button mat-icon-button color="warn" (click)="deleteTransaction(transaction.id)">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-      </mat-card-content>
-    </mat-card>
+          <ng-template #noTransactions>
+            <div class="no-transactions">
+              <p>No transactions yet. Add your first transaction above!</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
   `,
   styles: [`
-    .transaction-form {
-      margin: 20px 0;
-      padding: 20px;
-      background-color: #f5f5f5;
-      border-radius: 4px;
+    .transactions-container {
+      min-height: 100vh;
+      background: #f5f5f5;
     }
 
-    .form-actions {
+    .header {
+      background: white;
+      padding: 20px 40px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       display: flex;
-      gap: 10px;
-      margin-top: 20px;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .transactions-table {
+    .header h1 {
+      margin: 0;
+      color: #333;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .user-info span {
+      color: #555;
+    }
+
+    .content {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .transaction-form-section,
+    .transactions-list-section {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin: 0 0 20px 0;
+      color: #333;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-bottom: 5px;
+      color: #555;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .form-control {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .error-message {
+      color: #dc3545;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .btn-primary {
+      background: #007bff;
+      color: white;
       width: 100%;
-      margin-top: 20px;
     }
 
-    .income {
-      color: green;
-      font-weight: bold;
+    .btn-primary:hover:not(:disabled) {
+      background: #0056b3;
     }
 
-    .expense {
-      color: red;
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .summary-item {
+      padding: 15px;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .summary-item.income {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+    }
+
+    .summary-item.expense {
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+    }
+
+    .summary-item.balance {
+      background: #d1ecf1;
+      border: 1px solid #bee5eb;
+    }
+
+    .summary-item .label {
+      display: block;
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 5px;
+    }
+
+    .summary-item .value {
+      display: block;
+      font-size: 20px;
       font-weight: bold;
+      color: #333;
+    }
+
+    .summary-item .value.negative {
+      color: #dc3545;
+    }
+
+    .transactions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .transaction-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+
+    .transaction-item:hover {
+      background: #f9f9f9;
+    }
+
+    .transaction-item.income {
+      border-left: 4px solid #28a745;
+    }
+
+    .transaction-item.expense {
+      border-left: 4px solid #dc3545;
+    }
+
+    .transaction-info {
+      flex: 1;
+    }
+
+    .transaction-description {
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .transaction-category {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .transaction-date {
+      font-size: 11px;
+      color: #999;
+      margin-top: 5px;
+    }
+
+    .transaction-amount {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 0 15px;
+      min-width: 100px;
+      text-align: right;
+    }
+
+    .transaction-amount.income {
+      color: #28a745;
+    }
+
+    .transaction-amount.expense {
+      color: #dc3545;
+    }
+
+    .btn-delete {
+      padding: 5px 15px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .btn-delete:hover {
+      background: #c82333;
+    }
+
+    .no-transactions {
+      text-align: center;
+      padding: 40px;
+      color: #666;
     }
   `]
 })
 export class TransactionsComponent implements OnInit {
-  transactions: Transaction[] = [];
-  categories: Category[] = [];
-  beneficiaries: Beneficiary[] = [];
-  users: User[] = [];
-  showForm = false;
-  editingId: number | null = null;
   transactionForm: FormGroup;
-  displayedColumns = ['date', 'type', 'amount', 'description', 'category', 'beneficiary', 'actions'];
+  transactions: Transaction[] = [];
+  currentUser: User | null = null;
+  loading = false;
+  errorMessage = '';
 
   constructor(
     private fb: FormBuilder,
     private transactionService: TransactionService,
-    private categoryService: CategoryService,
-    private beneficiaryService: BeneficiaryService,
-    private userService: UserService,
-    private snackBar: MatSnackBar
+    private authService: AuthService,
+    private router: Router
   ) {
     this.transactionForm = this.fb.group({
-      type: ['expense', Validators.required],
-      amount: [0, [Validators.required, Validators.min(0.01)]],
       description: ['', Validators.required],
-      transaction_date: [new Date(), Validators.required],
-      category_id: [null, Validators.required],
-      beneficiary_id: [null, Validators.required],
-      created_by_user_id: [null, Validators.required]
+      amount: ['', [Validators.required, Validators.min(0.01)]],
+      category: ['', Validators.required],
+      type: ['expense', Validators.required]
     });
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
+    this.loadCurrentUser();
     this.loadTransactions();
-    this.loadCategories();
-    this.loadBeneficiaries();
-    this.loadUsers();
   }
 
-  loadTransactions() {
+  loadCurrentUser(): void {
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+    });
+  }
+
+  loadTransactions(): void {
     this.transactionService.getTransactions().subscribe({
-      next: (data) => this.transactions = data,
-      error: (err) => this.showError('Failed to load transactions')
-    });
-  }
-
-  loadCategories() {
-    this.categoryService.getCategories().subscribe({
-      next: (data) => this.categories = data,
-      error: (err) => this.showError('Failed to load categories')
-    });
-  }
-
-  loadBeneficiaries() {
-    this.beneficiaryService.getBeneficiaries().subscribe({
-      next: (data) => this.beneficiaries = data,
-      error: (err) => this.showError('Failed to load beneficiaries')
-    });
-  }
-
-  loadUsers() {
-    this.userService.getUsers().subscribe({
-      next: (data) => this.users = data,
-      error: (err) => this.showError('Failed to load users')
-    });
-  }
-
-  toggleForm() {
-    this.showForm = !this.showForm;
-    if (!this.showForm) {
-      this.cancelEdit();
-    }
-  }
-
-  onSubmit() {
-    if (this.transactionForm.valid) {
-      const formValue = this.transactionForm.value;
-      const transaction = {
-        ...formValue,
-        transaction_date: formValue.transaction_date.toISOString()
-      };
-
-      if (this.editingId) {
-        this.transactionService.updateTransaction(this.editingId, transaction).subscribe({
-          next: () => {
-            this.showSuccess('Transaction updated successfully');
-            this.loadTransactions();
-            this.cancelEdit();
-          },
-          error: (err) => this.showError('Failed to update transaction')
-        });
-      } else {
-        this.transactionService.createTransaction(transaction).subscribe({
-          next: () => {
-            this.showSuccess('Transaction created successfully');
-            this.loadTransactions();
-            this.cancelEdit();
-          },
-          error: (err) => this.showError('Failed to create transaction')
-        });
+      next: (transactions) => {
+        this.transactions = transactions;
+      },
+      error: (error) => {
+        console.error('Failed to load transactions', error);
       }
-    }
-  }
-
-  editTransaction(transaction: Transaction) {
-    this.editingId = transaction.id;
-    this.showForm = true;
-    this.transactionForm.patchValue({
-      type: transaction.type,
-      amount: transaction.amount,
-      description: transaction.description,
-      transaction_date: new Date(transaction.transaction_date),
-      category_id: transaction.category_id,
-      beneficiary_id: transaction.beneficiary_id,
-      created_by_user_id: transaction.created_by_user_id
     });
   }
 
-  deleteTransaction(id: number) {
-    if (confirm('Are you sure you want to delete this transaction?')) {
-      this.transactionService.deleteTransaction(id).subscribe({
-        next: () => {
-          this.showSuccess('Transaction deleted successfully');
-          this.loadTransactions();
+  onSubmit(): void {
+    if (this.transactionForm.valid) {
+      this.loading = true;
+      this.errorMessage = '';
+
+      const transactionData: TransactionCreate = this.transactionForm.value;
+
+      this.transactionService.createTransaction(transactionData).subscribe({
+        next: (transaction) => {
+          this.transactions.unshift(transaction);
+          this.transactionForm.reset({ type: 'expense' });
+          this.loading = false;
         },
-        error: (err) => this.showError('Failed to delete transaction')
+        error: (error) => {
+          this.loading = false;
+          this.errorMessage = error.error?.detail || 'Failed to add transaction. Please try again.';
+        }
       });
     }
   }
 
-  cancelEdit() {
-    this.showForm = false;
-    this.editingId = null;
-    this.transactionForm.reset({
-      type: 'expense',
-      amount: 0,
-      transaction_date: new Date()
-    });
+  deleteTransaction(id: number): void {
+    if (confirm('Are you sure you want to delete this transaction?')) {
+      this.transactionService.deleteTransaction(id).subscribe({
+        next: () => {
+          this.transactions = this.transactions.filter(t => t.id !== id);
+        },
+        error: (error) => {
+          console.error('Failed to delete transaction', error);
+        }
+      });
+    }
   }
 
-  showSuccess(message: string) {
-    this.snackBar.open(message, 'Close', { duration: 3000 });
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 
-  showError(message: string) {
-    this.snackBar.open(message, 'Close', { duration: 5000 });
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+  }
+
+  get totalIncome(): number {
+    return this.transactions
+      .filter(t => t.type === 'income')
+      .reduce((sum, t) => sum + t.amount, 0);
+  }
+
+  get totalExpenses(): number {
+    return this.transactions
+      .filter(t => t.type === 'expense')
+      .reduce((sum, t) => sum + t.amount, 0);
+  }
+
+  get balance(): number {
+    return this.totalIncome - this.totalExpenses;
   }
 }
