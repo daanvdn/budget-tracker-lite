@@ -3,6 +3,7 @@ name = "budget-tracker-lite-backend"
 version = "0.1.0"
 description = "Budget Tracker Lite Backend API"
 authors = ["Budget Tracker Team"]
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -13,8 +14,10 @@ alembic = "^1.12.1"
 pydantic = "^2.5.0"
 pydantic-settings = "^2.1.0"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+bcrypt = "4.0.1"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 python-multipart = "^0.0.6"
+email-validator = "^2.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.3"
