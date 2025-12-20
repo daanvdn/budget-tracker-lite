@@ -180,6 +180,53 @@ budget-tracker-lite/
    - Click "Last Month" button
 3. View the aggregated summary
 
+## CI/CD
+
+This project includes comprehensive GitHub Actions workflows for continuous integration:
+
+### Workflows
+
+- **CI** (`ci.yml`) - Runs all checks on push/PR to main and develop branches
+  - Backend unit tests
+  - Backend linting (flake8)
+  - Frontend unit tests
+  - Docker build verification
+
+- **Backend Tests** (`backend-tests.yml`) - Runs pytest with coverage
+- **Frontend Tests** (`frontend-tests.yml`) - Runs Angular/Karma tests with ChromeHeadless
+- **Backend Linter** (`backend-lint.yml`) - Checks code quality with flake8, black, and isort
+- **Docker Build** (`docker-build.yml`) - Builds and verifies Docker images for both frontend and backend
+
+### Running Tests Locally
+
+**Backend:**
+```bash
+cd backend
+pip install -e ".[dev]"
+pytest -v --cov=src
+```
+
+**Frontend:**
+```bash
+cd frontend
+npm install
+npm test -- --browsers=ChromeHeadless --watch=false
+```
+
+**Linting:**
+```bash
+cd backend
+pip install flake8 black isort
+flake8 src tests --max-line-length=120
+black --check --line-length=120 src tests
+isort --check-only --profile=black src tests
+```
+
+**Docker Build:**
+```bash
+docker-compose build
+```
+
 ## Configuration
 
 ### Environment Variables
