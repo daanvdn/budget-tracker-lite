@@ -95,7 +95,7 @@ Budget Tracker Lite is a lean, self-hosted budget tracking application for house
 ```bash
 cd backend
 pip install uv
-uv pip install -r pyproject.toml
+uv pip install -e ".[dev]"
 mkdir -p ../data/uploads
 uvicorn src.app.main:app --reload
 ```
@@ -145,7 +145,7 @@ npm test                  # Run tests in headless mode
 - **Dependency Injection**: FastAPI's dependency injection for database sessions
 - **Async/Await**: All database operations are asynchronous
 - **Pydantic Validation**: Request/response validation using Pydantic schemas
-- **Database Migrations**: Alembic for schema changes (if needed)
+- **Database Migrations**: Alembic for schema changes in production (for development, can recreate database)
 
 ### Frontend Patterns
 - **Standalone Components**: Angular 17+ pattern (no NgModules)
