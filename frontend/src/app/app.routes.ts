@@ -1,25 +1,16 @@
 import { Routes } from '@angular/router';
+import { LoginComponent } from './features/auth/login/login.component';
+import { RegisterComponent } from './features/auth/register/register.component';
+import { ForgotPasswordComponent } from './features/auth/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './features/auth/reset-password/reset-password.component';
+import { TransactionsComponent } from './features/transactions/transactions.component';
+import { AuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/transactions', pathMatch: 'full' },
-  {
-    path: 'transactions',
-    loadComponent: () => import('./features/transactions/transactions.component').then(m => m.TransactionsComponent)
-  },
-  {
-    path: 'reports',
-    loadComponent: () => import('./features/reports/reports.component').then(m => m.ReportsComponent)
-  },
-  {
-    path: 'categories',
-    loadComponent: () => import('./features/categories/categories.component').then(m => m.CategoriesComponent)
-  },
-  {
-    path: 'beneficiaries',
-    loadComponent: () => import('./features/beneficiaries/beneficiaries.component').then(m => m.BeneficiariesComponent)
-  },
-  {
-    path: 'users',
-    loadComponent: () => import('./features/users/users.component').then(m => m.UsersComponent)
-  }
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'reset-password', component: ResetPasswordComponent },
+  { path: '', component: TransactionsComponent, canActivate: [AuthGuard] },
+  { path: '**', redirectTo: '' }
 ];

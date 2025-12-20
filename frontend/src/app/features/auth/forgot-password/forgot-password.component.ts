@@ -1,0 +1,270 @@
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
+
+@Component({
+  selector: 'app-forgot-password',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  template: `
+    <div class="forgot-password-container">
+      <div class="forgot-password-card">
+        <h2>Forgot Password</h2>
+        <p class="description">Enter your email address and we'll generate a password reset token for you.</p>
+        
+        <form [formGroup]="forgotPasswordForm" (ngSubmit)="onSubmit()" *ngIf="!resetToken">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              class="form-control"
+              [class.error]="forgotPasswordForm.get('email')?.invalid && forgotPasswordForm.get('email')?.touched"
+            />
+            <div class="error-message" *ngIf="forgotPasswordForm.get('email')?.invalid && forgotPasswordForm.get('email')?.touched">
+              Please enter a valid email
+            </div>
+          </div>
+
+          <div class="error-message" *ngIf="errorMessage">
+            {{ errorMessage }}
+          </div>
+
+          <button type="submit" class="btn btn-primary" [disabled]="forgotPasswordForm.invalid || loading">
+            {{ loading ? 'Sending...' : 'Request Reset Token' }}
+          </button>
+        </form>
+
+        <div class="success-section" *ngIf="resetToken">
+          <div class="success-message">
+            <p><strong>Password reset token generated!</strong></p>
+            <p>Copy the token below to reset your password:</p>
+            <div class="token-display">
+              <code>{{ resetToken }}</code>
+              <button class="btn-copy" (click)="copyToken()">
+                {{ copied ? 'Copied!' : 'Copy' }}
+              </button>
+            </div>
+            <p class="note">This token will expire in 1 hour.</p>
+          </div>
+          <button class="btn btn-primary" (click)="goToResetPassword()">
+            Reset Password Now
+          </button>
+        </div>
+
+        <div class="links">
+          <a routerLink="/login">Back to Login</a>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .forgot-password-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    .forgot-password-card {
+      background: white;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      max-width: 500px;
+      width: 100%;
+    }
+
+    h2 {
+      margin: 0 0 10px 0;
+      text-align: center;
+      color: #333;
+    }
+
+    .description {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+      font-weight: 500;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .form-control.error {
+      border-color: #dc3545;
+    }
+
+    .error-message {
+      color: #dc3545;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .success-section {
+      text-align: center;
+    }
+
+    .success-message {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      border-radius: 4px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .success-message p {
+      margin: 10px 0;
+    }
+
+    .token-display {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 15px;
+      margin: 15px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .token-display code {
+      flex: 1;
+      word-break: break-all;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    .btn-copy {
+      padding: 5px 15px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .btn-copy:hover {
+      background: #0056b3;
+    }
+
+    .note {
+      font-size: 12px;
+      color: #856404;
+      font-style: italic;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .btn-primary {
+      background: #007bff;
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #0056b3;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .links {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .links a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
+    }
+  `]
+})
+export class ForgotPasswordComponent {
+  forgotPasswordForm: FormGroup;
+  loading = false;
+  errorMessage = '';
+  resetToken = '';
+  copied = false;
+
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
+    this.forgotPasswordForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]]
+    });
+  }
+
+  onSubmit(): void {
+    if (this.forgotPasswordForm.valid) {
+      this.loading = true;
+      this.errorMessage = '';
+
+      this.authService.forgotPassword(this.forgotPasswordForm.value.email).subscribe({
+        next: (response) => {
+          this.loading = false;
+          if (response.reset_token) {
+            this.resetToken = response.reset_token;
+          }
+        },
+        error: (error) => {
+          this.loading = false;
+          this.errorMessage = error.error?.detail || 'Failed to generate reset token. Please try again.';
+        }
+      });
+    }
+  }
+
+  copyToken(): void {
+    navigator.clipboard.writeText(this.resetToken).then(() => {
+      this.copied = true;
+      setTimeout(() => {
+        this.copied = false;
+      }, 2000);
+    });
+  }
+
+  goToResetPassword(): void {
+    this.router.navigate(['/reset-password'], {
+      queryParams: { token: this.resetToken }
+    });
+  }
+}

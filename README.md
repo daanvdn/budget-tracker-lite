@@ -1,207 +1,229 @@
 # Budget Tracker Lite
 
-A lean, self-hosted budget tracking application for household use. Track expenses and income with support for aggregations and filtering.
+A simple budget tracking application with user authentication, built with FastAPI (backend) and Angular (frontend).
 
 ## Features
 
-- ✅ Track both expenses and income in a unified transaction system
-- ✅ Manage categories, beneficiaries, and users
-- ✅ Filter transactions by date range, category, beneficiary, and type
-- ✅ View aggregated summaries and reports
-- ✅ Mobile-responsive design with Angular Material
-- ✅ Optional image uploads for receipts
-- ✅ No authentication required (designed for private LAN use)
+### Authentication
+- ✅ User registration with password strength validation
+- ✅ Login with JWT tokens
+- ✅ Password reset functionality (with token display for LAN use)
+- ✅ Protected API endpoints and routes
+- ✅ Automatic token management and refresh handling
+
+### Budget Tracking
+- ✅ Add income and expense transactions
+- ✅ View transaction history
+- ✅ Track total income, expenses, and balance
+- ✅ Categorize transactions
+- ✅ Delete transactions
 
 ## Tech Stack
 
-- **Frontend**: Angular 17+ (standalone components) + Angular Material
-- **Backend**: FastAPI (Python)
-- **Database**: SQLite
-- **Dependency Management**: uv (for Python)
-- **Deployment**: Docker Compose
+### Backend
+- **FastAPI**: Modern Python web framework
+- **SQLAlchemy**: ORM for database operations
+- **SQLite**: Database (easily swappable with PostgreSQL/MySQL)
+- **Passlib**: Password hashing with bcrypt
+- **Python-JOSE**: JWT token generation and validation
+- **Pydantic**: Data validation
 
-## Quick Start
-
-### Prerequisites
-
-- Docker and Docker Compose
-- (Optional) Node.js 20+ and Python 3.11+ for local development
-
-### Run with Docker Compose
-
-1. Clone the repository:
-```bash
-git clone https://github.com/daanvdn/budget-tracker-lite.git
-cd budget-tracker-lite
-```
-
-2. Start the application:
-```bash
-docker-compose up -d
-```
-
-3. Access the application:
-- Frontend: http://localhost
-- Backend API: http://localhost:8000
-- API Documentation: http://localhost:8000/docs
-
-The database and uploaded images will be stored in the `./data` directory.
-
-### Stop the application:
-```bash
-docker-compose down
-```
-
-## Development
-
-### Backend Development
-
-```bash
-cd backend
-
-# Install uv if not already installed
-pip install uv
-
-# Install dependencies
-uv pip install -r pyproject.toml
-
-# Run the backend
-uvicorn src.app.main:app --reload
-```
-
-Backend will be available at http://localhost:8000
-
-### Frontend Development
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Run the development server
-npm start
-```
-
-Frontend will be available at http://localhost:4200
+### Frontend
+- **Angular 17**: Modern web framework with standalone components
+- **RxJS**: Reactive programming
+- **TypeScript**: Type-safe development
+- **CSS**: Custom styling
 
 ## Project Structure
 
 ```
 budget-tracker-lite/
-├── docker-compose.yml          # Docker Compose configuration
-├── README.md                   # This file
-├── backend/                    # FastAPI backend
-│   ├── Dockerfile
-│   ├── pyproject.toml         # Python dependencies (uv managed)
-│   └── src/app/
-│       ├── main.py            # FastAPI application
-│       ├── config.py          # Configuration
-│       ├── database.py        # Database setup
-│       ├── models/            # SQLAlchemy models
-│       ├── schemas/           # Pydantic schemas
-│       ├── routers/           # API endpoints
-│       └── services/          # Business logic
-├── frontend/                  # Angular frontend
-│   ├── Dockerfile
-│   ├── nginx.conf            # Nginx configuration
-│   ├── package.json
-│   └── src/app/
-│       ├── core/services/    # API services
-│       ├── features/         # Feature components
-│       └── shared/           # Shared models and components
-└── data/                     # SQLite DB + uploaded images (mounted volume)
+├── backend/              # FastAPI backend
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── auth/         # Authentication module
+│   │   │   ├── transactions/ # Transactions module
+│   │   │   ├── models/       # Database models
+│   │   │   ├── database/     # Database configuration
+│   │   │   └── config/       # Application settings
+│   │   └── main.py          # Application entry point
+│   └── pyproject.toml       # Python dependencies
+│
+└── frontend/            # Angular frontend
+    ├── src/
+    │   └── app/
+    │       ├── core/           # Core services, guards, interceptors
+    │       └── features/       # Feature modules (auth, transactions)
+    └── package.json         # Node.js dependencies
 ```
 
-## Data Models
+## Getting Started
 
-### Users
-- Track who creates transactions
-- Pre-seeded with sample users
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
+- Poetry (for Python dependency management)
+- npm (comes with Node.js)
 
-### Categories
-- Define expense and income categories
-- Can be used for expenses, income, or both
-- Pre-seeded with common categories (groceries, gifts, salary, etc.)
+### Backend Setup
 
-### Beneficiaries
-- Track who transactions are for (e.g., children, household)
-- Pre-seeded with sample beneficiaries
+1. Navigate to the backend directory:
+```bash
+cd backend
+```
 
-### Transactions
-- Unified model for both expenses and income
-- Includes amount, description, date, and optional image
-- Links to category, beneficiary, and creating user
+2. Install Poetry (if not already installed):
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+3. Install dependencies:
+```bash
+poetry install
+```
+
+4. Create environment configuration:
+```bash
+cp .env.example .env
+```
+
+5. Generate a secure SECRET_KEY:
+```bash
+openssl rand -hex 32
+```
+Update the `SECRET_KEY` in `.env` with the generated value.
+
+6. Run the backend server:
+```bash
+poetry run python src/main.py
+```
+
+The API will be available at http://localhost:8000
+- API docs: http://localhost:8000/docs
+- Alternative docs: http://localhost:8000/redoc
+
+### Frontend Setup
+
+1. Navigate to the frontend directory:
+```bash
+cd frontend
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Run the development server:
+```bash
+npm start
+```
+
+The application will be available at http://localhost:4200
 
 ## API Endpoints
 
-### Transactions
-- `GET /api/transactions` - List with filters
-- `POST /api/transactions` - Create
-- `GET /api/transactions/{id}` - Get one
-- `PUT /api/transactions/{id}` - Update
-- `DELETE /api/transactions/{id}` - Delete
+### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login and get JWT token
+- `GET /api/auth/me` - Get current user info
+- `POST /api/auth/forgot-password` - Request password reset
+- `POST /api/auth/reset-password` - Reset password with token
 
-### Aggregations
-- `GET /api/aggregations/summary` - Get totals with filters
+### Transactions (Protected)
+- `GET /api/transactions` - Get all transactions
+- `POST /api/transactions` - Create new transaction
+- `GET /api/transactions/{id}` - Get transaction by ID
+- `PUT /api/transactions/{id}` - Update transaction
+- `DELETE /api/transactions/{id}` - Delete transaction
 
-### Categories
-- `GET /api/categories` - List all
-- `POST /api/categories` - Create
-- `PUT /api/categories/{id}` - Update
-- `DELETE /api/categories/{id}` - Delete
+## Security Features
 
-### Beneficiaries
-- `GET /api/beneficiaries` - List all
-- `POST /api/beneficiaries` - Create
-- `PUT /api/beneficiaries/{id}` - Update
-- `DELETE /api/beneficiaries/{id}` - Delete
+1. **Password Security**
+   - Passwords hashed with bcrypt
+   - Minimum 8 characters
+   - Requires at least 1 number and 1 uppercase letter
+   - Never stored in plain text
 
-### Users
-- `GET /api/users` - List all
-- `POST /api/users` - Create
-- `PUT /api/users/{id}` - Update
-- `DELETE /api/users/{id}` - Delete
+2. **JWT Authentication**
+   - Tokens expire after 24 hours (configurable)
+   - Secure token generation with HS256 algorithm
+   - Automatic token validation on protected routes
 
-### Images
-- `POST /api/images/upload` - Upload image
-- `GET /api/images/{filename}` - Serve image
+3. **Password Reset**
+   - Reset tokens expire after 1 hour
+   - One-time use tokens
+   - Secure random token generation
+   - For LAN use: tokens displayed directly (email integration optional)
 
-## Usage Examples
+4. **API Security**
+   - CORS enabled for configured origins
+   - All transaction endpoints require authentication
+   - 401 errors automatically redirect to login
 
-### Example Query
-"How much did I spend on Child A for gifts in the past month?"
+## Development
 
-1. Go to the **Reports** page
-2. Set filters:
-   - Beneficiary: Child A
-   - Category: Gifts
-   - Transaction Type: Expense
-   - Click "Last Month" button
-3. View the aggregated summary
+### Backend Development
+- The backend uses SQLite by default for easy development
+- Database tables are created automatically on first run
+- API documentation is auto-generated via FastAPI
+
+### Frontend Development
+- Uses Angular standalone components (no NgModules)
+- Reactive forms for all user inputs
+- Password strength indicator on registration
+- Auth guard prevents unauthorized access
+- HTTP interceptor automatically adds JWT tokens
 
 ## Configuration
 
-### Environment Variables
+### Backend Configuration (backend/.env)
+```env
+DATABASE_URL=sqlite:///./budget_tracker.db
+SECRET_KEY=your-secret-key-here
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=1440
+RESET_TOKEN_EXPIRE_MINUTES=60
+```
 
-Backend configuration can be customized via environment variables or `.env` file:
+### Frontend Configuration
+The API URL is configured in each service. To change:
+- Update `apiUrl` in `auth.service.ts`
+- Update `apiUrl` in `transaction.service.ts`
 
-- `DATABASE_URL` - Database connection string (default: `sqlite+aiosqlite:///data/budget_tracker.db`)
-- `UPLOAD_DIR` - Directory for uploaded images (default: `/data/uploads`)
-- `MAX_UPLOAD_SIZE` - Maximum file upload size in bytes (default: 10MB)
-- `CORS_ORIGINS` - Allowed CORS origins (default: `["http://localhost:4200", "http://localhost"]`)
+## Testing
 
-## Deployment on Synology NAS
+### Test the Backend
+```bash
+cd backend
+poetry run pytest
+```
 
-1. Enable SSH and Docker on your Synology NAS
-2. Copy the project files to your NAS
-3. SSH into your NAS and navigate to the project directory
-4. Run `docker-compose up -d`
-5. Access via your NAS's IP address on port 80
+### Test the Frontend
+```bash
+cd frontend
+npm test
+```
+
+## Production Deployment
+
+### Backend
+1. Use a production database (PostgreSQL recommended)
+2. Set a strong SECRET_KEY
+3. Enable HTTPS
+4. Configure proper CORS origins
+5. Consider adding rate limiting
+6. Use a production WSGI server (uvicorn with gunicorn)
+
+### Frontend
+1. Build for production: `npm run build`
+2. Serve the `dist/` folder with a web server
+3. Configure proper API URL for production
+4. Enable HTTPS
 
 ## License
 
-MIT
+This project is open source and available under the MIT License.
 
 ## Contributing
 
