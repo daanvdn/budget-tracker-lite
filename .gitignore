@@ -4,24 +4,35 @@ __pycache__/
 *$py.class
 *.so
 .Python
-*.db
-*.db-journal
-
-# Virtual environments
-.venv/
+env/
 venv/
 ENV/
+.venv
+*.egg-info/
+dist/
+build/
+
+# Database
+*.db
+*.db-journal
+*.sqlite
 
 # Node.js
 node_modules/
-dist/
-.angular/
+npm-debug.log
+yarn-error.log
 
-# IDE
+# Angular
+/frontend/dist/
+/frontend/.angular/
+/frontend/out-tsc/
+
+# IDEs
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
 # OS
 .DS_Store
@@ -29,6 +40,16 @@ Thumbs.db
 
 # Environment
 .env
+.env.local
+
+# Data
+/data/
 
 # Logs
 *.log
+
+# Testing
+coverage/
+.coverage
+htmlcov/
+.pytest_cache/
