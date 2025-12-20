@@ -1,13 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy.orm import Session
 from typing import List, Optional
-from app.database.session import get_db
-from app.auth.dependencies import get_current_active_user
-from app.models.user import User
-from app.transactions.schemas import TransactionCreate, TransactionUpdate, TransactionResponse
-from app.transactions.service import (
-    create_transaction, get_transactions, get_transaction_by_id,
-    update_transaction, delete_transaction
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy.orm import Session
+from src.app.auth.dependencies import get_current_active_user
+from src.app.database.session import get_db
+from src.app.models.user import User
+from src.app.transactions.schemas import TransactionCreate, TransactionResponse, TransactionUpdate
+from src.app.transactions.service import (
+    create_transaction,
+    delete_transaction,
+    get_transaction_by_id,
+    get_transactions,
+    update_transaction,
 )
 
 router = APIRouter(prefix="/api/transactions", tags=["Transactions"])
@@ -17,7 +21,7 @@ router = APIRouter(prefix="/api/transactions", tags=["Transactions"])
 async def create_new_transaction(
     transaction_data: TransactionCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user)
+    current_user: User = Depends(get_current_active_user),
 ):
     """Create a new transaction"""
     transaction = create_transaction(db, transaction_data, current_user)
@@ -31,29 +35,23 @@ async def get_all_transactions(
     type: Optional[str] = Query(None, pattern="^(income|expense)$"),
     category: Optional[str] = None,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user)
+    current_user: User = Depends(get_current_active_user),
 ):
     """Get all transactions for the current user"""
     transactions = get_transactions(
-        db, current_user, skip=skip, limit=limit,
-        type_filter=type, category_filter=category
+        db, current_user, skip=skip, limit=limit, type_filter=type, category_filter=category
     )
     return transactions
 
 
 @router.get("/{transaction_id}", response_model=TransactionResponse)
 async def get_transaction(
-    transaction_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user)
+    transaction_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)
 ):
     """Get a specific transaction by ID"""
     transaction = get_transaction_by_id(db, transaction_id, current_user)
     if not transaction:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Transaction not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
     return transaction
 
 
@@ -62,29 +60,21 @@ async def update_existing_transaction(
     transaction_id: int,
     transaction_data: TransactionUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user)
+    current_user: User = Depends(get_current_active_user),
 ):
     """Update a transaction"""
     transaction = update_transaction(db, transaction_id, transaction_data, current_user)
     if not transaction:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Transaction not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
     return transaction
 
 
 @router.delete("/{transaction_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_existing_transaction(
-    transaction_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user)
+    transaction_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)
 ):
     """Delete a transaction"""
     success = delete_transaction(db, transaction_id, current_user)
     if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Transaction not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
     return None

@@ -4,11 +4,11 @@ FastAPI backend for Budget Tracker Lite with JWT authentication.
 
 ## Setup
 
-1. Install dependencies:
+1. Install dependencies (requires Python 3.13 and [uv](https://docs.astral.sh/uv/)):
 ```bash
 cd backend
-pip install poetry
-poetry install
+pip install uv
+uv sync --extra dev
 ```
 
 2. Configure environment:
@@ -19,12 +19,7 @@ cp .env.example .env
 
 3. Run the server:
 ```bash
-poetry run python src/main.py
-```
-
-Or with uvicorn directly:
-```bash
-poetry run uvicorn main:app --reload --app-dir src
+uv run uvicorn src.app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 The API will be available at http://localhost:8000

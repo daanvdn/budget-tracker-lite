@@ -1,7 +1,4 @@
-from datetime import datetime
-from typing import Optional
-
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..models import Transaction, TransactionType
@@ -33,12 +30,13 @@ async def get_aggregation_summary(db: AsyncSession, filters: AggregationFilters)
     # Calculate aggregates
     total_income = sum(float(t.amount) for t in transactions if t.type == TransactionType.INCOME)
     total_expenses = sum(float(t.amount) for t in transactions if t.type == TransactionType.EXPENSE)
-    net_balance = total_income - total_expenses
+    net_total = total_income - total_expenses
     transaction_count = len(transactions)
 
     return AggregationSummary(
         total_income=total_income,
         total_expenses=total_expenses,
-        net_balance=net_balance,
+        net_total=net_total,
+        net_balance=net_total,
         transaction_count=transaction_count,
     )

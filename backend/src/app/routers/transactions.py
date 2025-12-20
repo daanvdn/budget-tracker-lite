@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -55,6 +55,16 @@ async def list_transactions(
     result = await db.execute(query)
     transactions = result.scalars().all()
     return transactions
+
+
+# Accept trailing slash for list endpoint without redirect
+router.add_api_route(
+    "/",
+    list_transactions,
+    methods=["GET"],
+    response_model=List[Transaction],
+    include_in_schema=False,
+)
 
 
 @router.post("", response_model=Transaction, status_code=status.HTTP_201_CREATED)

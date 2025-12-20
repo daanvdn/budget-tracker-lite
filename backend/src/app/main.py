@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from src.app.config.settings import settings
 
-from .config import settings
 from .database import AsyncSessionLocal, init_db
 from .models import (
     Beneficiary,
@@ -29,7 +29,6 @@ async def seed_data():
     from sqlalchemy import select
 
     async with AsyncSessionLocal() as db:
-
         # Check if data already exists
         result = await db.execute(select(User))
         if result.first():
@@ -155,7 +154,7 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

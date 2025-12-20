@@ -60,9 +60,9 @@ budget-tracker-lite/
 ## Getting Started
 
 ### Prerequisites
-- Python 3.11+
+- Python 3.13+
 - Node.js 18+
-- Poetry (for Python dependency management)
+- [uv](https://docs.astral.sh/uv/) for Python dependency management
 - npm (comes with Node.js)
 
 ### Backend Setup
@@ -72,30 +72,26 @@ budget-tracker-lite/
 cd backend
 ```
 
-2. Install Poetry (if not already installed):
+2. Install dependencies:
 ```bash
-curl -sSL https://install.python-poetry.org | python3 -
+pip install uv
+uv sync --extra dev
 ```
 
-3. Install dependencies:
-```bash
-poetry install
-```
-
-4. Create environment configuration:
+3. Create environment configuration:
 ```bash
 cp .env.example .env
 ```
 
-5. Generate a secure SECRET_KEY:
+4. Generate a secure SECRET_KEY:
 ```bash
 openssl rand -hex 32
 ```
 Update the `SECRET_KEY` in `.env` with the generated value.
 
-6. Run the backend server:
+5. Run the backend server:
 ```bash
-poetry run python src/main.py
+uv run uvicorn src.app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 The API will be available at http://localhost:8000
@@ -197,8 +193,7 @@ This project includes comprehensive GitHub Actions workflows for continuous inte
 **Backend:**
 ```bash
 cd backend
-pip install -e ".[dev]"
-pytest -v --cov=src
+uv run pytest -v --cov=src
 ```
 
 **Frontend:**
@@ -211,10 +206,8 @@ npm test -- --browsers=ChromeHeadless --watch=false
 **Linting:**
 ```bash
 cd backend
-pip install flake8 black isort
-flake8 src tests --max-line-length=120
-black --check --line-length=120 src tests
-isort --check-only --profile=black src tests
+uv run ruff format --check src tests
+uv run ruff check src tests
 ```
 
 **Docker Build:**
@@ -243,7 +236,7 @@ The API URL is configured in each service. To change:
 ### Test the Backend
 ```bash
 cd backend
-poetry run pytest
+uv run pytest
 ```
 
 ### Test the Frontend
