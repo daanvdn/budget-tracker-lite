@@ -1,138 +1,151 @@
 import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from fastapi.testclient import TestClient
-from datetime import date
+import pytest_asyncio
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from httpx import AsyncClient, ASGITransport
+from datetime import datetime
 
-from app.database.database import Base, get_db
-from app.models import User, Category, Beneficiary, Transaction
-from app.models.category import CategoryType
-from app.models.transaction import TransactionType
-from main import app
+from src.app.database import Base, get_db
+from src.app.models import User, Category, Beneficiary, Transaction, CategoryType, TransactionType
+from src.app.main import app
 
 
 # Create test database
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
+test_engine = create_async_engine(TEST_DATABASE_URL, echo=False)
+TestingSessionLocal = async_sessionmaker(
+    test_engine,
+    class_=AsyncSession,
+    expire_on_commit=False
+)
 
 
-@pytest.fixture(scope="function")
-def db():
+@pytest_asyncio.fixture(scope="function")
+async def db():
     """Create a fresh database for each test"""
-    Base.metadata.create_all(bind=engine)
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-        Base.metadata.drop_all(bind=engine)
+    async with test_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    
+    async with TestingSessionLocal() as session:
+        yield session
+    
+    async with test_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
 
 
-@pytest.fixture(scope="function")
-def client(db):
+@pytest_asyncio.fixture(scope="function")
+async def client(db):
     """Create a test client with the test database"""
-    def override_get_db():
-        try:
-            yield db
-        finally:
-            pass
+    async def override_get_db():
+        yield db
     
     app.dependency_overrides[get_db] = override_get_db
-    with TestClient(app) as test_client:
+    
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test"
+    ) as test_client:
         yield test_client
+    
     app.dependency_overrides.clear()
 
 
-@pytest.fixture
-def sample_user(db):
+@pytest_asyncio.fixture
+async def sample_user(db):
     """Create a sample user"""
-    user = User(name="Test User", email="test@example.com")
+    user = User(name="Test User")
     db.add(user)
-    db.commit()
-    db.refresh(user)
+    await db.commit()
+    await db.refresh(user)
     return user
 
 
-@pytest.fixture
-def sample_category(db):
+@pytest_asyncio.fixture
+async def sample_category(db):
     """Create a sample category"""
     category = Category(name="Food", type=CategoryType.EXPENSE)
     db.add(category)
-    db.commit()
-    db.refresh(category)
+    await db.commit()
+    await db.refresh(category)
     return category
 
 
-@pytest.fixture
-def sample_beneficiary(db):
+@pytest_asyncio.fixture
+async def sample_beneficiary(db):
     """Create a sample beneficiary"""
     beneficiary = Beneficiary(name="Grocery Store")
     db.add(beneficiary)
-    db.commit()
-    db.refresh(beneficiary)
+    await db.commit()
+    await db.refresh(beneficiary)
     return beneficiary
 
 
-@pytest.fixture
-def sample_transaction(db, sample_user, sample_category, sample_beneficiary):
+@pytest_asyncio.fixture
+async def sample_transaction(db, sample_user, sample_category, sample_beneficiary):
     """Create a sample transaction"""
     transaction = Transaction(
         amount=50.0,
-        date=date(2024, 1, 15),
+        transaction_date=datetime(2024, 1, 15),
         description="Grocery shopping",
         type=TransactionType.EXPENSE,
         category_id=sample_category.id,
         beneficiary_id=sample_beneficiary.id,
-        user_id=sample_user.id
+        created_by_user_id=sample_user.id
     )
     db.add(transaction)
-    db.commit()
-    db.refresh(transaction)
+    await db.commit()
+    await db.refresh(transaction)
     return transaction
 
 
-@pytest.fixture
-def sample_data(db):
+@pytest_asyncio.fixture
+async def sample_data(db):
     """Create a complete dataset for testing"""
     # Create users
-    user1 = User(name="User One", email="user1@example.com")
-    user2 = User(name="User Two", email="user2@example.com")
+    user1 = User(name="User One")
+    user2 = User(name="User Two")
     db.add_all([user1, user2])
-    db.commit()
+    await db.commit()
+    await db.refresh(user1)
+    await db.refresh(user2)
     
     # Create categories
     cat1 = Category(name="Food", type=CategoryType.EXPENSE)
     cat2 = Category(name="Salary", type=CategoryType.INCOME)
     cat3 = Category(name="Transport", type=CategoryType.EXPENSE)
     db.add_all([cat1, cat2, cat3])
-    db.commit()
+    await db.commit()
+    await db.refresh(cat1)
+    await db.refresh(cat2)
+    await db.refresh(cat3)
     
     # Create beneficiaries
     ben1 = Beneficiary(name="Supermarket")
     ben2 = Beneficiary(name="Employer")
     ben3 = Beneficiary(name="Gas Station")
     db.add_all([ben1, ben2, ben3])
-    db.commit()
+    await db.commit()
+    await db.refresh(ben1)
+    await db.refresh(ben2)
+    await db.refresh(ben3)
     
     # Create transactions
     trans1 = Transaction(
-        amount=100.0, date=date(2024, 1, 10), description="Groceries",
+        amount=100.0, transaction_date=datetime(2024, 1, 10), description="Groceries",
         type=TransactionType.EXPENSE, category_id=cat1.id,
-        beneficiary_id=ben1.id, user_id=user1.id
+        beneficiary_id=ben1.id, created_by_user_id=user1.id
     )
     trans2 = Transaction(
-        amount=3000.0, date=date(2024, 1, 31), description="Monthly salary",
+        amount=3000.0, transaction_date=datetime(2024, 1, 31), description="Monthly salary",
         type=TransactionType.INCOME, category_id=cat2.id,
-        beneficiary_id=ben2.id, user_id=user1.id
+        beneficiary_id=ben2.id, created_by_user_id=user1.id
     )
     trans3 = Transaction(
-        amount=50.0, date=date(2024, 2, 5), description="Gas",
+        amount=50.0, transaction_date=datetime(2024, 2, 5), description="Gas",
         type=TransactionType.EXPENSE, category_id=cat3.id,
-        beneficiary_id=ben3.id, user_id=user1.id
+        beneficiary_id=ben3.id, created_by_user_id=user1.id
     )
     db.add_all([trans1, trans2, trans3])
-    db.commit()
+    await db.commit()
     
     return {
         "users": [user1, user2],
