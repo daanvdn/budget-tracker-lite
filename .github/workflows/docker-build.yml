@@ -2,14 +2,12 @@ name: Docker Build
 
 on:
   push:
-    branches: [ main, develop ]
     paths:
       - 'backend/**'
       - 'frontend/**'
       - 'docker-compose.yml'
       - '.github/workflows/docker-build.yml'
   pull_request:
-    branches: [ main, develop ]
     paths:
       - 'backend/**'
       - 'frontend/**'
