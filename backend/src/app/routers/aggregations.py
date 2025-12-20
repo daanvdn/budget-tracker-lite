@@ -9,13 +9,10 @@ router = APIRouter(prefix="/aggregations", tags=["aggregations"])
 
 
 @router.get("/summary", response_model=AggregationSummary)
-async def aggregation_summary(
-    filters: AggregationFilters = Depends(),
-    db: AsyncSession = Depends(get_db)
-):
+async def aggregation_summary(filters: AggregationFilters = Depends(), db: AsyncSession = Depends(get_db)):
     """
     Get aggregation summary with optional filters
-    
+
     Example: "How much did I spend on Child A for gifts in the past month?"
     - Set beneficiary_id to Child A's ID
     - Set category_id to gifts category ID

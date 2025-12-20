@@ -19,7 +19,7 @@ async def test_create_transaction(client, sample_user, sample_category, sample_b
         "type": "expense",
         "category_id": sample_category.id,
         "beneficiary_id": sample_beneficiary.id,
-        "created_by_user_id": sample_user.id
+        "created_by_user_id": sample_user.id,
     }
     response = await client.post("/api/transactions/", json=transaction_data)
     assert response.status_code == 201
@@ -42,10 +42,7 @@ async def test_get_transaction(client, sample_transaction):
 @pytest.mark.asyncio
 async def test_update_transaction(client, sample_transaction):
     """Test updating a transaction"""
-    update_data = {
-        "amount": 75.0,
-        "description": "Updated description"
-    }
+    update_data = {"amount": 75.0, "description": "Updated description"}
     response = await client.put(f"/api/transactions/{sample_transaction.id}", json=update_data)
     assert response.status_code == 200
     data = response.json()
@@ -58,7 +55,7 @@ async def test_delete_transaction(client, sample_transaction):
     """Test deleting a transaction"""
     response = await client.delete(f"/api/transactions/{sample_transaction.id}")
     assert response.status_code == 204
-    
+
     # Verify it's deleted
     response = await client.get(f"/api/transactions/{sample_transaction.id}")
     assert response.status_code == 404

@@ -3,22 +3,15 @@ from sqlalchemy.orm import DeclarativeBase
 from .config import settings
 
 # Create async engine
-engine = create_async_engine(
-    settings.database_url,
-    echo=True,
-    future=True
-)
+engine = create_async_engine(settings.database_url, echo=True, future=True)
 
 # Create async session factory
-AsyncSessionLocal = async_sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False
-)
+AsyncSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 
 class Base(DeclarativeBase):
     """Base class for all models"""
+
     pass
 
 

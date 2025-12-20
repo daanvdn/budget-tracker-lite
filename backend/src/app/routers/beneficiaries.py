@@ -45,10 +45,10 @@ async def update_beneficiary(beneficiary_id: int, beneficiary: BeneficiaryUpdate
     db_beneficiary = result.scalar_one_or_none()
     if not db_beneficiary:
         raise HTTPException(status_code=404, detail="Beneficiary not found")
-    
+
     for key, value in beneficiary.model_dump().items():
         setattr(db_beneficiary, key, value)
-    
+
     await db.commit()
     await db.refresh(db_beneficiary)
     return db_beneficiary
@@ -61,6 +61,6 @@ async def delete_beneficiary(beneficiary_id: int, db: AsyncSession = Depends(get
     db_beneficiary = result.scalar_one_or_none()
     if not db_beneficiary:
         raise HTTPException(status_code=404, detail="Beneficiary not found")
-    
+
     await db.delete(db_beneficiary)
     await db.commit()

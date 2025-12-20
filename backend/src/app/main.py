@@ -12,17 +12,17 @@ from .models import User, Category, Beneficiary, Transaction, CategoryType, Tran
 async def seed_data():
     """Seed initial data if database is empty"""
     from sqlalchemy import select
-    
+
     async with AsyncSessionLocal() as db:
-        
+
         # Check if data already exists
         result = await db.execute(select(User))
         if result.first():
             print("Database already seeded, skipping...")
             return
-        
+
         print("Seeding database with initial data...")
-        
+
         # Create users
         users_data = [
             User(name="Parent 1"),
@@ -30,11 +30,11 @@ async def seed_data():
         ]
         db.add_all(users_data)
         await db.commit()
-        
+
         # Refresh to get IDs
         for user in users_data:
             await db.refresh(user)
-        
+
         # Create categories
         categories_data = [
             Category(name="Groceries", type=CategoryType.EXPENSE),
@@ -50,11 +50,11 @@ async def seed_data():
         ]
         db.add_all(categories_data)
         await db.commit()
-        
+
         # Refresh to get IDs
         for category in categories_data:
             await db.refresh(category)
-        
+
         # Create beneficiaries
         beneficiaries_data = [
             Beneficiary(name="Household"),
@@ -63,11 +63,11 @@ async def seed_data():
         ]
         db.add_all(beneficiaries_data)
         await db.commit()
-        
+
         # Refresh to get IDs
         for beneficiary in beneficiaries_data:
             await db.refresh(beneficiary)
-        
+
         # Create sample transactions
         now = datetime.utcnow()
         transactions_data = [
@@ -110,7 +110,7 @@ async def seed_data():
         ]
         db.add_all(transactions_data)
         await db.commit()
-        
+
         print("Database seeded successfully!")
 
 
@@ -122,9 +122,9 @@ async def lifespan(app: FastAPI):
     await init_db()
     await seed_data()
     print("Application startup complete!")
-    
+
     yield
-    
+
     # Shutdown
     print("Application shutdown")
 
@@ -134,7 +134,7 @@ app = FastAPI(
     title="Budget Tracker Lite API",
     description="Self-hosted budget tracking application for household use",
     version="0.1.0",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # Configure CORS
@@ -158,11 +158,7 @@ app.include_router(images.router, prefix=settings.api_prefix)
 @app.get("/")
 async def root():
     """Root endpoint"""
-    return {
-        "message": "Budget Tracker Lite API",
-        "version": "0.1.0",
-        "docs": "/docs"
-    }
+    return {"message": "Budget Tracker Lite API", "version": "0.1.0", "docs": "/docs"}
 
 
 @app.get("/health")
