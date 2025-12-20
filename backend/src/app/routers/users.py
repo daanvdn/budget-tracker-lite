@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 from typing import List
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..database import get_db
 from ..models import User as UserModel
@@ -45,10 +46,10 @@ async def update_user(user_id: int, user: UserUpdate, db: AsyncSession = Depends
     db_user = result.scalar_one_or_none()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     for key, value in user.model_dump().items():
         setattr(db_user, key, value)
-    
+
     await db.commit()
     await db.refresh(db_user)
     return db_user
@@ -61,6 +62,6 @@ async def delete_user(user_id: int, db: AsyncSession = Depends(get_db)):
     db_user = result.scalar_one_or_none()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     await db.delete(db_user)
     await db.commit()

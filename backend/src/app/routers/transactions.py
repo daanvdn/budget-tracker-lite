@@ -1,13 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
-from typing import List, Optional
 from datetime import datetime
+from typing import List, Optional
+
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from ..database import get_db
 from ..models import Transaction as TransactionModel
-from ..schemas import Transaction, TransactionCreate, TransactionUpdate, TransactionType
+from ..schemas import Transaction, TransactionCreate, TransactionType, TransactionUpdate
 
 router = APIRouter(prefix="/transactions", tags=["transactions"])
 
@@ -22,15 +23,15 @@ async def list_transactions(
     created_by_user_id: Optional[int] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """List transactions with optional filters"""
     query = select(TransactionModel).options(
         selectinload(TransactionModel.category),
         selectinload(TransactionModel.beneficiary),
-        selectinload(TransactionModel.created_by_user)
+        selectinload(TransactionModel.created_by_user),
     )
-    
+
     # Apply filters
     if start_date:
         query = query.where(TransactionModel.transaction_date >= start_date)
@@ -44,13 +45,13 @@ async def list_transactions(
         query = query.where(TransactionModel.beneficiary_id == beneficiary_id)
     if created_by_user_id:
         query = query.where(TransactionModel.created_by_user_id == created_by_user_id)
-    
+
     # Order by transaction date descending
     query = query.order_by(TransactionModel.transaction_date.desc())
-    
+
     # Pagination
     query = query.offset(skip).limit(limit)
-    
+
     result = await db.execute(query)
     transactions = result.scalars().all()
     return transactions
@@ -63,7 +64,7 @@ async def create_transaction(transaction: TransactionCreate, db: AsyncSession = 
     db.add(db_transaction)
     await db.commit()
     await db.refresh(db_transaction)
-    
+
     # Load relationships
     result = await db.execute(
         select(TransactionModel)
@@ -71,7 +72,7 @@ async def create_transaction(transaction: TransactionCreate, db: AsyncSession = 
         .options(
             selectinload(TransactionModel.category),
             selectinload(TransactionModel.beneficiary),
-            selectinload(TransactionModel.created_by_user)
+            selectinload(TransactionModel.created_by_user),
         )
     )
     return result.scalar_one()
@@ -86,7 +87,7 @@ async def get_transaction(transaction_id: int, db: AsyncSession = Depends(get_db
         .options(
             selectinload(TransactionModel.category),
             selectinload(TransactionModel.beneficiary),
-            selectinload(TransactionModel.created_by_user)
+            selectinload(TransactionModel.created_by_user),
         )
     )
     transaction = result.scalar_one_or_none()
@@ -96,24 +97,20 @@ async def get_transaction(transaction_id: int, db: AsyncSession = Depends(get_db
 
 
 @router.put("/{transaction_id}", response_model=Transaction)
-async def update_transaction(
-    transaction_id: int,
-    transaction: TransactionUpdate,
-    db: AsyncSession = Depends(get_db)
-):
+async def update_transaction(transaction_id: int, transaction: TransactionUpdate, db: AsyncSession = Depends(get_db)):
     """Update a transaction"""
     result = await db.execute(select(TransactionModel).where(TransactionModel.id == transaction_id))
     db_transaction = result.scalar_one_or_none()
     if not db_transaction:
         raise HTTPException(status_code=404, detail="Transaction not found")
-    
+
     # Update only provided fields
     for key, value in transaction.model_dump(exclude_unset=True).items():
         setattr(db_transaction, key, value)
-    
+
     await db.commit()
     await db.refresh(db_transaction)
-    
+
     # Load relationships
     result = await db.execute(
         select(TransactionModel)
@@ -121,7 +118,7 @@ async def update_transaction(
         .options(
             selectinload(TransactionModel.category),
             selectinload(TransactionModel.beneficiary),
-            selectinload(TransactionModel.created_by_user)
+            selectinload(TransactionModel.created_by_user),
         )
     )
     return result.scalar_one()
@@ -134,6 +131,6 @@ async def delete_transaction(transaction_id: int, db: AsyncSession = Depends(get
     db_transaction = result.scalar_one_or_none()
     if not db_transaction:
         raise HTTPException(status_code=404, detail="Transaction not found")
-    
+
     await db.delete(db_transaction)
     await db.commit()

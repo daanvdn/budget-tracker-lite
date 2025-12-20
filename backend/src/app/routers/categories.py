@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 from typing import List
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..database import get_db
 from ..models import Category as CategoryModel
@@ -45,10 +46,10 @@ async def update_category(category_id: int, category: CategoryUpdate, db: AsyncS
     db_category = result.scalar_one_or_none()
     if not db_category:
         raise HTTPException(status_code=404, detail="Category not found")
-    
+
     for key, value in category.model_dump().items():
         setattr(db_category, key, value)
-    
+
     await db.commit()
     await db.refresh(db_category)
     return db_category
@@ -61,6 +62,6 @@ async def delete_category(category_id: int, db: AsyncSession = Depends(get_db)):
     db_category = result.scalar_one_or_none()
     if not db_category:
         raise HTTPException(status_code=404, detail="Category not found")
-    
+
     await db.delete(db_category)
     await db.commit()
