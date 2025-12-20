@@ -4,7 +4,7 @@ import pytest
 @pytest.mark.asyncio
 async def test_get_categories_empty(client):
     """Test getting categories when database is empty"""
-    response = await client.get("/api/categories/")
+    response = await client.get("/api/categories")
     assert response.status_code == 200
     assert response.json() == []
 
@@ -13,7 +13,7 @@ async def test_get_categories_empty(client):
 async def test_create_category(client):
     """Test creating a new category"""
     category_data = {"name": "Food", "type": "expense"}
-    response = await client.post("/api/categories/", json=category_data)
+    response = await client.post("/api/categories", json=category_data)
     assert response.status_code == 201
     data = response.json()
     assert data["name"] == "Food"

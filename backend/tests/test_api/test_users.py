@@ -4,7 +4,7 @@ import pytest
 @pytest.mark.asyncio
 async def test_get_users_empty(client):
     """Test getting users when database is empty"""
-    response = await client.get("/api/users/")
+    response = await client.get("/api/users")
     assert response.status_code == 200
     assert response.json() == []
 
@@ -13,7 +13,7 @@ async def test_get_users_empty(client):
 async def test_create_user(client):
     """Test creating a new user"""
     user_data = {"name": "John Doe"}
-    response = await client.post("/api/users/", json=user_data)
+    response = await client.post("/api/users", json=user_data)
     assert response.status_code == 201
     data = response.json()
     assert data["name"] == "John Doe"

@@ -1,13 +1,20 @@
-import pytest
-import pytest_asyncio
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from httpx import AsyncClient, ASGITransport
 from datetime import datetime
 
-from src.app.database import Base, get_db
-from src.app.models import User, Category, Beneficiary, Transaction, CategoryType, TransactionType
-from src.app.main import app
+import pytest
+import pytest_asyncio
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+from src.app.database import Base, get_db
+from src.app.main import app
+from src.app.models import (
+    Beneficiary,
+    Category,
+    CategoryType,
+    Transaction,
+    TransactionType,
+    User,
+)
 
 # Create test database
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"

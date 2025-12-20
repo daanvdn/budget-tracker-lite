@@ -4,7 +4,7 @@ import pytest
 @pytest.mark.asyncio
 async def test_get_transactions_empty(client):
     """Test getting transactions when database is empty"""
-    response = await client.get("/api/transactions/")
+    response = await client.get("/api/transactions")
     assert response.status_code == 200
     assert response.json() == []
 
@@ -21,7 +21,7 @@ async def test_create_transaction(client, sample_user, sample_category, sample_b
         "beneficiary_id": sample_beneficiary.id,
         "created_by_user_id": sample_user.id,
     }
-    response = await client.post("/api/transactions/", json=transaction_data)
+    response = await client.post("/api/transactions", json=transaction_data)
     assert response.status_code == 201
     data = response.json()
     assert data["amount"] == 100.0

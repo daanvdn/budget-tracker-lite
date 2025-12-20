@@ -1,8 +1,11 @@
-from sqlalchemy import String, Integer, Numeric, DateTime, Enum as SQLEnum, ForeignKey, Text
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+import enum
 from datetime import datetime
 from typing import Optional
-import enum
+
+from sqlalchemy import DateTime
+from sqlalchemy import Enum as SQLEnum
+from sqlalchemy import ForeignKey, Integer, Numeric, String, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
 

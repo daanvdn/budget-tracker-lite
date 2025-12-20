@@ -4,7 +4,7 @@ import pytest
 @pytest.mark.asyncio
 async def test_get_beneficiaries_empty(client):
     """Test getting beneficiaries when database is empty"""
-    response = await client.get("/api/beneficiaries/")
+    response = await client.get("/api/beneficiaries")
     assert response.status_code == 200
     assert response.json() == []
 
@@ -13,7 +13,7 @@ async def test_get_beneficiaries_empty(client):
 async def test_create_beneficiary(client):
     """Test creating a new beneficiary"""
     beneficiary_data = {"name": "Grocery Store"}
-    response = await client.post("/api/beneficiaries/", json=beneficiary_data)
+    response = await client.post("/api/beneficiaries", json=beneficiary_data)
     assert response.status_code == 201
     data = response.json()
     assert data["name"] == "Grocery Store"
