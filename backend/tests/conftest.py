@@ -5,7 +5,8 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from app.database import Base, get_db, async_engine as production_engine
+from app.database import Base, get_db
+from app.database import async_engine as production_engine
 from app.main import app
 from app.models import (
     Beneficiary,
@@ -26,6 +27,7 @@ def cleanup_production_engine():
     yield
     # Dispose the production engine to prevent hanging
     import asyncio
+
     try:
         loop = asyncio.get_event_loop()
         if loop.is_running():

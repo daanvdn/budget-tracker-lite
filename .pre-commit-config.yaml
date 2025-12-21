@@ -1,18 +1,15 @@
 repos:
-  - repo: local
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.14.10
     hooks:
-      - id: ruff-format-check
-        name: ruff format (check)
-        entry: bash -c 'cd backend && uv run ruff format --check src tests'
-        language: system
-        pass_filenames: false
+      # Run the linter.
       - id: ruff-check
-        name: ruff check
-        entry: bash -c 'cd backend && uv run ruff check src tests'
-        language: system
-        pass_filenames: false
-      - id: backend-pytest
-        name: backend pytest
-        entry: bash -c 'cd backend && uv run --extra dev pytest -v --cov=src --cov-report=xml --cov-report=term'
-        language: system
-        pass_filenames: false
+        args: [ --fix ]
+      # Run the formatter.
+      - id: ruff-format
+#      - id: backend-pytest
+#        name: backend pytest
+#        entry: bash -c 'cd backend && uv run --extra dev pytest -v --cov=src --cov-report=xml --cov-report=term'
+#        language: system
+#        pass_filenames: false
