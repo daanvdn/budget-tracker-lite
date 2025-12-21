@@ -21,5 +21,5 @@ export const routes: Routes = [
   { path: 'beneficiaries', component: BeneficiariesComponent, canActivate: [AuthGuard] },
   { path: 'reports', component: ReportsComponent, canActivate: [AuthGuard] },
   { path: 'users', component: UsersComponent, canActivate: [AuthGuard] },
-  { path: '**', redirectTo: 'transactions' }
+  { path: '**', redirectTo: 'transactions', pathMatch: 'full' }
 ];

@@ -104,7 +104,7 @@ export class AppComponent {
     private router: Router
   ) {}
 
-  isAuthenticated$ = this.authService.currentUser$.pipe(
+  readonly isAuthenticated$ = this.authService.currentUser$.pipe(
     map(user => !!user)
   );
 
