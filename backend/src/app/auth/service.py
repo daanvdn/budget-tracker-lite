@@ -3,7 +3,8 @@ import secrets
 from datetime import datetime, timedelta
 from typing import Optional
 
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.schemas import Token, UserLogin, UserRegister
 from app.auth.security import create_access_token, get_password_hash, verify_password
@@ -26,10 +27,11 @@ def validate_password_strength(password: str) -> tuple[bool, str]:
     return True, "Password is valid"
 
 
-def register_user(db: Session, user_data: UserRegister) -> User:
+async def register_user(db: AsyncSession, user_data: UserRegister) -> User:
     """Register a new user"""
     # Check if user already exists
-    existing_user = db.query(User).filter(User.email == user_data.email).first()
+    result = await db.execute(select(User).filter(User.email == user_data.email))
+    existing_user = result.scalar_one_or_none()
     if existing_user:
         raise ValueError("Email already registered")
 
@@ -49,15 +51,16 @@ def register_user(db: Session, user_data: UserRegister) -> User:
     )
 
     db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+    await db.commit()
+    await db.refresh(new_user)
 
     return new_user
 
 
-def authenticate_user(db: Session, login_data: UserLogin) -> Optional[User]:
+async def authenticate_user(db: AsyncSession, login_data: UserLogin) -> Optional[User]:
     """Authenticate a user with email and password"""
-    user = db.query(User).filter(User.email == login_data.email).first()
+    result = await db.execute(select(User).filter(User.email == login_data.email))
+    user = result.scalar_one_or_none()
     if not user:
         return None
 
@@ -74,9 +77,10 @@ def create_user_token(user: User) -> Token:
     return Token(access_token=access_token, token_type="bearer")
 
 
-def create_password_reset_token(db: Session, email: str) -> Optional[PasswordResetToken]:
+async def create_password_reset_token(db: AsyncSession, email: str) -> Optional[PasswordResetToken]:
     """Create a password reset token for a user"""
-    user = db.query(User).filter(User.email == email).first()
+    result = await db.execute(select(User).filter(User.email == email))
+    user = result.scalar_one_or_none()
     if not user:
         return None
 
@@ -92,16 +96,17 @@ def create_password_reset_token(db: Session, email: str) -> Optional[PasswordRes
     )
 
     db.add(reset_token)
-    db.commit()
-    db.refresh(reset_token)
+    await db.commit()
+    await db.refresh(reset_token)
 
     return reset_token
 
 
-def reset_password_with_token(db: Session, token: str, new_password: str) -> bool:
+async def reset_password_with_token(db: AsyncSession, token: str, new_password: str) -> bool:
     """Reset user password using a reset token"""
     # Find the reset token
-    reset_token = db.query(PasswordResetToken).filter(PasswordResetToken.token == token).first()
+    result = await db.execute(select(PasswordResetToken).filter(PasswordResetToken.token == token))
+    reset_token = result.scalar_one_or_none()
 
     if not reset_token:
         raise ValueError("Invalid reset token")
@@ -120,7 +125,8 @@ def reset_password_with_token(db: Session, token: str, new_password: str) -> boo
         raise ValueError(message)
 
     # Get the user
-    user = db.query(User).filter(User.id == reset_token.user_id).first()
+    user_result = await db.execute(select(User).filter(User.id == reset_token.user_id))
+    user = user_result.scalar_one_or_none()
     if not user:
         raise ValueError("User not found")
 
@@ -130,6 +136,6 @@ def reset_password_with_token(db: Session, token: str, new_password: str) -> boo
     # Mark token as used
     reset_token.used = True
 
-    db.commit()
+    await db.commit()
 
     return True

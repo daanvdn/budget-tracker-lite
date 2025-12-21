@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_active_user
 from app.auth.schemas import (
@@ -26,19 +26,19 @@ router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-async def register(user_data: UserRegister, db: Session = Depends(get_db)):
+async def register(user_data: UserRegister, db: AsyncSession = Depends(get_db)):
     """Register a new user"""
     try:
-        user = register_user(db, user_data)
+        user = await register_user(db, user_data)
         return user
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 @router.post("/login", response_model=Token)
-async def login(login_data: UserLogin, db: Session = Depends(get_db)):
+async def login(login_data: UserLogin, db: AsyncSession = Depends(get_db)):
     """Login user and return JWT token"""
-    user = authenticate_user(db, login_data)
+    user = await authenticate_user(db, login_data)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -60,9 +60,9 @@ async def get_current_user_info(current_user: User = Depends(get_current_active_
 
 
 @router.post("/forgot-password", response_model=ForgotPasswordResponse)
-async def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db)):
+async def forgot_password(request: ForgotPasswordRequest, db: AsyncSession = Depends(get_db)):
     """Request password reset token"""
-    reset_token = create_password_reset_token(db, request.email)
+    reset_token = await create_password_reset_token(db, request.email)
 
     if not reset_token:
         # Don't reveal if email exists or not for security
@@ -76,10 +76,10 @@ async def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(
 
 
 @router.post("/reset-password", response_model=ResetPasswordResponse)
-async def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db)):
+async def reset_password(request: ResetPasswordRequest, db: AsyncSession = Depends(get_db)):
     """Reset password using reset token"""
     try:
-        reset_password_with_token(db, request.token, request.new_password)
+        await reset_password_with_token(db, request.token, request.new_password)
         return ResetPasswordResponse(message="Password has been reset successfully")
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -6,11 +8,22 @@ from app.config.settings import settings
 from app.database.session import init_db
 from app.transactions.router import router as transactions_router
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan context manager for startup and shutdown events"""
+    # Startup: Initialize database tables
+    await init_db()
+    yield
+    # Shutdown: Add cleanup code here if needed
+
+
 # Initialize FastAPI app
 app = FastAPI(
     title="Budget Tracker Lite API",
     description="A simple budget tracking application with authentication",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 # Configure CORS
@@ -21,13 +34,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-# Initialize database on startup
-@app.on_event("startup")
-async def startup_event():
-    """Initialize database tables on startup"""
-    await init_db()
 
 
 # Include routers
