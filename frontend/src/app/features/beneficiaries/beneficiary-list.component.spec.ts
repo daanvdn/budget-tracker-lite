@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { of } from 'rxjs';
 import { BeneficiaryListComponent } from './beneficiary-list.component';
 import { BeneficiaryService } from '../../core/services/beneficiary.service';
-import { Beneficiary } from '../../core/models';
+import { Beneficiary } from '../../shared/models/models';
 
 describe('BeneficiaryListComponent', () => {
   let component: BeneficiaryListComponent;
@@ -20,8 +20,7 @@ describe('BeneficiaryListComponent', () => {
     mockBeneficiaryService.getBeneficiaries.and.returnValue(of(mockBeneficiaries));
 
     await TestBed.configureTestingModule({
-      declarations: [ BeneficiaryListComponent ],
-      imports: [ CommonModule ],
+      imports: [ BeneficiaryListComponent, CommonModule ],
       providers: [
         { provide: BeneficiaryService, useValue: mockBeneficiaryService }
       ]

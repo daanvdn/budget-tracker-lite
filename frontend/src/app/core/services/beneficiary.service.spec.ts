@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { BeneficiaryService } from './beneficiary.service';
-import { Beneficiary } from '../models';
+import { Beneficiary } from '../../shared/models/models';
 
 describe('BeneficiaryService', () => {
   let service: BeneficiaryService;
   let httpMock: HttpTestingController;
-  const apiUrl = 'http://localhost:8000/beneficiaries';
+  const apiUrl = 'http://localhost:8000/api/beneficiaries';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -54,36 +54,36 @@ describe('BeneficiaryService', () => {
   });
 
   it('should create a beneficiary', () => {
-    const newBeneficiary: Beneficiary = { name: 'Gas Station' };
-    const mockResponse: Beneficiary = { ...newBeneficiary, id: 3 };
+    const newName = 'Gas Station';
+    const mockResponse: Beneficiary = { id: 3, name: 'Gas Station' };
 
-    service.createBeneficiary(newBeneficiary).subscribe(beneficiary => {
+    service.createBeneficiary(newName).subscribe(beneficiary => {
       expect(beneficiary).toEqual(mockResponse);
     });
 
     const req = httpMock.expectOne(apiUrl);
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual(newBeneficiary);
+    expect(req.request.body).toEqual({ name: newName });
     req.flush(mockResponse);
   });
 
   it('should update a beneficiary', () => {
-    const update = { name: 'Updated Store' };
+    const updateName = 'Updated Store';
     const mockResponse: Beneficiary = { id: 1, name: 'Updated Store' };
 
-    service.updateBeneficiary(1, update).subscribe(beneficiary => {
+    service.updateBeneficiary(1, updateName).subscribe(beneficiary => {
       expect(beneficiary).toEqual(mockResponse);
     });
 
     const req = httpMock.expectOne(`${apiUrl}/1`);
     expect(req.request.method).toBe('PUT');
-    expect(req.request.body).toEqual(update);
+    expect(req.request.body).toEqual({ name: updateName });
     req.flush(mockResponse);
   });
 
   it('should delete a beneficiary', () => {
     service.deleteBeneficiary(1).subscribe(response => {
-      expect(response).toBeUndefined();
+      expect(response).toBeNull();
     });
 
     const req = httpMock.expectOne(`${apiUrl}/1`);

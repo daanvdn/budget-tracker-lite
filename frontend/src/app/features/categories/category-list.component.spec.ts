@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { of } from 'rxjs';
 import { CategoryListComponent } from './category-list.component';
 import { CategoryService } from '../../core/services/category.service';
-import { Category } from '../../core/models';
+import { Category, CategoryType } from '../../shared/models/models';
 
 describe('CategoryListComponent', () => {
   let component: CategoryListComponent;
@@ -11,8 +11,8 @@ describe('CategoryListComponent', () => {
   let mockCategoryService: jasmine.SpyObj<CategoryService>;
 
   const mockCategories: Category[] = [
-    { id: 1, name: 'Food', type: 'expense' },
-    { id: 2, name: 'Salary', type: 'income' }
+    { id: 1, name: 'Food', type: CategoryType.EXPENSE },
+    { id: 2, name: 'Salary', type: CategoryType.INCOME }
   ];
 
   beforeEach(async () => {
@@ -20,8 +20,7 @@ describe('CategoryListComponent', () => {
     mockCategoryService.getCategories.and.returnValue(of(mockCategories));
 
     await TestBed.configureTestingModule({
-      declarations: [ CategoryListComponent ],
-      imports: [ CommonModule ],
+      imports: [ CategoryListComponent, CommonModule ],
       providers: [
         { provide: CategoryService, useValue: mockCategoryService }
       ]

@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TransactionService } from '../../core/services/transaction.service';
-import { Transaction } from '../../core/models';
+import { TransactionService, Transaction } from '../../core/services/transaction.service';
 
 @Component({
   selector: 'app-transaction-list',

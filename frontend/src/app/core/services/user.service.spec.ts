@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { UserService } from './user.service';
-import { User } from '../models';
+import { User } from '../../shared/models/models';
 
 describe('UserService', () => {
   let service: UserService;
   let httpMock: HttpTestingController;
-  const apiUrl = 'http://localhost:8000/users';
+  const apiUrl = 'http://localhost:8000/api/users';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -27,8 +27,8 @@ describe('UserService', () => {
 
   it('should get all users', () => {
     const mockUsers: User[] = [
-      { id: 1, name: 'John Doe', email: 'john@example.com' },
-      { id: 2, name: 'Jane Smith', email: 'jane@example.com' }
+      { id: 1, name: 'John Doe', created_at: '2024-01-01T00:00:00Z' },
+      { id: 2, name: 'Jane Smith', created_at: '2024-01-02T00:00:00Z' }
     ];
 
     service.getUsers().subscribe(users => {
@@ -42,7 +42,7 @@ describe('UserService', () => {
   });
 
   it('should get a single user', () => {
-    const mockUser: User = { id: 1, name: 'John Doe', email: 'john@example.com' };
+    const mockUser: User = { id: 1, name: 'John Doe', created_at: '2024-01-01T00:00:00Z' };
 
     service.getUser(1).subscribe(user => {
       expect(user).toEqual(mockUser);
@@ -54,36 +54,36 @@ describe('UserService', () => {
   });
 
   it('should create a user', () => {
-    const newUser: User = { name: 'Bob Wilson', email: 'bob@example.com' };
-    const mockResponse: User = { ...newUser, id: 3 };
+    const newName = 'Bob Wilson';
+    const mockResponse: User = { id: 3, name: newName, created_at: '2024-01-03T00:00:00Z' };
 
-    service.createUser(newUser).subscribe(user => {
+    service.createUser(newName).subscribe(user => {
       expect(user).toEqual(mockResponse);
     });
 
     const req = httpMock.expectOne(apiUrl);
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual(newUser);
+    expect(req.request.body).toEqual({ name: newName });
     req.flush(mockResponse);
   });
 
   it('should update a user', () => {
-    const update = { name: 'Updated Name' };
-    const mockResponse: User = { id: 1, name: 'Updated Name', email: 'john@example.com' };
+    const updateName = 'Updated Name';
+    const mockResponse: User = { id: 1, name: 'Updated Name', created_at: '2024-01-01T00:00:00Z' };
 
-    service.updateUser(1, update).subscribe(user => {
+    service.updateUser(1, updateName).subscribe(user => {
       expect(user).toEqual(mockResponse);
     });
 
     const req = httpMock.expectOne(`${apiUrl}/1`);
     expect(req.request.method).toBe('PUT');
-    expect(req.request.body).toEqual(update);
+    expect(req.request.body).toEqual({ name: updateName });
     req.flush(mockResponse);
   });
 
   it('should delete a user', () => {
     service.deleteUser(1).subscribe(response => {
-      expect(response).toBeUndefined();
+      expect(response).toBeNull();
     });
 
     const req = httpMock.expectOne(`${apiUrl}/1`);

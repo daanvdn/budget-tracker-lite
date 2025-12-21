@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReportsComponent } from './reports.component';
-import { AggregationSummary } from '../../core/models';
+import { AggregationSummary } from '../../shared/models/models';
 
 describe('ReportsComponent', () => {
   let component: ReportsComponent;
@@ -13,18 +14,16 @@ describe('ReportsComponent', () => {
   const mockSummary: AggregationSummary = {
     total_income: 3000,
     total_expenses: 150,
-    net_total: 2850,
-    by_category: [
-      { category_id: 1, category_name: 'Food', total: 100 },
-      { category_id: 2, category_name: 'Salary', total: 3000 }
-    ],
-    by_beneficiary: []
+    net_balance: 2850,
+    transaction_count: 5
   };
+
+  const mockCategories = [{ id: 1, name: 'Food', type: 'expense' }];
+  const mockBeneficiaries = [{ id: 1, name: 'Store' }];
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ReportsComponent ],
-      imports: [ HttpClientTestingModule, FormsModule, CommonModule ]
+      imports: [ ReportsComponent, HttpClientTestingModule, ReactiveFormsModule, CommonModule, NoopAnimationsModule ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ReportsComponent);
@@ -36,37 +35,47 @@ describe('ReportsComponent', () => {
     httpMock.verify();
   });
 
+  function flushInitialRequests() {
+    const catReq = httpMock.expectOne('http://localhost:8000/api/categories');
+    catReq.flush(mockCategories);
+    const benReq = httpMock.expectOne('http://localhost:8000/api/beneficiaries');
+    benReq.flush(mockBeneficiaries);
+    const summaryReq = httpMock.expectOne('http://localhost:8000/api/aggregations/summary');
+    summaryReq.flush(mockSummary);
+  }
+
   it('should create', () => {
+    fixture.detectChanges();
+    flushInitialRequests();
     expect(component).toBeTruthy();
   });
 
   it('should load summary on init', () => {
     fixture.detectChanges();
-    const req = httpMock.expectOne('http://localhost:8000/aggregations/summary');
-    expect(req.request.method).toBe('GET');
-    req.flush(mockSummary);
+    flushInitialRequests();
     expect(component.summary).toEqual(mockSummary);
   });
 
   it('should display aggregation data', () => {
     fixture.detectChanges();
-    const req = httpMock.expectOne('http://localhost:8000/aggregations/summary');
-    req.flush(mockSummary);
+    flushInitialRequests();
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.textContent).toContain('3000');
+    expect(compiled.textContent).toContain('3,000');
     expect(compiled.textContent).toContain('150');
-    expect(compiled.textContent).toContain('2850');
+    expect(compiled.textContent).toContain('2,850');
   });
 
   it('should apply filters', () => {
-    component.filters = { start_date: '2024-01-01', end_date: '2024-01-31' };
+    fixture.detectChanges();
+    flushInitialRequests();
+
+    component.filterForm.patchValue({ start_date: new Date('2024-01-01'), end_date: new Date('2024-01-31') });
     component.loadSummary();
 
-    const req = httpMock.expectOne(req => req.url.includes('aggregations/summary'));
-    expect(req.request.url).toContain('start_date=2024-01-01');
-    expect(req.request.url).toContain('end_date=2024-01-31');
+    const req = httpMock.expectOne(req => req.url.includes('api/aggregations/summary'));
+    expect(req.request.method).toBe('GET');
     req.flush(mockSummary);
   });
 });

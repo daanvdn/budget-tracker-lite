@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CategoryService } from '../../core/services/category.service';
-import { Category } from '../../core/models';
+import { Category } from '../../shared/models/models';
 
 @Component({
   selector: 'app-category-list',

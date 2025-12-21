@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BeneficiaryService } from '../../core/services/beneficiary.service';
-import { Beneficiary } from '../../core/models';
+import { Beneficiary } from '../../shared/models/models';
 
 @Component({
   selector: 'app-beneficiary-list',

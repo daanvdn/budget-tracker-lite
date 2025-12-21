@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { CategoryService } from './category.service';
-import { Category } from '../models';
+import { Category, CategoryType } from '../../shared/models/models';
 
 describe('CategoryService', () => {
   let service: CategoryService;
   let httpMock: HttpTestingController;
-  const apiUrl = 'http://localhost:8000/categories';
+  const apiUrl = 'http://localhost:8000/api/categories';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -27,8 +27,8 @@ describe('CategoryService', () => {
 
   it('should get all categories', () => {
     const mockCategories: Category[] = [
-      { id: 1, name: 'Food', type: 'expense' },
-      { id: 2, name: 'Salary', type: 'income' }
+      { id: 1, name: 'Food', type: CategoryType.EXPENSE },
+      { id: 2, name: 'Salary', type: CategoryType.INCOME }
     ];
 
     service.getCategories().subscribe(categories => {
@@ -42,7 +42,7 @@ describe('CategoryService', () => {
   });
 
   it('should get a single category', () => {
-    const mockCategory: Category = { id: 1, name: 'Food', type: 'expense' };
+    const mockCategory: Category = { id: 1, name: 'Food', type: CategoryType.EXPENSE };
 
     service.getCategory(1).subscribe(category => {
       expect(category).toEqual(mockCategory);
@@ -54,36 +54,38 @@ describe('CategoryService', () => {
   });
 
   it('should create a category', () => {
-    const newCategory: Category = { name: 'Transport', type: 'expense' };
-    const mockResponse: Category = { ...newCategory, id: 3 };
+    const newName = 'Transport';
+    const newType = CategoryType.EXPENSE;
+    const mockResponse: Category = { id: 3, name: newName, type: newType };
 
-    service.createCategory(newCategory).subscribe(category => {
+    service.createCategory(newName, newType).subscribe(category => {
       expect(category).toEqual(mockResponse);
     });
 
     const req = httpMock.expectOne(apiUrl);
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual(newCategory);
+    expect(req.request.body).toEqual({ name: newName, type: newType });
     req.flush(mockResponse);
   });
 
   it('should update a category', () => {
-    const update = { name: 'Updated Food' };
-    const mockResponse: Category = { id: 1, name: 'Updated Food', type: 'expense' };
+    const updateName = 'Updated Food';
+    const updateType = CategoryType.EXPENSE;
+    const mockResponse: Category = { id: 1, name: 'Updated Food', type: CategoryType.EXPENSE };
 
-    service.updateCategory(1, update).subscribe(category => {
+    service.updateCategory(1, updateName, updateType).subscribe(category => {
       expect(category).toEqual(mockResponse);
     });
 
     const req = httpMock.expectOne(`${apiUrl}/1`);
     expect(req.request.method).toBe('PUT');
-    expect(req.request.body).toEqual(update);
+    expect(req.request.body).toEqual({ name: updateName, type: updateType });
     req.flush(mockResponse);
   });
 
   it('should delete a category', () => {
     service.deleteCategory(1).subscribe(response => {
-      expect(response).toBeUndefined();
+      expect(response).toBeNull();
     });
 
     const req = httpMock.expectOne(`${apiUrl}/1`);

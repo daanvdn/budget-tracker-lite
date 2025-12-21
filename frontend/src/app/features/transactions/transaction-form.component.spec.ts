@@ -12,12 +12,11 @@ describe('TransactionFormComponent', () => {
 
   beforeEach(async () => {
     mockTransactionService = jasmine.createSpyObj('TransactionService', ['createTransaction', 'updateTransaction']);
-    mockTransactionService.createTransaction.and.returnValue(of({} as Transaction));
-    mockTransactionService.updateTransaction.and.returnValue(of({} as Transaction));
+    mockTransactionService.createTransaction.and.returnValue(of({} as any));
+    mockTransactionService.updateTransaction.and.returnValue(of({} as any));
 
     await TestBed.configureTestingModule({
-      declarations: [ TransactionFormComponent ],
-      imports: [ ReactiveFormsModule ],
+      imports: [ TransactionFormComponent, ReactiveFormsModule ],
       providers: [
         { provide: TransactionService, useValue: mockTransactionService }
       ]

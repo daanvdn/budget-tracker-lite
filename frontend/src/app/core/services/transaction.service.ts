@@ -73,4 +73,10 @@ export class TransactionService {
   deleteTransaction(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  uploadImage(transactionId: number, file: File): Observable<{ message: string; path: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<{ message: string; path: string }>(`${this.apiUrl}/${transactionId}/upload-image`, formData);
+  }
 }

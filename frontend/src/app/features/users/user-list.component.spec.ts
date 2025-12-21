@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { of } from 'rxjs';
 import { UserListComponent } from './user-list.component';
 import { UserService } from '../../core/services/user.service';
-import { User } from '../../core/models';
+import { User } from '../../shared/models/models';
 
 describe('UserListComponent', () => {
   let component: UserListComponent;
@@ -11,8 +11,8 @@ describe('UserListComponent', () => {
   let mockUserService: jasmine.SpyObj<UserService>;
 
   const mockUsers: User[] = [
-    { id: 1, name: 'John Doe', email: 'john@example.com' },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com' }
+    { id: 1, name: 'John Doe', created_at: '2024-01-01T00:00:00Z' },
+    { id: 2, name: 'Jane Smith', created_at: '2024-01-02T00:00:00Z' }
   ];
 
   beforeEach(async () => {
@@ -20,8 +20,7 @@ describe('UserListComponent', () => {
     mockUserService.getUsers.and.returnValue(of(mockUsers));
 
     await TestBed.configureTestingModule({
-      declarations: [ UserListComponent ],
-      imports: [ CommonModule ],
+      imports: [ UserListComponent, CommonModule ],
       providers: [
         { provide: UserService, useValue: mockUserService }
       ]
