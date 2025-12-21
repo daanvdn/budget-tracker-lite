@@ -15,17 +15,11 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
-  { 
-    path: '', 
-    canActivate: [AuthGuard],
-    children: [
-      { path: '', redirectTo: 'transactions', pathMatch: 'full' },
-      { path: 'transactions', component: TransactionsComponent },
-      { path: 'categories', component: CategoriesComponent },
-      { path: 'beneficiaries', component: BeneficiariesComponent },
-      { path: 'reports', component: ReportsComponent },
-      { path: 'users', component: UsersComponent }
-    ]
-  },
-  { path: '**', redirectTo: '' }
+  { path: '', redirectTo: 'transactions', pathMatch: 'full' },
+  { path: 'transactions', component: TransactionsComponent, canActivate: [AuthGuard] },
+  { path: 'categories', component: CategoriesComponent, canActivate: [AuthGuard] },
+  { path: 'beneficiaries', component: BeneficiariesComponent, canActivate: [AuthGuard] },
+  { path: 'reports', component: ReportsComponent, canActivate: [AuthGuard] },
+  { path: 'users', component: UsersComponent, canActivate: [AuthGuard] },
+  { path: '**', redirectTo: 'transactions' }
 ];
