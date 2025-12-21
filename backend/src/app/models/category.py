@@ -1,7 +1,8 @@
 from sqlalchemy import Column, Enum, Integer, String
 from sqlalchemy.orm import relationship
-from src.app.database.session import Base
-from src.app.schemas import CategoryType
+
+from app.database.session import Base
+from app.schemas import CategoryType
 
 
 class Category(Base):

@@ -2,7 +2,8 @@ from datetime import datetime
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.orm import relationship
-from src.app.database.session import Base
+
+from app.database.session import Base
 
 
 class User(Base):

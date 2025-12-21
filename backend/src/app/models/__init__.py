@@ -1,4 +1,4 @@
-from src.app.schemas import CategoryType, TransactionType
+from app.schemas import CategoryType, TransactionType
 
 from .beneficiary import Beneficiary
 from .category import Category

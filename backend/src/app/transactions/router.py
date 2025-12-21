@@ -2,11 +2,16 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
-from src.app.auth.dependencies import get_current_active_user
-from src.app.database.session import get_db
-from src.app.models.user import User
-from src.app.transactions.schemas import TransactionCreate, TransactionResponse, TransactionUpdate
-from src.app.transactions.service import (
+
+from app.auth.dependencies import get_current_active_user
+from app.database.session import get_db
+from app.models.user import User
+from app.transactions.schemas import (
+    TransactionCreate,
+    TransactionResponse,
+    TransactionUpdate,
+)
+from app.transactions.service import (
     create_transaction,
     delete_transaction,
     get_transaction_by_id,

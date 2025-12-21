@@ -3,7 +3,8 @@ from datetime import datetime, timedelta
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from src.app.config.settings import settings
+
+from app.config.settings import settings
 
 from .database import AsyncSessionLocal, init_db
 from .models import (

@@ -2,9 +2,10 @@ from datetime import datetime
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
-from src.app.models.transaction import Transaction
-from src.app.models.user import User
-from src.app.transactions.schemas import TransactionCreate, TransactionUpdate
+
+from app.models.transaction import Transaction
+from app.models.user import User
+from app.transactions.schemas import TransactionCreate, TransactionUpdate
 
 
 def create_transaction(db: Session, transaction_data: TransactionCreate, user: User) -> Transaction:

@@ -4,11 +4,12 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from sqlalchemy.orm import Session
-from src.app.auth.schemas import Token, UserLogin, UserRegister
-from src.app.auth.security import create_access_token, get_password_hash, verify_password
-from src.app.config.settings import settings
-from src.app.models.password_reset_token import PasswordResetToken
-from src.app.models.user import User
+
+from app.auth.schemas import Token, UserLogin, UserRegister
+from app.auth.security import create_access_token, get_password_hash, verify_password
+from app.config.settings import settings
+from app.models.password_reset_token import PasswordResetToken
+from app.models.user import User
 
 
 def validate_password_strength(password: str) -> tuple[bool, str]:
