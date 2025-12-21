@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from './core/services/auth.service';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,7 @@ import { AuthService } from './core/services/auth.service';
     <div class="app-shell">
       <header class="app-header">
         <div class="brand">Budget Tracker Lite</div>
-        <ng-container *ngIf="isAuthenticated(); else authLinks">
+        <ng-container *ngIf="isAuthenticated$ | async; else authLinks">
           <div class="nav-actions">
             <nav class="nav-links">
               <a routerLink="/transactions" routerLinkActive="active">Transactions</a>
@@ -103,9 +104,9 @@ export class AppComponent {
     private router: Router
   ) {}
 
-  isAuthenticated(): boolean {
-    return this.authService.isAuthenticated();
-  }
+  isAuthenticated$ = this.authService.currentUser$.pipe(
+    map(() => this.authService.isAuthenticated())
+  );
 
   logout(): void {
     this.authService.logout();
