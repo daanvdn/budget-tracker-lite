@@ -1,12 +1,13 @@
+from app.database.database import Base, engine
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.database.database import Base, engine
+
 from app.routers import (
-    users_router,
-    categories_router,
-    beneficiaries_router,
-    transactions_router,
     aggregations_router,
+    beneficiaries_router,
+    categories_router,
+    transactions_router,
+    users_router,
 )
 
 # Create database tables

@@ -164,5 +164,6 @@ class AggregationSummary(BaseModel):
 
     total_income: float = 0.0
     total_expenses: float = 0.0
+    net_total: float = 0.0
     net_balance: float = 0.0
     transaction_count: int = 0

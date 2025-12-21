@@ -20,30 +20,23 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - name: Set up Python and uv
+      uses: astral-sh/setup-uv@v3
       with:
-        python-version: '3.11'
+        python-version: '3.13'
+        cache: true
         
-    - name: Install linting tools
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 black isort
-        
-    - name: Run flake8
+    - name: Install dependencies
       working-directory: ./backend
       run: |
-        # Stop the build if there are Python syntax errors or undefined names
-        flake8 src tests --count --select=E9,F63,F7,F82 --show-source --statistics
-        # Exit-zero treats all errors as warnings. Line length set to 120.
-        flake8 src tests --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
+        uv sync --frozen --python 3.13 --extra dev
         
-    - name: Check code formatting with black
+    - name: Check formatting with Ruff
       working-directory: ./backend
       run: |
-        black --check --line-length=120 src tests
+        uv run ruff format --check src tests
         
-    - name: Check import sorting with isort
+    - name: Lint with Ruff
       working-directory: ./backend
       run: |
-        isort --check-only --profile=black src tests
+        uv run ruff check src tests

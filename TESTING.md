@@ -8,13 +8,13 @@ The backend has been fully implemented and tested. All endpoints are working cor
 1. Install dependencies:
 ```bash
 cd backend
-pip install poetry
-poetry install
+pip install uv
+uv sync --extra dev
 ```
 
 2. Start the backend server:
 ```bash
-poetry run python src/main.py
+uv run uvicorn src.app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 The API will be available at http://localhost:8000
@@ -219,7 +219,7 @@ SELECT * FROM password_reset_tokens;
 
 ## Known Issues and Notes
 
-1. **bcrypt Version**: The project uses bcrypt 4.0.1 for compatibility with passlib. Newer versions have API changes.
+1. **bcrypt Version**: bcrypt is pinned via `uv.lock` for Python 3.13 compatibility alongside passlib.
 
 2. **Email**: Password reset tokens are displayed directly instead of being emailed (suitable for LAN use). To add email support, integrate an SMTP service in `auth/service.py`.
 

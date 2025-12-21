@@ -2,7 +2,7 @@
 name = "budget-tracker-backend"
 version = "0.1.0"
 description = "Budget Tracker Lite - Backend API with Authentication"
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.109.0",
     "uvicorn[standard]>=0.27.0",
@@ -14,7 +14,7 @@ dependencies = [
     "pydantic-settings>=2.1.0",
     "python-dateutil>=2.8.2",
     "passlib[bcrypt]>=1.7.4",
-    "bcrypt==4.0.1",
+    "bcrypt>=4.2.0",
     "python-jose[cryptography]>=3.3.0",
     "email-validator>=2.1.0",
 ]
@@ -24,6 +24,8 @@ dev = [
     "pytest>=7.4.4",
     "pytest-asyncio>=0.23.3",
     "httpx>=0.26.0",
+    "ruff>=0.7.0",
+    "pytest-cov>=4.1.0",
 ]
 
 [build-system]
@@ -36,3 +38,15 @@ packages = ["src/app"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

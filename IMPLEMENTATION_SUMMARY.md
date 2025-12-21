@@ -14,11 +14,12 @@ A fully functional REST API with:
 - **API Documentation**: Auto-generated Swagger UI and ReDoc
 
 **Technology Stack:**
-- FastAPI 0.104.1
-- SQLAlchemy 2.0.23
-- Passlib with bcrypt 4.0.1
+- FastAPI 0.126.0
+- SQLAlchemy 2.0.45
+- Passlib with bcrypt 5.x
 - Python-JOSE for JWT
 - Pydantic for validation
+- Python 3.13 managed with uv
 
 ### Frontend (Angular)
 A modern single-page application with:
@@ -61,7 +62,7 @@ budget-tracker-lite/
 │   │   │       └── settings.py
 │   │   └── main.py                # Application entry
 │   ├── pyproject.toml             # Dependencies
-│   ├── poetry.lock                # Lock file
+│   ├── uv.lock                    # Lock file
 │   └── .env.example               # Config template
 │
 ├── frontend/
