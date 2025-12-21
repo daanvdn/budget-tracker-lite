@@ -105,7 +105,7 @@ export class AppComponent {
   ) {}
 
   isAuthenticated$ = this.authService.currentUser$.pipe(
-    map(() => this.authService.isAuthenticated())
+    map(user => !!user)
   );
 
   logout(): void {
