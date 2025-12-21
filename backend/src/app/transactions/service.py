@@ -59,9 +59,7 @@ def _to_response(transaction: Transaction, category_name: str, user_id: int) -> 
     )
 
 
-async def create_transaction(
-    db: AsyncSession, transaction_data: TransactionCreate, user: User
-) -> TransactionResponse:
+async def create_transaction(db: AsyncSession, transaction_data: TransactionCreate, user: User) -> TransactionResponse:
     """Create a new transaction for a user"""
     transaction_type = TransactionType(transaction_data.type)
     category = await _get_or_create_category(db, transaction_data.category, transaction_type)
@@ -114,9 +112,7 @@ async def get_transactions(
     return [_to_response(transaction, category_name, user.id) for transaction, category_name in rows]
 
 
-async def get_transaction_by_id(
-    db: AsyncSession, transaction_id: int, user: User
-) -> Optional[TransactionResponse]:
+async def get_transaction_by_id(db: AsyncSession, transaction_id: int, user: User) -> Optional[TransactionResponse]:
     """Get a specific transaction by ID for a user"""
     result = await db.execute(
         select(Transaction, Category.name)
@@ -155,7 +151,9 @@ async def update_transaction(
     category_name: Optional[str] = None
     if transaction_data.category is not None:
         category = await _get_or_create_category(
-            db, transaction_data.category, transaction.type  # type: ignore[arg-type]
+            db,
+            transaction_data.category,
+            transaction.type,  # type: ignore[arg-type]
         )
         transaction.category_id = category.id
         category_name = category.name
