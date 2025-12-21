@@ -18,7 +18,6 @@ export const routes: Routes = [
   { 
     path: '', 
     canActivate: [AuthGuard],
-    canActivateChild: [AuthGuard],
     children: [
       { path: '', redirectTo: 'transactions', pathMatch: 'full' },
       { path: 'transactions', component: TransactionsComponent },
