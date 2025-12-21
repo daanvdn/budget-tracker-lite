@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from './core/services/auth.service';
-import { map } from 'rxjs';
+import { map, shareReplay } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -105,7 +105,8 @@ export class AppComponent {
   ) {}
 
   readonly isAuthenticated$ = this.authService.currentUser$.pipe(
-    map(user => !!user)
+    map(user => !!user),
+    shareReplay(1)
   );
 
   logout(): void {
