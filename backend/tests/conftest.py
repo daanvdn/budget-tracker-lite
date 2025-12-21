@@ -3,9 +3,10 @@ from datetime import datetime
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from src.app.database import Base, get_db
-from src.app.main import app
-from src.app.models import (
+
+from app.database import Base, get_db
+from app.main import app
+from app.models import (
     Beneficiary,
     Category,
     CategoryType,
