@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_active_user
 from app.database.session import get_db
@@ -25,11 +25,11 @@ router = APIRouter(prefix="/api/transactions", tags=["Transactions"])
 @router.post("", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)
 async def create_new_transaction(
     transaction_data: TransactionCreate,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
     """Create a new transaction"""
-    transaction = create_transaction(db, transaction_data, current_user)
+    transaction = await create_transaction(db, transaction_data, current_user)
     return transaction
 
 
@@ -39,11 +39,11 @@ async def get_all_transactions(
     limit: int = Query(100, ge=1, le=1000),
     type: Optional[str] = Query(None, pattern="^(income|expense)$"),
     category: Optional[str] = None,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
     """Get all transactions for the current user"""
-    transactions = get_transactions(
+    transactions = await get_transactions(
         db, current_user, skip=skip, limit=limit, type_filter=type, category_filter=category
     )
     return transactions
@@ -51,10 +51,10 @@ async def get_all_transactions(
 
 @router.get("/{transaction_id}", response_model=TransactionResponse)
 async def get_transaction(
-    transaction_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)
+    transaction_id: int, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_active_user)
 ):
     """Get a specific transaction by ID"""
-    transaction = get_transaction_by_id(db, transaction_id, current_user)
+    transaction = await get_transaction_by_id(db, transaction_id, current_user)
     if not transaction:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
     return transaction
@@ -64,11 +64,11 @@ async def get_transaction(
 async def update_existing_transaction(
     transaction_id: int,
     transaction_data: TransactionUpdate,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
     """Update a transaction"""
-    transaction = update_transaction(db, transaction_id, transaction_data, current_user)
+    transaction = await update_transaction(db, transaction_id, transaction_data, current_user)
     if not transaction:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
     return transaction
@@ -76,10 +76,10 @@ async def update_existing_transaction(
 
 @router.delete("/{transaction_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_existing_transaction(
-    transaction_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)
+    transaction_id: int, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_active_user)
 ):
     """Delete a transaction"""
-    success = delete_transaction(db, transaction_id, current_user)
+    success = await delete_transaction(db, transaction_id, current_user)
     if not success:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
     return None
