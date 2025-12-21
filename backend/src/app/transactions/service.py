@@ -1,62 +1,140 @@
 from datetime import datetime
 from typing import List, Optional
 
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.beneficiary import Beneficiary
+from app.models.category import Category
 from app.models.transaction import Transaction
 from app.models.user import User
-from app.transactions.schemas import TransactionCreate, TransactionUpdate
+from app.schemas import CategoryType, TransactionType
+from app.transactions.schemas import TransactionCreate, TransactionResponse, TransactionUpdate
+
+DEFAULT_BENEFICIARY_NAME = "General"
 
 
-def create_transaction(db: Session, transaction_data: TransactionCreate, user: User) -> Transaction:
+async def _get_or_create_category(db: AsyncSession, name: str, transaction_type: TransactionType) -> Category:
+    """Fetch existing category by name or create a new one."""
+    result = await db.execute(select(Category).where(Category.name == name))
+    category = result.scalar_one_or_none()
+    if category:
+        return category
+
+    category = Category(
+        name=name,
+        type=CategoryType.INCOME if transaction_type == TransactionType.INCOME else CategoryType.EXPENSE,
+    )
+    db.add(category)
+    await db.commit()
+    await db.refresh(category)
+    return category
+
+
+async def _get_default_beneficiary(db: AsyncSession) -> Beneficiary:
+    """Fetch or create a default beneficiary for simple transaction inputs."""
+    result = await db.execute(select(Beneficiary).where(Beneficiary.name == DEFAULT_BENEFICIARY_NAME))
+    beneficiary = result.scalar_one_or_none()
+    if beneficiary:
+        return beneficiary
+
+    beneficiary = Beneficiary(name=DEFAULT_BENEFICIARY_NAME)
+    db.add(beneficiary)
+    await db.commit()
+    await db.refresh(beneficiary)
+    return beneficiary
+
+
+def _to_response(transaction: Transaction, category_name: str, user_id: int) -> TransactionResponse:
+    """Map a Transaction model to the simplified response expected by the frontend."""
+    return TransactionResponse(
+        id=transaction.id,
+        user_id=user_id,
+        description=transaction.description,
+        amount=transaction.amount,
+        category=category_name,
+        type=transaction.type.value,
+        date=transaction.transaction_date,
+        created_at=transaction.created_at,
+    )
+
+
+async def create_transaction(db: AsyncSession, transaction_data: TransactionCreate, user: User) -> TransactionResponse:
     """Create a new transaction for a user"""
+    transaction_type = TransactionType(transaction_data.type)
+    category = await _get_or_create_category(db, transaction_data.category, transaction_type)
+    beneficiary = await _get_default_beneficiary(db)
+
     transaction = Transaction(
-        user_id=user.id,
-        description=transaction_data.description,
         amount=transaction_data.amount,
-        category=transaction_data.category,
-        type=transaction_data.type,
-        date=transaction_data.date or datetime.utcnow(),
-        created_at=datetime.utcnow(),
+        transaction_date=transaction_data.date or datetime.utcnow(),
+        description=transaction_data.description,
+        type=transaction_type,
+        category_id=category.id,
+        beneficiary_id=beneficiary.id,
+        created_by_user_id=user.id,
     )
 
     db.add(transaction)
-    db.commit()
-    db.refresh(transaction)
+    await db.commit()
+    await db.refresh(transaction)
 
-    return transaction
+    return _to_response(transaction, category.name, user.id)
 
 
-def get_transactions(
-    db: Session,
+async def get_transactions(
+    db: AsyncSession,
     user: User,
     skip: int = 0,
     limit: int = 100,
     type_filter: Optional[str] = None,
     category_filter: Optional[str] = None,
-) -> List[Transaction]:
+) -> List[TransactionResponse]:
     """Get all transactions for a user with optional filters"""
-    query = db.query(Transaction).filter(Transaction.user_id == user.id)
+    query = (
+        select(Transaction, Category.name)
+        .join(Category, Transaction.category_id == Category.id)
+        .where(Transaction.created_by_user_id == user.id)
+        .order_by(Transaction.transaction_date.desc())
+        .offset(skip)
+        .limit(limit)
+    )
 
     if type_filter:
-        query = query.filter(Transaction.type == type_filter)
+        query = query.where(Transaction.type == TransactionType(type_filter))
 
     if category_filter:
-        query = query.filter(Transaction.category == category_filter)
+        query = query.where(Category.name == category_filter)
 
-    return query.order_by(Transaction.date.desc()).offset(skip).limit(limit).all()
+    result = await db.execute(query)
+    rows = result.all()
+
+    return [_to_response(transaction, category_name, user.id) for transaction, category_name in rows]
 
 
-def get_transaction_by_id(db: Session, transaction_id: int, user: User) -> Optional[Transaction]:
+async def get_transaction_by_id(db: AsyncSession, transaction_id: int, user: User) -> Optional[TransactionResponse]:
     """Get a specific transaction by ID for a user"""
-    return db.query(Transaction).filter(Transaction.id == transaction_id, Transaction.user_id == user.id).first()
+    result = await db.execute(
+        select(Transaction, Category.name)
+        .join(Category, Transaction.category_id == Category.id)
+        .where(Transaction.id == transaction_id, Transaction.created_by_user_id == user.id)
+    )
+    row = result.first()
+    if not row:
+        return None
+
+    transaction, category_name = row
+    return _to_response(transaction, category_name, user.id)
 
 
-def update_transaction(
-    db: Session, transaction_id: int, transaction_data: TransactionUpdate, user: User
-) -> Optional[Transaction]:
+async def update_transaction(
+    db: AsyncSession, transaction_id: int, transaction_data: TransactionUpdate, user: User
+) -> Optional[TransactionResponse]:
     """Update a transaction"""
-    transaction = get_transaction_by_id(db, transaction_id, user)
+    result = await db.execute(
+        select(Transaction).where(Transaction.id == transaction_id, Transaction.created_by_user_id == user.id)
+    )
+    transaction = result.scalar_one_or_none()
     if not transaction:
         return None
 
@@ -65,26 +143,41 @@ def update_transaction(
         transaction.description = transaction_data.description
     if transaction_data.amount is not None:
         transaction.amount = transaction_data.amount
-    if transaction_data.category is not None:
-        transaction.category = transaction_data.category
     if transaction_data.type is not None:
-        transaction.type = transaction_data.type
+        transaction.type = TransactionType(transaction_data.type)
     if transaction_data.date is not None:
-        transaction.date = transaction_data.date
+        transaction.transaction_date = transaction_data.date
 
-    db.commit()
-    db.refresh(transaction)
+    category_name: Optional[str] = None
+    if transaction_data.category is not None:
+        category = await _get_or_create_category(
+            db,
+            transaction_data.category,
+            transaction.type,  # type: ignore[arg-type]
+        )
+        transaction.category_id = category.id
+        category_name = category.name
 
-    return transaction
+    await db.commit()
+    await db.refresh(transaction)
+
+    if category_name is None:
+        category_result = await db.execute(select(Category.name).where(Category.id == transaction.category_id))
+        category_name = category_result.scalar_one_or_none() or ""
+
+    return _to_response(transaction, category_name, user.id)
 
 
-def delete_transaction(db: Session, transaction_id: int, user: User) -> bool:
+async def delete_transaction(db: AsyncSession, transaction_id: int, user: User) -> bool:
     """Delete a transaction"""
-    transaction = get_transaction_by_id(db, transaction_id, user)
+    result = await db.execute(
+        select(Transaction).where(Transaction.id == transaction_id, Transaction.created_by_user_id == user.id)
+    )
+    transaction = result.scalar_one_or_none()
     if not transaction:
         return False
 
-    db.delete(transaction)
-    db.commit()
+    await db.delete(transaction)
+    await db.commit()
 
     return True
