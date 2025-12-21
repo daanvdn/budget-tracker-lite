@@ -1,3 +1,6 @@
+import logging
+import traceback
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -22,6 +25,8 @@ from app.auth.service import (
 from app.database.session import get_db
 from app.models.user import User
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
 
@@ -33,24 +38,44 @@ async def register(user_data: UserRegister, db: AsyncSession = Depends(get_db)):
         return user
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except Exception as e:
+        logger.error(
+            f"Unexpected error during user registration:\n"
+            f"{''.join(traceback.format_exception(type(e), e, e.__traceback__))}"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred during registration",
+        )
 
 
 @router.post("/login", response_model=Token)
 async def login(login_data: UserLogin, db: AsyncSession = Depends(get_db)):
     """Login user and return JWT token"""
-    user = await authenticate_user(db, login_data)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
+    try:
+        user = await authenticate_user(db, login_data)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect email or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        if not user.is_active:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User account is inactive")
+
+        token = create_user_token(user)
+        return token
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(
+            f"Unexpected error during login:\n{''.join(traceback.format_exception(type(e), e, e.__traceback__))}"
         )
-
-    if not user.is_active:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User account is inactive")
-
-    token = create_user_token(user)
-    return token
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred during login",
+        )
 
 
 @router.get("/me", response_model=UserResponse)
@@ -83,3 +108,12 @@ async def reset_password(request: ResetPasswordRequest, db: AsyncSession = Depen
         return ResetPasswordResponse(message="Password has been reset successfully")
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except Exception as e:
+        logger.error(
+            f"Unexpected error during password reset:\n"
+            f"{''.join(traceback.format_exception(type(e), e, e.__traceback__))}"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred during password reset",
+        )

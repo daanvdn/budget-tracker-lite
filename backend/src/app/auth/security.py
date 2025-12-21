@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -6,17 +7,27 @@ from passlib.context import CryptContext
 
 from app.config.settings import settings
 
+logger = logging.getLogger(__name__)
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against a hash"""
-    return pwd_context.verify(plain_password, hashed_password)
+    try:
+        return pwd_context.verify(plain_password, hashed_password)
+    except Exception as e:
+        logger.error(f"Error verifying password: {e}", exc_info=True)
+        raise
 
 
 def get_password_hash(password: str) -> str:
     """Hash a password"""
-    return pwd_context.hash(password)
+    try:
+        return pwd_context.hash(password)
+    except Exception as e:
+        logger.error(f"Error hashing password: {e}", exc_info=True)
+        raise
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:

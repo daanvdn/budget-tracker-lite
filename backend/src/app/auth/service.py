@@ -1,3 +1,4 @@
+import logging
 import re
 import secrets
 from datetime import datetime, timedelta
@@ -11,6 +12,8 @@ from app.auth.security import create_access_token, get_password_hash, verify_pas
 from app.config.settings import settings
 from app.models.password_reset_token import PasswordResetToken
 from app.models.user import User
+
+logger = logging.getLogger(__name__)
 
 
 def validate_password_strength(password: str) -> tuple[bool, str]:
@@ -41,7 +44,9 @@ async def register_user(db: AsyncSession, user_data: UserRegister) -> User:
         raise ValueError(message)
 
     # Create new user
+    logger.debug(f"Hashing password for new user: {user_data.email}")
     hashed_password = get_password_hash(user_data.password)
+    logger.debug(f"Password hashed successfully for user: {user_data.email}")
     new_user = User(
         name=user_data.name,
         email=user_data.email,

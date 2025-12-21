@@ -1,8 +1,12 @@
+import logging
+import sys
+import traceback
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.config.settings import settings
 
@@ -24,6 +28,18 @@ from .routers import (
     users,
 )
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+    ],
+)
+
+# Create logger for this module
+logger = logging.getLogger(__name__)
+
 
 async def seed_data():
     """Seed initial data if database is empty"""
@@ -33,10 +49,10 @@ async def seed_data():
         # Check if data already exists
         result = await db.execute(select(User))
         if result.first():
-            print("Database already seeded, skipping...")
+            logger.info("Database already seeded, skipping...")
             return
 
-        print("Seeding database with initial data...")
+        logger.info("Seeding database with initial data...")
 
         # Create users
         users_data = [
@@ -126,22 +142,22 @@ async def seed_data():
         db.add_all(transactions_data)
         await db.commit()
 
-        print("Database seeded successfully!")
+        logger.info("Database seeded successfully!")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan context manager for startup and shutdown"""
     # Startup
-    print("Initializing database...")
+    logger.info("Initializing database...")
     await init_db()
     await seed_data()
-    print("Application startup complete!")
+    logger.info("Application startup complete!")
 
     yield
 
     # Shutdown
-    print("Application shutdown")
+    logger.info("Application shutdown")
 
 
 # Create FastAPI app
@@ -160,6 +176,33 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def log_exceptions_middleware(request: Request, call_next):
+    """Middleware to catch and log all exceptions with full tracebacks"""
+    try:
+        return await call_next(request)
+    except Exception as exc:
+        logger.error(
+            f"Unhandled exception during request {request.method} {request.url.path}:\n"
+            f"{''.join(traceback.format_exception(type(exc), exc, exc.__traceback__))}"
+        )
+        raise
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """Global exception handler to log all unhandled exceptions"""
+    logger.error(
+        f"Unhandled exception for {request.method} {request.url.path}:\n"
+        f"{''.join(traceback.format_exception(type(exc), exc, exc.__traceback__))}"
+    )
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error"},
+    )
+
 
 # Include routers
 app.include_router(users.router, prefix=settings.api_prefix)
