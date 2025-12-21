@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { TransactionService, Transaction, TransactionCreate } from '../../../core/services/transaction.service';
-import { AuthService, User } from '../../../core/services/auth.service';
+import { TransactionService, Transaction, TransactionCreate } from '../../core/services/transaction.service';
+import { AuthService, User } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-transactions',
@@ -399,17 +399,17 @@ export class TransactionsComponent implements OnInit {
   }
 
   loadCurrentUser(): void {
-    this.authService.currentUser$.subscribe(user => {
+    this.authService.currentUser$.subscribe((user: User | null) => {
       this.currentUser = user;
     });
   }
 
   loadTransactions(): void {
     this.transactionService.getTransactions().subscribe({
-      next: (transactions) => {
+      next: (transactions: Transaction[]) => {
         this.transactions = transactions;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Failed to load transactions', error);
       }
     });
@@ -423,12 +423,12 @@ export class TransactionsComponent implements OnInit {
       const transactionData: TransactionCreate = this.transactionForm.value;
 
       this.transactionService.createTransaction(transactionData).subscribe({
-        next: (transaction) => {
+        next: (transaction: Transaction) => {
           this.transactions.unshift(transaction);
           this.transactionForm.reset({ type: 'expense' });
           this.loading = false;
         },
-        error: (error) => {
+        error: (error: any) => {
           this.loading = false;
           this.errorMessage = error.error?.detail || 'Failed to add transaction. Please try again.';
         }
@@ -442,7 +442,7 @@ export class TransactionsComponent implements OnInit {
         next: () => {
           this.transactions = this.transactions.filter(t => t.id !== id);
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Failed to delete transaction', error);
         }
       });
