@@ -1,10 +1,13 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { TransactionService } from '../../core/services/transaction.service';
 import { Transaction } from '../../core/models';
 
 @Component({
   selector: 'app-transaction-form',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
   template: `
     <div class="transaction-form">
       <h3>{{ editMode ? 'Edit' : 'Create' }} Transaction</h3>

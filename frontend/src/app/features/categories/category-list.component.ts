@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { CategoryService } from '../../core/services/category.service';
 import { Category } from '../../core/models';
 
 @Component({
   selector: 'app-category-list',
+  standalone: true,
+  imports: [CommonModule],
   template: `
     <div class="category-list">
       <h2>Categories</h2>

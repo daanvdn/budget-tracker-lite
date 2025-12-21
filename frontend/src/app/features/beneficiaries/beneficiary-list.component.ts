@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { BeneficiaryService } from '../../core/services/beneficiary.service';
 import { Beneficiary } from '../../core/models';
 
 @Component({
   selector: 'app-beneficiary-list',
+  standalone: true,
+  imports: [CommonModule],
   template: `
     <div class="beneficiary-list">
       <h2>Beneficiaries</h2>

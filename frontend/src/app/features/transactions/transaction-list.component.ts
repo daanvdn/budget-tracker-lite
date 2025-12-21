@@ -1,9 +1,13 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { TransactionService } from '../../core/services/transaction.service';
 import { Transaction } from '../../core/models';
 
 @Component({
   selector: 'app-transaction-list',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="transaction-list">
       <h2>Transactions</h2>
