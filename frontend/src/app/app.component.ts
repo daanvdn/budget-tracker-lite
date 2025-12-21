@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -10,13 +11,24 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
     <div class="app-shell">
       <header class="app-header">
         <div class="brand">Budget Tracker Lite</div>
-        <nav class="nav-links">
-          <a routerLink="/transactions" routerLinkActive="active">Transactions</a>
-          <a routerLink="/categories" routerLinkActive="active">Categories</a>
-          <a routerLink="/beneficiaries" routerLinkActive="active">Beneficiaries</a>
-          <a routerLink="/reports" routerLinkActive="active">Reports</a>
-          <a routerLink="/users" routerLinkActive="active">Users</a>
-        </nav>
+        <ng-container *ngIf="isAuthenticated(); else authLinks">
+          <div class="nav-actions">
+            <nav class="nav-links">
+              <a routerLink="/transactions" routerLinkActive="active">Transactions</a>
+              <a routerLink="/categories" routerLinkActive="active">Categories</a>
+              <a routerLink="/beneficiaries" routerLinkActive="active">Beneficiaries</a>
+              <a routerLink="/reports" routerLinkActive="active">Reports</a>
+              <a routerLink="/users" routerLinkActive="active">Users</a>
+            </nav>
+            <button class="logout-btn" type="button" (click)="logout()">Logout</button>
+          </div>
+        </ng-container>
+        <ng-template #authLinks>
+          <div class="nav-links">
+            <a routerLink="/login" routerLinkActive="active">Login</a>
+            <a routerLink="/register" routerLinkActive="active">Register</a>
+          </div>
+        </ng-template>
       </header>
       <router-outlet></router-outlet>
     </div>
@@ -42,6 +54,12 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
       letter-spacing: 0.5px;
     }
 
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
     .nav-links {
       display: flex;
       gap: 16px;
@@ -61,8 +79,36 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
     .nav-links a.active {
       background: rgba(255, 255, 255, 0.2);
     }
+
+    .logout-btn {
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      background: transparent;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
   `]
 })
 export class AppComponent {
   title = 'Budget Tracker Lite';
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  isAuthenticated(): boolean {
+    return this.authService.isAuthenticated();
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 }
