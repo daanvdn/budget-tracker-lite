@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.auth.router import router as auth_router
 from app.config.settings import settings
 from app.database.session import init_db
+from app.routers import aggregations, beneficiaries, categories
 from app.transactions.router import router as transactions_router
 
 
@@ -39,6 +40,9 @@ app.add_middleware(
 # Include routers
 app.include_router(auth_router)
 app.include_router(transactions_router)
+app.include_router(categories.router, prefix=settings.api_prefix)
+app.include_router(beneficiaries.router, prefix=settings.api_prefix)
+app.include_router(aggregations.router, prefix=settings.api_prefix)
 
 
 # Root endpoint
