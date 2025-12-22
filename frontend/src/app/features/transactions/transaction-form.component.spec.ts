@@ -41,12 +41,12 @@ describe('TransactionFormComponent', () => {
     const mockTransaction: Transaction = {
       id: 1,
       amount: 100,
-      date: '2024-01-15',
+      transaction_date: '2024-01-15T10:00:00Z',
       type: 'expense',
       description: 'Test',
       category_id: 1,
       beneficiary_id: 1,
-      user_id: 1
+      created_by_user_id: 1
     };
     component.transaction = mockTransaction;
     fixture.detectChanges();
@@ -62,11 +62,11 @@ describe('TransactionFormComponent', () => {
     
     component.transactionForm.patchValue({
       amount: 100,
-      date: '2024-01-15',
+      transaction_date: '2024-01-15T10:00',
       type: 'expense',
       category_id: 1,
       beneficiary_id: 1,
-      user_id: 1
+      created_by_user_id: 1
     });
     
     expect(component.transactionForm.valid).toBeTrue();
@@ -86,11 +86,11 @@ describe('TransactionFormComponent', () => {
     fixture.detectChanges();
     component.transactionForm.patchValue({
       amount: 100,
-      date: '2024-01-15',
+      transaction_date: '2024-01-15T10:00',
       type: 'expense',
       category_id: 1,
       beneficiary_id: 1,
-      user_id: 1
+      created_by_user_id: 1
     });
     
     component.onSubmit();
@@ -103,11 +103,11 @@ describe('TransactionFormComponent', () => {
     
     component.transactionForm.patchValue({
       amount: 150,
-      date: '2024-01-16',
+      transaction_date: '2024-01-16T10:00',
       type: 'expense',
       category_id: 1,
       beneficiary_id: 1,
-      user_id: 1
+      created_by_user_id: 1
     });
     
     component.onSubmit();
