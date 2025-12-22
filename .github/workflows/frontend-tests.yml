@@ -24,10 +24,12 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        
-    - name: Install dependencies
+    - name: Clean install (remove node_modules and lock file)
       working-directory: ./frontend
-      run: npm install
+      run: |
+        rm -rf node_modules package-lock.json
+        npm install
+
       
     - name: Run tests
       working-directory: ./frontend
