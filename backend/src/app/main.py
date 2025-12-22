@@ -27,6 +27,7 @@ from .routers import (
     transactions,
     users,
 )
+from .auth.router import router as auth_router
 
 # Configure logging
 logging.basicConfig(
@@ -205,6 +206,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 
 # Include routers
+app.include_router(auth_router)
 app.include_router(users.router, prefix=settings.api_prefix)
 app.include_router(categories.router, prefix=settings.api_prefix)
 app.include_router(beneficiaries.router, prefix=settings.api_prefix)

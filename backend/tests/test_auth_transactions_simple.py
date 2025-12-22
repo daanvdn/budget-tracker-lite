@@ -43,6 +43,7 @@ async def test_auth_flow_and_transaction_creation(simple_client: AsyncClient):
         json={"name": "Tester", "email": "tester@example.com", "password": "TestPass123"},
     )
     assert register_resp.status_code == 201
+    user_id = register_resp.json()["id"]
 
     # Login
     login_resp = await simple_client.post(
@@ -56,6 +57,22 @@ async def test_auth_flow_and_transaction_creation(simple_client: AsyncClient):
     me_resp = await simple_client.get("/api/auth/me", headers=headers)
     assert me_resp.status_code == 200
 
+    # Create a category first
+    category_resp = await simple_client.post(
+        "/api/categories",
+        json={"name": "Food", "type": "expense"},
+    )
+    assert category_resp.status_code == 201
+    category_id = category_resp.json()["id"]
+
+    # Create a beneficiary
+    beneficiary_resp = await simple_client.post(
+        "/api/beneficiaries",
+        json={"name": "Self"},
+    )
+    assert beneficiary_resp.status_code == 201
+    beneficiary_id = beneficiary_resp.json()["id"]
+
     # Create a transaction
     create_resp = await simple_client.post(
         "/api/transactions",
@@ -63,9 +80,11 @@ async def test_auth_flow_and_transaction_creation(simple_client: AsyncClient):
         json={
             "description": "Coffee",
             "amount": 3.5,
-            "category": "Food",
+            "category_id": category_id,
+            "beneficiary_id": beneficiary_id,
+            "created_by_user_id": user_id,
             "type": "expense",
-            "date": "2024-01-01T00:00:00",
+            "transaction_date": "2024-01-01T00:00:00",
         },
     )
     assert create_resp.status_code == 201
@@ -77,5 +96,5 @@ async def test_auth_flow_and_transaction_creation(simple_client: AsyncClient):
     assert len(data) == 1
     assert data[0]["description"] == "Coffee"
     assert data[0]["amount"] == 3.5
-    assert data[0]["category"] == "Food"
+    assert data[0]["category"]["name"] == "Food"
     assert data[0]["type"] == "expense"

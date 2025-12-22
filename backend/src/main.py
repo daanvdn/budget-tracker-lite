@@ -6,14 +6,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.auth.router import router as auth_router
 from app.config.settings import settings
 from app.database.session import init_db
-from app.routers import aggregations, beneficiaries, categories
-from app.transactions.router import router as transactions_router
+from app.routers import aggregations, beneficiaries, categories, images, transactions, users
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan context manager for startup and shutdown events"""
     # Startup: Initialize database tables
+    # Import models to ensure they're registered with Base
+    from app.models import Beneficiary, Category, Transaction, User  # noqa: F401
     await init_db()
     yield
     # Shutdown: Add cleanup code here if needed
@@ -39,10 +40,12 @@ app.add_middleware(
 
 # Include routers
 app.include_router(auth_router)
-app.include_router(transactions_router)
+app.include_router(users.router, prefix=settings.api_prefix)
 app.include_router(categories.router, prefix=settings.api_prefix)
 app.include_router(beneficiaries.router, prefix=settings.api_prefix)
+app.include_router(transactions.router, prefix=settings.api_prefix)
 app.include_router(aggregations.router, prefix=settings.api_prefix)
+app.include_router(images.router, prefix=settings.api_prefix)
 
 
 # Root endpoint
