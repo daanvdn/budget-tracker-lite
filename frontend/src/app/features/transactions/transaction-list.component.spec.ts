@@ -10,9 +10,39 @@ describe('TransactionListComponent', () => {
   let fixture: ComponentFixture<TransactionListComponent>;
   let mockTransactionService: jasmine.SpyObj<TransactionService>;
 
+  const mockCategory = { id: 1, name: 'Food', type: 'expense' as const };
+  const mockBeneficiary = { id: 1, name: 'Grocery Store' };
+  const mockUser = { id: 1, name: 'Test User', created_at: '2024-01-01T00:00:00Z' };
+
   const mockTransactions: Transaction[] = [
-    { id: 1, user_id: 1, description: 'Food', amount: 100, category: 'Food', type: 'expense', date: '2024-01-15', created_at: '2024-01-15T00:00:00Z' },
-    { id: 2, user_id: 1, description: 'Salary', amount: 3000, category: 'Salary', type: 'income', date: '2024-01-31', created_at: '2024-01-31T00:00:00Z' }
+    { 
+      id: 1, 
+      created_by_user_id: 1, 
+      description: 'Food', 
+      amount: 100, 
+      category_id: 1,
+      beneficiary_id: 1,
+      type: 'expense', 
+      transaction_date: '2024-01-15T00:00:00Z', 
+      created_at: '2024-01-15T00:00:00Z',
+      category: mockCategory,
+      beneficiary: mockBeneficiary,
+      created_by_user: mockUser
+    },
+    { 
+      id: 2, 
+      created_by_user_id: 1, 
+      description: 'Salary', 
+      amount: 3000, 
+      category_id: 2,
+      beneficiary_id: 2,
+      type: 'income', 
+      transaction_date: '2024-01-31T00:00:00Z', 
+      created_at: '2024-01-31T00:00:00Z',
+      category: { id: 2, name: 'Salary', type: 'income' as const },
+      beneficiary: { id: 2, name: 'Employer' },
+      created_by_user: mockUser
+    }
   ];
 
   beforeEach(async () => {

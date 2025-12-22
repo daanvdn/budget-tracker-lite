@@ -22,14 +22,18 @@ import { TransactionService, Transaction } from '../../core/services/transaction
             <th>Amount</th>
             <th>Type</th>
             <th>Description</th>
+            <th>Category</th>
+            <th>Beneficiary</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let transaction of transactions">
-            <td>{{ transaction.date }}</td>
+            <td>{{ transaction.transaction_date }}</td>
             <td>{{ transaction.amount }}</td>
             <td>{{ transaction.type }}</td>
             <td>{{ transaction.description }}</td>
+            <td>{{ transaction.category?.name }}</td>
+            <td>{{ transaction.beneficiary?.name }}</td>
           </tr>
         </tbody>
       </table>
@@ -54,7 +58,7 @@ export class TransactionListComponent implements OnInit {
   }
 
   applyFilters(): void {
-    this.transactionService.getTransactions(this.filters).subscribe(
+    this.transactionService.getTransactions().subscribe(
       data => this.transactions = data
     );
   }

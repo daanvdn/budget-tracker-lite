@@ -1,9 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TransactionService, Transaction, TransactionCreate } from '../../core/services/transaction.service';
 import { AuthService, User } from '../../core/services/auth.service';
+import { CategoryService } from '../../core/services/category.service';
+import { BeneficiaryService } from '../../core/services/beneficiary.service';
+import { ImageService } from '../../core/services/image.service';
+import { Category, Beneficiary } from '../../shared/models/models';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-transactions',
@@ -48,21 +53,77 @@ import { AuthService, User } from '../../core/services/auth.service';
 
             <div class="form-row">
               <div class="form-group">
-                <label for="category">Category</label>
+                <label for="transaction_date">Transaction Date</label>
                 <input
-                  type="text"
-                  id="category"
-                  formControlName="category"
+                  type="datetime-local"
+                  id="transaction_date"
+                  formControlName="transaction_date"
                   class="form-control"
                 />
               </div>
 
               <div class="form-group">
                 <label for="type">Type</label>
-                <select id="type" formControlName="type" class="form-control">
-                  <option value="income">Income</option>
+                <select id="type" formControlName="type" class="form-control" (change)="onTypeChange()">
                   <option value="expense">Expense</option>
+                  <option value="income">Income</option>
                 </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="category_id">Category</label>
+                <select id="category_id" formControlName="category_id" class="form-control">
+                  <option value="">Select Category</option>
+                  <option *ngFor="let category of filteredCategories" [value]="category.id">
+                    {{ category.name }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="beneficiary_id">Beneficiary</label>
+                <select id="beneficiary_id" formControlName="beneficiary_id" class="form-control">
+                  <option value="">Select Beneficiary</option>
+                  <option *ngFor="let beneficiary of beneficiaries" [value]="beneficiary.id">
+                    {{ beneficiary.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group image-upload-group">
+                <label>Receipt Image (Optional)</label>
+                <div class="image-upload-controls">
+                  <input
+                    type="file"
+                    #fileInput
+                    accept="image/*"
+                    (change)="onFileSelected($event)"
+                    style="display: none"
+                  />
+                  <input
+                    type="file"
+                    #cameraInput
+                    accept="image/*"
+                    capture="environment"
+                    (change)="onFileSelected($event)"
+                    style="display: none"
+                  />
+                  <button type="button" class="btn btn-outline" (click)="fileInput.click()">
+                    📁 Choose File
+                  </button>
+                  <button type="button" class="btn btn-outline" (click)="cameraInput.click()">
+                    📷 Take Photo
+                  </button>
+                </div>
+                <div class="image-preview" *ngIf="selectedImagePreview">
+                  <img [src]="selectedImagePreview" alt="Selected image preview" />
+                  <button type="button" class="btn-remove-image" (click)="removeSelectedImage()">×</button>
+                </div>
+                <div class="upload-status" *ngIf="uploadingImage">Uploading image...</div>
               </div>
             </div>
 
@@ -70,7 +131,7 @@ import { AuthService, User } from '../../core/services/auth.service';
               {{ errorMessage }}
             </div>
 
-            <button type="submit" class="btn btn-primary" [disabled]="transactionForm.invalid || loading">
+            <button type="submit" class="btn btn-primary" [disabled]="transactionForm.invalid || loading || uploadingImage">
               {{ loading ? 'Adding...' : 'Add Transaction' }}
             </button>
           </form>
@@ -98,8 +159,19 @@ import { AuthService, User } from '../../core/services/auth.service';
             <div class="transaction-item" *ngFor="let transaction of transactions" [class]="transaction.type">
               <div class="transaction-info">
                 <div class="transaction-description">{{ transaction.description }}</div>
-                <div class="transaction-category">{{ transaction.category }}</div>
-                <div class="transaction-date">{{ formatDate(transaction.date) }}</div>
+                <div class="transaction-meta">
+                  <span class="transaction-category">{{ transaction.category?.name }}</span>
+                  <span class="transaction-beneficiary" *ngIf="transaction.beneficiary">• {{ transaction.beneficiary.name }}</span>
+                </div>
+                <div class="transaction-dates">
+                  <span class="transaction-date">Date: {{ formatDate(transaction.transaction_date) }}</span>
+                  <span class="transaction-created">Created: {{ formatDate(transaction.created_at) }}</span>
+                </div>
+                <div class="transaction-image" *ngIf="transaction.image_path">
+                  <button type="button" class="btn-view-image" (click)="viewImage(transaction.image_path)">
+                    🖼️ View Receipt
+                  </button>
+                </div>
               </div>
               <div class="transaction-amount" [class]="transaction.type">
                 {{ transaction.type === 'income' ? '+' : '-' }}\${{ transaction.amount.toFixed(2) }}
@@ -113,6 +185,14 @@ import { AuthService, User } from '../../core/services/auth.service';
               <p>No transactions yet. Add your first transaction above!</p>
             </div>
           </ng-template>
+        </div>
+      </div>
+
+      <!-- Image Modal -->
+      <div class="image-modal" *ngIf="viewingImage" (click)="closeImageModal()">
+        <div class="image-modal-content" (click)="$event.stopPropagation()">
+          <button class="btn-close-modal" (click)="closeImageModal()">×</button>
+          <img [src]="viewingImage" alt="Receipt image" />
         </div>
       </div>
     </div>
@@ -187,6 +267,10 @@ import { AuthService, User } from '../../core/services/auth.service';
       flex-direction: column;
     }
 
+    .image-upload-group {
+      grid-column: 1 / -1;
+    }
+
     label {
       margin-bottom: 5px;
       color: #555;
@@ -199,6 +283,62 @@ import { AuthService, User } from '../../core/services/auth.service';
       border: 1px solid #ddd;
       border-radius: 4px;
       font-size: 14px;
+    }
+
+    .image-upload-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 5px;
+    }
+
+    .btn-outline {
+      padding: 8px 16px;
+      border: 1px solid #007bff;
+      background: white;
+      color: #007bff;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-outline:hover {
+      background: #f0f7ff;
+    }
+
+    .image-preview {
+      position: relative;
+      margin-top: 10px;
+      display: inline-block;
+    }
+
+    .image-preview img {
+      max-width: 200px;
+      max-height: 150px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+
+    .btn-remove-image {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: none;
+      background: #dc3545;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .upload-status {
+      margin-top: 5px;
+      color: #666;
+      font-size: 12px;
     }
 
     .error-message {
@@ -294,7 +434,7 @@ import { AuthService, User } from '../../core/services/auth.service';
 
     .transaction-item {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       padding: 15px;
       border: 1px solid #ddd;
@@ -324,15 +464,47 @@ import { AuthService, User } from '../../core/services/auth.service';
       margin-bottom: 5px;
     }
 
-    .transaction-category {
+    .transaction-meta {
       font-size: 12px;
       color: #666;
+      margin-bottom: 4px;
     }
 
-    .transaction-date {
+    .transaction-category {
+      background: #e9ecef;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .transaction-beneficiary {
+      margin-left: 8px;
+      color: #888;
+    }
+
+    .transaction-dates {
       font-size: 11px;
       color: #999;
-      margin-top: 5px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .transaction-image {
+      margin-top: 8px;
+    }
+
+    .btn-view-image {
+      padding: 4px 10px;
+      font-size: 12px;
+      background: #17a2b8;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-view-image:hover {
+      background: #138496;
     }
 
     .transaction-amount {
@@ -370,32 +542,100 @@ import { AuthService, User } from '../../core/services/auth.service';
       padding: 40px;
       color: #666;
     }
+
+    /* Image Modal */
+    .image-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .image-modal-content {
+      position: relative;
+      max-width: 90%;
+      max-height: 90%;
+    }
+
+    .image-modal-content img {
+      max-width: 100%;
+      max-height: 80vh;
+      border-radius: 8px;
+    }
+
+    .btn-close-modal {
+      position: absolute;
+      top: -40px;
+      right: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: white;
+      color: #333;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   `]
 })
 export class TransactionsComponent implements OnInit {
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('cameraInput') cameraInput!: ElementRef<HTMLInputElement>;
+
   transactionForm: FormGroup;
   transactions: Transaction[] = [];
+  categories: Category[] = [];
+  beneficiaries: Beneficiary[] = [];
   currentUser: User | null = null;
   loading = false;
   errorMessage = '';
+  
+  // Image handling
+  selectedFile: File | null = null;
+  selectedImagePreview: string | null = null;
+  uploadedImagePath: string | null = null;
+  uploadingImage = false;
+  viewingImage: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private transactionService: TransactionService,
     private authService: AuthService,
+    private categoryService: CategoryService,
+    private beneficiaryService: BeneficiaryService,
+    private imageService: ImageService,
     private router: Router
   ) {
     this.transactionForm = this.fb.group({
       description: ['', Validators.required],
       amount: ['', [Validators.required, Validators.min(0.01)]],
-      category: ['', Validators.required],
-      type: ['expense', Validators.required]
+      transaction_date: [this.getCurrentDateTime(), Validators.required],
+      type: ['expense', Validators.required],
+      category_id: ['', Validators.required],
+      beneficiary_id: ['', Validators.required]
     });
   }
 
   ngOnInit(): void {
     this.loadCurrentUser();
     this.loadTransactions();
+    this.loadCategories();
+    this.loadBeneficiaries();
+  }
+
+  getCurrentDateTime(): string {
+    const now = new Date();
+    // Format for datetime-local input: YYYY-MM-DDTHH:mm
+    return now.toISOString().slice(0, 16);
   }
 
   loadCurrentUser(): void {
@@ -415,17 +655,121 @@ export class TransactionsComponent implements OnInit {
     });
   }
 
+  loadCategories(): void {
+    this.categoryService.getCategories().subscribe({
+      next: (categories: Category[]) => {
+        this.categories = categories;
+      },
+      error: (error: any) => {
+        console.error('Failed to load categories', error);
+      }
+    });
+  }
+
+  loadBeneficiaries(): void {
+    this.beneficiaryService.getBeneficiaries().subscribe({
+      next: (beneficiaries: Beneficiary[]) => {
+        this.beneficiaries = beneficiaries;
+      },
+      error: (error: any) => {
+        console.error('Failed to load beneficiaries', error);
+      }
+    });
+  }
+
+  get filteredCategories(): Category[] {
+    const selectedType = this.transactionForm.get('type')?.value;
+    return this.categories.filter(cat => 
+      cat.type === selectedType || cat.type === 'both'
+    );
+  }
+
+  onTypeChange(): void {
+    // Reset category selection when type changes
+    this.transactionForm.patchValue({ category_id: '' });
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        this.selectedImagePreview = e.target?.result as string;
+      };
+      reader.readAsDataURL(this.selectedFile);
+      
+      // Upload the image
+      this.uploadImage();
+    }
+    // Reset input so same file can be selected again
+    input.value = '';
+  }
+
+  uploadImage(): void {
+    if (!this.selectedFile) return;
+    
+    this.uploadingImage = true;
+    this.imageService.uploadImage(this.selectedFile).subscribe({
+      next: (response) => {
+        this.uploadedImagePath = response.path;
+        this.uploadingImage = false;
+      },
+      error: (error: any) => {
+        console.error('Failed to upload image', error);
+        this.errorMessage = 'Failed to upload image. Please try again.';
+        this.uploadingImage = false;
+        this.removeSelectedImage();
+      }
+    });
+  }
+
+  removeSelectedImage(): void {
+    this.selectedFile = null;
+    this.selectedImagePreview = null;
+    this.uploadedImagePath = null;
+  }
+
+  viewImage(imagePath: string): void {
+    // Convert relative path to full URL
+    this.viewingImage = `${environment.apiUrl}${imagePath.replace('/api', '')}`;
+  }
+
+  closeImageModal(): void {
+    this.viewingImage = null;
+  }
+
   onSubmit(): void {
-    if (this.transactionForm.valid) {
+    if (this.transactionForm.valid && this.currentUser) {
       this.loading = true;
       this.errorMessage = '';
 
-      const transactionData: TransactionCreate = this.transactionForm.value;
+      const formValue = this.transactionForm.value;
+      
+      // Convert datetime-local string to ISO format
+      const transactionDate = new Date(formValue.transaction_date).toISOString();
+      
+      const transactionData: TransactionCreate = {
+        type: formValue.type,
+        amount: parseFloat(formValue.amount),
+        description: formValue.description,
+        transaction_date: transactionDate,
+        category_id: parseInt(formValue.category_id, 10),
+        beneficiary_id: parseInt(formValue.beneficiary_id, 10),
+        created_by_user_id: this.currentUser.id,
+        image_path: this.uploadedImagePath || undefined
+      };
 
       this.transactionService.createTransaction(transactionData).subscribe({
         next: (transaction: Transaction) => {
           this.transactions.unshift(transaction);
-          this.transactionForm.reset({ type: 'expense' });
+          this.transactionForm.reset({ 
+            type: 'expense',
+            transaction_date: this.getCurrentDateTime()
+          });
+          this.removeSelectedImage();
           this.loading = false;
         },
         error: (error: any) => {
@@ -455,8 +799,9 @@ export class TransactionsComponent implements OnInit {
   }
 
   formatDate(dateString: string): string {
+    if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 
   get totalIncome(): number {

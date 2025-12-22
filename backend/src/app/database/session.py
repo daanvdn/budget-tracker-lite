@@ -31,7 +31,10 @@ async def get_db():
 
 
 async def init_db():
-    """Initialize database tables"""
-
+    """Initialize database tables
+    
+    Note: Models must be imported before calling this function to ensure
+    all tables are registered with Base.metadata
+    """
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

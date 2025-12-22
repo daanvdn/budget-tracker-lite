@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     database_url: str = "sqlite+aiosqlite:///data/budget_tracker.db"
 
     # File storage
-    upload_dir: Path = Path("/data/uploads")
+    upload_dir: Path = Path("data/uploads")
     max_upload_size: int = 10 * 1024 * 1024  # 10MB
 
     # API

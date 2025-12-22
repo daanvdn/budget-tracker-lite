@@ -3,31 +3,59 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-export interface Transaction {
+export interface Category {
   id: number;
-  user_id: number;
-  description: string;
-  amount: number;
-  category: string;
-  type: 'income' | 'expense';
-  date: string;
+  name: string;
+  type: 'expense' | 'income' | 'both';
+}
+
+export interface Beneficiary {
+  id: number;
+  name: string;
+}
+
+export interface User {
+  id: number;
+  name: string;
   created_at: string;
 }
 
-export interface TransactionCreate {
-  description: string;
-  amount: number;
-  category: string;
+export interface Transaction {
+  id: number;
   type: 'income' | 'expense';
-  date?: string;
+  amount: number;
+  description: string;
+  transaction_date: string;
+  image_path?: string;
+  category_id: number;
+  beneficiary_id: number;
+  created_by_user_id: number;
+  created_at: string;
+  category: Category;
+  beneficiary: Beneficiary;
+  created_by_user: User;
+}
+
+export interface TransactionCreate {
+  type: 'income' | 'expense';
+  amount: number;
+  description: string;
+  transaction_date: string;
+  category_id: number;
+  beneficiary_id: number;
+  created_by_user_id: number;
+  image_path?: string;
 }
 
 export interface TransactionUpdate {
-  description?: string;
-  amount?: number;
-  category?: string;
   type?: 'income' | 'expense';
-  date?: string;
+  amount?: number;
+  description?: string;
+  transaction_date?: string;
+  category_id?: number;
+  beneficiary_id?: number;
+  created_by_user_id?: number;
+  image_path?: string;
 }
 
 @Injectable({
@@ -42,17 +70,21 @@ export class TransactionService {
     skip: number = 0,
     limit: number = 100,
     type?: 'income' | 'expense',
-    category?: string
+    category_id?: number,
+    beneficiary_id?: number
   ): Observable<Transaction[]> {
     let params = new HttpParams()
       .set('skip', skip.toString())
       .set('limit', limit.toString());
     
     if (type) {
-      params = params.set('type', type);
+      params = params.set('transaction_type', type);
     }
-    if (category) {
-      params = params.set('category', category);
+    if (category_id) {
+      params = params.set('category_id', category_id.toString());
+    }
+    if (beneficiary_id) {
+      params = params.set('beneficiary_id', beneficiary_id.toString());
     }
 
     return this.http.get<Transaction[]>(this.apiUrl, { params });
@@ -72,11 +104,5 @@ export class TransactionService {
 
   deleteTransaction(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
-
-  uploadImage(transactionId: number, file: File): Observable<{ message: string; path: string }> {
-    const formData = new FormData();
-    formData.append('file', file);
-    return this.http.post<{ message: string; path: string }>(`${this.apiUrl}/${transactionId}/upload-image`, formData);
   }
 }

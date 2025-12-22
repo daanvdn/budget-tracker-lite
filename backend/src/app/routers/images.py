@@ -4,7 +4,7 @@ from pathlib import Path
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 
-from ..config import settings
+from app.config.settings import settings
 
 router = APIRouter(prefix="/images", tags=["images"])
 

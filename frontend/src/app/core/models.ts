@@ -1,13 +1,17 @@
 export interface Transaction {
   id?: number;
   amount: number;
-  date: string;
+  transaction_date: string;
   description?: string;
   type: 'expense' | 'income';
   category_id: number;
   beneficiary_id: number;
-  user_id: number;
+  created_by_user_id: number;
   image_path?: string;
+  created_at?: string;
+  category?: Category;
+  beneficiary?: Beneficiary;
+  created_by_user?: User;
 }
 
 export interface Category {
@@ -24,7 +28,8 @@ export interface Beneficiary {
 export interface User {
   id?: number;
   name: string;
-  email: string;
+  email?: string;
+  created_at?: string;
 }
 
 export interface AggregationSummary {
