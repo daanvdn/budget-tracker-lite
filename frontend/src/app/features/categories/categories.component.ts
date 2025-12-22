@@ -28,25 +28,7 @@ import { Category, CategoryType } from '../../shared/models/models';
     MatSnackBarModule
   ],
   templateUrl: './categories.component.html',
-  styles: [`
-    .category-form {
-      margin: 20px 0;
-      padding: 20px;
-      background-color: #f5f5f5;
-      border-radius: 4px;
-    }
-
-    .form-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .categories-table {
-      width: 100%;
-      margin-top: 20px;
-    }
-  `]
+  styleUrls: ['./categories.component.css']
 })
 export class CategoriesComponent implements OnInit {
   categories: Category[] = [];

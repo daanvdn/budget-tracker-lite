@@ -26,25 +26,7 @@ import { Beneficiary } from '../../shared/models/models';
     MatSnackBarModule
   ],
   templateUrl: './beneficiaries.component.html',
-  styles: [`
-    .beneficiary-form {
-      margin: 20px 0;
-      padding: 20px;
-      background-color: #f5f5f5;
-      border-radius: 4px;
-    }
-
-    .form-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .beneficiaries-table {
-      width: 100%;
-      margin-top: 20px;
-    }
-  `]
+  styleUrls: ['./beneficiaries.component.css']
 })
 export class BeneficiariesComponent implements OnInit {
   beneficiaries: Beneficiary[] = [];

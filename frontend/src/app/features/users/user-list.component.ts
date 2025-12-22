@@ -7,17 +7,8 @@ import { User } from '../../shared/models/models';
   selector: 'app-user-list',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="user-list">
-      <h2>Users</h2>
-      <ul *ngIf="users.length > 0">
-        <li *ngFor="let user of users">
-          {{ user.name }} ({{ user.created_at | date:'short' }})
-        </li>
-      </ul>
-      <p *ngIf="users.length === 0">No users found.</p>
-    </div>
-  `
+  templateUrl: './user-list.component.html',
+  styleUrls: ['./user-list.component.css']
 })
 export class UserListComponent implements OnInit {
   users: User[] = [];

@@ -26,25 +26,7 @@ import { User } from '../../shared/models/models';
     MatSnackBarModule
   ],
   templateUrl: './users.component.html',
-  styles: [`
-    .user-form {
-      margin: 20px 0;
-      padding: 20px;
-      background-color: #f5f5f5;
-      border-radius: 4px;
-    }
-
-    .form-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .users-table {
-      width: 100%;
-      margin-top: 20px;
-    }
-  `]
+  styleUrls: ['./users.component.css']
 })
 export class UsersComponent implements OnInit {
   users: User[] = [];

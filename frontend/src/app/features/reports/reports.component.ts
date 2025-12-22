@@ -28,53 +28,7 @@ import { AggregationSummary, Category, Beneficiary } from '../../shared/models/m
     MatButtonModule
   ],
   templateUrl: './reports.component.html',
-  styles: [`
-    .filter-form {
-      margin-bottom: 20px;
-      padding: 20px;
-      background-color: #f5f5f5;
-      border-radius: 4px;
-    }
-
-    .quick-filters {
-      display: flex;
-      gap: 10px;
-      margin: 20px 0;
-    }
-
-    .summary-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      margin-top: 20px;
-    }
-
-    .summary-card {
-      text-align: center;
-    }
-
-    .summary-amount {
-      font-size: 2em;
-      font-weight: bold;
-      margin: 20px 0;
-    }
-
-    .income-card .summary-amount {
-      color: green;
-    }
-
-    .expense-card .summary-amount {
-      color: red;
-    }
-
-    .positive {
-      color: green;
-    }
-
-    .negative {
-      color: red;
-    }
-  `]
+  styleUrls: ['./reports.component.css']
 })
 export class ReportsComponent implements OnInit {
   filterForm: FormGroup;

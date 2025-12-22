@@ -7,7 +7,8 @@ import { Category } from '../../shared/models/models';
   selector: 'app-category-list',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './category-list.component.html'
+  templateUrl: './category-list.component.html',
+  styleUrls: ['./category-list.component.css']
 })
 export class CategoryListComponent implements OnInit {
   categories: Category[] = [];

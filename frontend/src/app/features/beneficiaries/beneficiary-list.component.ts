@@ -7,7 +7,8 @@ import { Beneficiary } from '../../shared/models/models';
   selector: 'app-beneficiary-list',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './beneficiary-list.component.html'
+  templateUrl: './beneficiary-list.component.html',
+  styleUrls: ['./beneficiary-list.component.css']
 })
 export class BeneficiaryListComponent implements OnInit {
   beneficiaries: Beneficiary[] = [];

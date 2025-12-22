@@ -1,0 +1,23 @@
+.transaction-form {
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.transaction-form h3 {
+  margin-top: 0;
+}
+
+.transaction-form input,
+.transaction-form select,
+.transaction-form button {
+  margin-bottom: 10px;
+  padding: 8px;
+  font-size: 14px;
+}
+
+.transaction-form button {
+  cursor: pointer;
+}
+

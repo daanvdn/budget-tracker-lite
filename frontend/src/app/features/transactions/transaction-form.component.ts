@@ -8,7 +8,8 @@ import { Transaction } from '../../core/models';
   selector: 'app-transaction-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './transaction-form.component.html'
+  templateUrl: './transaction-form.component.html',
+  styleUrls: ['./transaction-form.component.css']
 })
 export class TransactionFormComponent implements OnInit {
   @Input() transaction?: Transaction;

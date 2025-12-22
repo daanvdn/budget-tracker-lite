@@ -7,7 +7,8 @@ import { TransactionService, Transaction } from '../../core/services/transaction
   selector: 'app-transaction-list',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './transaction-list.component.html'
+  templateUrl: './transaction-list.component.html',
+  styleUrls: ['./transaction-list.component.css']
 })
 export class TransactionListComponent implements OnInit {
   transactions: Transaction[] = [];
