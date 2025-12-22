@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { TransactionService, Transaction, TransactionCreate } from '../../core/services/transaction.service';
+import { TransactionService, Transaction, TransactionCreate, TransactionUpdate } from '../../core/services/transaction.service';
 import { AuthService, User } from '../../core/services/auth.service';
 import { CategoryService } from '../../core/services/category.service';
 import { BeneficiaryService } from '../../core/services/beneficiary.service';
@@ -26,7 +26,7 @@ import { environment } from '../../../environments/environment';
 
       <div class="content">
         <div class="transaction-form-section">
-          <h2>Add Transaction</h2>
+          <h2>{{ editMode ? 'Edit Transaction' : 'Add Transaction' }}</h2>
           <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
             <div class="form-row">
               <div class="form-group">
@@ -131,9 +131,14 @@ import { environment } from '../../../environments/environment';
               {{ errorMessage }}
             </div>
 
-            <button type="submit" class="btn btn-primary" [disabled]="transactionForm.invalid || loading || uploadingImage">
-              {{ loading ? 'Adding...' : 'Add Transaction' }}
-            </button>
+            <div class="form-buttons">
+              <button type="submit" class="btn btn-primary" [disabled]="transactionForm.invalid || loading || uploadingImage">
+                {{ loading ? (editMode ? 'Saving...' : 'Adding...') : (editMode ? 'Save Changes' : 'Add Transaction') }}
+              </button>
+              <button type="button" class="btn btn-secondary" *ngIf="editMode" (click)="cancelEdit()">
+                Cancel
+              </button>
+            </div>
           </form>
         </div>
 
@@ -176,7 +181,10 @@ import { environment } from '../../../environments/environment';
               <div class="transaction-amount" [class]="transaction.type">
                 {{ transaction.type === 'income' ? '+' : '-' }}\${{ transaction.amount.toFixed(2) }}
               </div>
-              <button class="btn-delete" (click)="deleteTransaction(transaction.id)">Delete</button>
+              <div class="transaction-actions">
+                <button class="btn-edit" (click)="editTransaction(transaction)">Edit</button>
+                <button class="btn-delete" (click)="deleteTransaction(transaction.id)">Delete</button>
+              </div>
             </div>
           </div>
 
@@ -537,6 +545,39 @@ import { environment } from '../../../environments/environment';
       background: #c82333;
     }
 
+    .btn-edit {
+      padding: 5px 15px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .btn-edit:hover {
+      background: #0056b3;
+    }
+
+    .transaction-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .form-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .form-buttons .btn-primary {
+      flex: 1;
+    }
+
+    .form-buttons .btn-secondary {
+      flex: 0 0 auto;
+    }
+
     .no-transactions {
       text-align: center;
       padding: 40px;
@@ -599,6 +640,10 @@ export class TransactionsComponent implements OnInit {
   loading = false;
   errorMessage = '';
   
+  // Edit mode
+  editMode = false;
+  editingTransaction: Transaction | null = null;
+
   // Image handling
   selectedFile: File | null = null;
   selectedImagePreview: string | null = null;
@@ -751,33 +796,101 @@ export class TransactionsComponent implements OnInit {
       // Convert datetime-local string to ISO format
       const transactionDate = new Date(formValue.transaction_date).toISOString();
       
-      const transactionData: TransactionCreate = {
-        type: formValue.type,
-        amount: parseFloat(formValue.amount),
-        description: formValue.description,
-        transaction_date: transactionDate,
-        category_id: parseInt(formValue.category_id, 10),
-        beneficiary_id: parseInt(formValue.beneficiary_id, 10),
-        created_by_user_id: this.currentUser.id,
-        image_path: this.uploadedImagePath || undefined
-      };
+      if (this.editMode && this.editingTransaction) {
+        // Update existing transaction
+        const updateData: TransactionUpdate = {
+          type: formValue.type,
+          amount: parseFloat(formValue.amount),
+          description: formValue.description,
+          transaction_date: transactionDate,
+          category_id: parseInt(formValue.category_id, 10),
+          beneficiary_id: parseInt(formValue.beneficiary_id, 10),
+          image_path: this.uploadedImagePath || this.editingTransaction.image_path || undefined
+        };
 
-      this.transactionService.createTransaction(transactionData).subscribe({
-        next: (transaction: Transaction) => {
-          this.transactions.unshift(transaction);
-          this.transactionForm.reset({ 
-            type: 'expense',
-            transaction_date: this.getCurrentDateTime()
-          });
-          this.removeSelectedImage();
-          this.loading = false;
-        },
-        error: (error: any) => {
-          this.loading = false;
-          this.errorMessage = error.error?.detail || 'Failed to add transaction. Please try again.';
-        }
-      });
+        this.transactionService.updateTransaction(this.editingTransaction.id, updateData).subscribe({
+          next: (updatedTransaction: Transaction) => {
+            // Update the transaction in the list
+            const index = this.transactions.findIndex(t => t.id === updatedTransaction.id);
+            if (index !== -1) {
+              this.transactions[index] = updatedTransaction;
+            }
+            this.resetForm();
+            this.loading = false;
+          },
+          error: (error: any) => {
+            this.loading = false;
+            this.errorMessage = error.error?.detail || 'Failed to update transaction. Please try again.';
+          }
+        });
+      } else {
+        // Create new transaction
+        const transactionData: TransactionCreate = {
+          type: formValue.type,
+          amount: parseFloat(formValue.amount),
+          description: formValue.description,
+          transaction_date: transactionDate,
+          category_id: parseInt(formValue.category_id, 10),
+          beneficiary_id: parseInt(formValue.beneficiary_id, 10),
+          created_by_user_id: this.currentUser.id,
+          image_path: this.uploadedImagePath || undefined
+        };
+
+        this.transactionService.createTransaction(transactionData).subscribe({
+          next: (transaction: Transaction) => {
+            this.transactions.unshift(transaction);
+            this.resetForm();
+            this.loading = false;
+          },
+          error: (error: any) => {
+            this.loading = false;
+            this.errorMessage = error.error?.detail || 'Failed to add transaction. Please try again.';
+          }
+        });
+      }
     }
+  }
+
+  editTransaction(transaction: Transaction): void {
+    this.editMode = true;
+    this.editingTransaction = transaction;
+
+    // Format the date for datetime-local input
+    const transactionDate = new Date(transaction.transaction_date);
+    const formattedDate = transactionDate.toISOString().slice(0, 16);
+
+    // Populate the form with existing values
+    this.transactionForm.patchValue({
+      description: transaction.description,
+      amount: transaction.amount,
+      transaction_date: formattedDate,
+      type: transaction.type,
+      category_id: transaction.category_id,
+      beneficiary_id: transaction.beneficiary_id
+    });
+
+    // Handle existing image
+    if (transaction.image_path) {
+      this.uploadedImagePath = transaction.image_path;
+      this.selectedImagePreview = `${environment.apiUrl}${transaction.image_path.replace('/api', '')}`;
+    }
+
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  cancelEdit(): void {
+    this.resetForm();
+  }
+
+  private resetForm(): void {
+    this.editMode = false;
+    this.editingTransaction = null;
+    this.transactionForm.reset({
+      type: 'expense',
+      transaction_date: this.getCurrentDateTime()
+    });
+    this.removeSelectedImage();
   }
 
   deleteTransaction(id: number): void {
