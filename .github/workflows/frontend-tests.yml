@@ -31,8 +31,7 @@ jobs:
       
     - name: Run tests
       working-directory: ./frontend
-      #run: npm test -- --browsers=ChromeHeadlessCI --watch=false --code-coverage
-      run: npm run test -- --code-coverage
+      run: npm test -- --browsers=ChromeHeadlessCI --watch=false --code-coverage
 
     - name: Upload coverage reports
       uses: codecov/codecov-action@v4
