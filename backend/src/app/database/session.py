@@ -32,7 +32,7 @@ async def get_db():
 
 async def init_db():
     """Initialize database tables
-    
+
     Note: Models must be imported before calling this function to ensure
     all tables are registered with Base.metadata
     """

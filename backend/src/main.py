@@ -15,6 +15,7 @@ async def lifespan(app: FastAPI):
     # Startup: Initialize database tables
     # Import models to ensure they're registered with Base
     from app.models import Beneficiary, Category, Transaction, User  # noqa: F401
+
     await init_db()
     yield
     # Shutdown: Add cleanup code here if needed
