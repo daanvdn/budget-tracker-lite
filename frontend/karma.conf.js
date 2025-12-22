@@ -40,6 +40,11 @@ module.exports = function (config) {
         flags: ['--no-sandbox', '--disable-gpu']
       }
     },
-    restartOnFileChange: true
+    restartOnFileChange: true,
+    browserDisconnectTimeout: 10000,
+    browserNoActivityTimeout: 60000,
+    captureTimeout: 210000,
+    browserDisconnectTolerance: 3,
+    processKillTimeout: 10000
   });
 };
