@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse
 
 from app.config.settings import settings
 
+from .auth.router import router as auth_router
 from .database import AsyncSessionLocal, init_db
 from .models import (
     Beneficiary,
@@ -27,7 +28,6 @@ from .routers import (
     transactions,
     users,
 )
-from .auth.router import router as auth_router
 
 # Configure logging
 logging.basicConfig(
