@@ -31,7 +31,7 @@ export interface Transaction {
   beneficiary_id: number;
   created_by_user_id: number;
   created_at: string;
-  category: Category;
+  category?: Category;
   beneficiary: Beneficiary;
   created_by_user: User;
 }
