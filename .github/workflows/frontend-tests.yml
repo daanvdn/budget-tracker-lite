@@ -28,12 +28,19 @@ jobs:
       working-directory: ./frontend
       run: |
         rm -rf node_modules package-lock.json
-        npm install
+        npm install --verbose
 
-      
+    - name: List karma plugins in node_modules
+      working-directory: ./frontend
+      run: ls -lh node_modules/karma-chrome-launcher
+
+    - name: List all installed modules
+      working-directory: ./frontend
+      run: npm list --depth=0
+
     - name: Run tests
       working-directory: ./frontend
-      run: npm test -- --browsers=ChromeHeadlessCI --watch=false --code-coverage
+      run: npm test -- --browsers=ChromeHeadless --watch=false --code-coverage
 
     - name: Upload coverage reports
       uses: codecov/codecov-action@v4
