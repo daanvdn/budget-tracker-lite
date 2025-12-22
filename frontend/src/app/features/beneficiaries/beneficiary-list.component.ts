@@ -7,17 +7,7 @@ import { Beneficiary } from '../../shared/models/models';
   selector: 'app-beneficiary-list',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="beneficiary-list">
-      <h2>Beneficiaries</h2>
-      <ul *ngIf="beneficiaries.length > 0">
-        <li *ngFor="let beneficiary of beneficiaries">
-          {{ beneficiary.name }}
-        </li>
-      </ul>
-      <p *ngIf="beneficiaries.length === 0">No beneficiaries found.</p>
-    </div>
-  `
+  templateUrl: './beneficiary-list.component.html'
 })
 export class BeneficiaryListComponent implements OnInit {
   beneficiaries: Beneficiary[] = [];

@@ -25,60 +25,7 @@ import { User } from '../../shared/models/models';
     MatInputModule,
     MatSnackBarModule
   ],
-  template: `
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>Users</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <button mat-raised-button color="primary" (click)="toggleForm()">
-          <mat-icon>add</mat-icon>
-          {{ showForm ? 'Cancel' : 'Add User' }}
-        </button>
-
-        <form *ngIf="showForm" [formGroup]="userForm" (ngSubmit)="onSubmit()" class="user-form">
-          <mat-form-field class="form-field-full-width">
-            <mat-label>Name</mat-label>
-            <input matInput formControlName="name" required>
-          </mat-form-field>
-
-          <div class="form-actions">
-            <button mat-raised-button color="primary" type="submit" [disabled]="!userForm.valid">
-              {{ editingId ? 'Update' : 'Create' }}
-            </button>
-            <button mat-button type="button" (click)="cancelEdit()">Cancel</button>
-          </div>
-        </form>
-
-        <table mat-table [dataSource]="users" class="users-table">
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef>Name</th>
-            <td mat-cell *matCellDef="let user">{{ user.name }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="created_at">
-            <th mat-header-cell *matHeaderCellDef>Created At</th>
-            <td mat-cell *matCellDef="let user">{{ user.created_at | date:'short' }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let user">
-              <button mat-icon-button (click)="editUser(user)">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button mat-icon-button color="warn" (click)="deleteUser(user.id)">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-      </mat-card-content>
-    </mat-card>
-  `,
+  templateUrl: './users.component.html',
   styles: [`
     .user-form {
       margin: 20px 0;

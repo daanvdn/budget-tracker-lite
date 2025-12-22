@@ -7,17 +7,7 @@ import { Category } from '../../shared/models/models';
   selector: 'app-category-list',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="category-list">
-      <h2>Categories</h2>
-      <ul *ngIf="categories.length > 0">
-        <li *ngFor="let category of categories">
-          {{ category.name }} ({{ category.type }})
-        </li>
-      </ul>
-      <p *ngIf="categories.length === 0">No categories found.</p>
-    </div>
-  `
+  templateUrl: './category-list.component.html'
 })
 export class CategoryListComponent implements OnInit {
   categories: Category[] = [];

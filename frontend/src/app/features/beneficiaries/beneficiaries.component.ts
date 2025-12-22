@@ -25,55 +25,7 @@ import { Beneficiary } from '../../shared/models/models';
     MatInputModule,
     MatSnackBarModule
   ],
-  template: `
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>Beneficiaries</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <button mat-raised-button color="primary" (click)="toggleForm()">
-          <mat-icon>add</mat-icon>
-          {{ showForm ? 'Cancel' : 'Add Beneficiary' }}
-        </button>
-
-        <form *ngIf="showForm" [formGroup]="beneficiaryForm" (ngSubmit)="onSubmit()" class="beneficiary-form">
-          <mat-form-field class="form-field-full-width">
-            <mat-label>Name</mat-label>
-            <input matInput formControlName="name" required>
-          </mat-form-field>
-
-          <div class="form-actions">
-            <button mat-raised-button color="primary" type="submit" [disabled]="!beneficiaryForm.valid">
-              {{ editingId ? 'Update' : 'Create' }}
-            </button>
-            <button mat-button type="button" (click)="cancelEdit()">Cancel</button>
-          </div>
-        </form>
-
-        <table mat-table [dataSource]="beneficiaries" class="beneficiaries-table">
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef>Name</th>
-            <td mat-cell *matCellDef="let beneficiary">{{ beneficiary.name }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let beneficiary">
-              <button mat-icon-button (click)="editBeneficiary(beneficiary)">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button mat-icon-button color="warn" (click)="deleteBeneficiary(beneficiary.id)">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-      </mat-card-content>
-    </mat-card>
-  `,
+  templateUrl: './beneficiaries.component.html',
   styles: [`
     .beneficiary-form {
       margin: 20px 0;

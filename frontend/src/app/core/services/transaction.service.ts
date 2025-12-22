@@ -71,7 +71,9 @@ export class TransactionService {
     limit: number = 100,
     type?: 'income' | 'expense',
     category_id?: number,
-    beneficiary_id?: number
+    beneficiary_id?: number,
+    start_date?: string,
+    end_date?: string
   ): Observable<Transaction[]> {
     let params = new HttpParams()
       .set('skip', skip.toString())
@@ -85,6 +87,12 @@ export class TransactionService {
     }
     if (beneficiary_id) {
       params = params.set('beneficiary_id', beneficiary_id.toString());
+    }
+    if (start_date) {
+      params = params.set('start_date', start_date);
+    }
+    if (end_date) {
+      params = params.set('end_date', end_date);
     }
 
     return this.http.get<Transaction[]>(this.apiUrl, { params });

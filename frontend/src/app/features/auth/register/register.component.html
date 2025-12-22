@@ -1,0 +1,89 @@
+<div class="register-container">
+  <div class="register-card">
+    <h2>Register for Budget Tracker</h2>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input
+          type="text"
+          id="name"
+          formControlName="name"
+          class="form-control"
+          [class.error]="registerForm.get('name')?.invalid && registerForm.get('name')?.touched"
+        />
+        <div class="error-message" *ngIf="registerForm.get('name')?.invalid && registerForm.get('name')?.touched">
+          Name is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-control"
+          [class.error]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+        />
+        <div class="error-message" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+          Please enter a valid email
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          class="form-control"
+          [class.error]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+        />
+        <div class="password-strength" *ngIf="registerForm.get('password')?.value">
+          <div class="strength-bar" [class]="getPasswordStrength()"></div>
+          <span class="strength-text">{{ getPasswordStrengthText() }}</span>
+        </div>
+        <div class="error-message" *ngIf="registerForm.get('password')?.errors && registerForm.get('password')?.touched">
+          <div *ngIf="registerForm.get('password')?.errors?.['required']">Password is required</div>
+          <div *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at least 8 characters</div>
+          <div *ngIf="registerForm.get('password')?.errors?.['passwordStrength']">
+            Password must contain at least 1 number and 1 uppercase letter
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          formControlName="confirmPassword"
+          class="form-control"
+          [class.error]="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched"
+        />
+        <div class="error-message" *ngIf="registerForm.get('confirmPassword')?.errors && registerForm.get('confirmPassword')?.touched">
+          <div *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">Please confirm your password</div>
+          <div *ngIf="registerForm.get('confirmPassword')?.errors?.['passwordMismatch']">Passwords do not match</div>
+        </div>
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <div class="success-message" *ngIf="successMessage">
+        {{ successMessage }}
+      </div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid || loading">
+        {{ loading ? 'Registering...' : 'Register' }}
+      </button>
+    </form>
+
+    <div class="links">
+      <a routerLink="/login">Already have an account? Login</a>
+    </div>
+  </div>
+</div>
+

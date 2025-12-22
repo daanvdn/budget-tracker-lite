@@ -1,0 +1,25 @@
+<div class="app-shell">
+  <header class="app-header">
+    <div class="brand">Budget Tracker Lite</div>
+    <ng-container *ngIf="isAuthenticated$ | async; else authLinks">
+      <div class="nav-actions">
+        <nav class="nav-links">
+          <a routerLink="/transactions" routerLinkActive="active">Transactions</a>
+          <a routerLink="/categories" routerLinkActive="active">Categories</a>
+          <a routerLink="/beneficiaries" routerLinkActive="active">Beneficiaries</a>
+          <a routerLink="/reports" routerLinkActive="active">Reports</a>
+          <a routerLink="/users" routerLinkActive="active">Users</a>
+        </nav>
+        <button class="logout-btn" type="button" (click)="logout()">Logout</button>
+      </div>
+    </ng-container>
+    <ng-template #authLinks>
+      <div class="nav-links">
+        <a routerLink="/login" routerLinkActive="active">Login</a>
+        <a routerLink="/register" routerLinkActive="active">Register</a>
+      </div>
+    </ng-template>
+  </header>
+  <router-outlet></router-outlet>
+</div>
+

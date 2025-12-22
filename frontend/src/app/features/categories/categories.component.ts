@@ -27,69 +27,7 @@ import { Category, CategoryType } from '../../shared/models/models';
     MatSelectModule,
     MatSnackBarModule
   ],
-  template: `
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>Categories</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <button mat-raised-button color="primary" (click)="toggleForm()">
-          <mat-icon>add</mat-icon>
-          {{ showForm ? 'Cancel' : 'Add Category' }}
-        </button>
-
-        <form *ngIf="showForm" [formGroup]="categoryForm" (ngSubmit)="onSubmit()" class="category-form">
-          <mat-form-field class="form-field-full-width">
-            <mat-label>Name</mat-label>
-            <input matInput formControlName="name" required>
-          </mat-form-field>
-
-          <mat-form-field class="form-field-full-width">
-            <mat-label>Type</mat-label>
-            <mat-select formControlName="type" required>
-              <mat-option value="expense">Expense</mat-option>
-              <mat-option value="income">Income</mat-option>
-              <mat-option value="both">Both</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <div class="form-actions">
-            <button mat-raised-button color="primary" type="submit" [disabled]="!categoryForm.valid">
-              {{ editingId ? 'Update' : 'Create' }}
-            </button>
-            <button mat-button type="button" (click)="cancelEdit()">Cancel</button>
-          </div>
-        </form>
-
-        <table mat-table [dataSource]="categories" class="categories-table">
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef>Name</th>
-            <td mat-cell *matCellDef="let category">{{ category.name }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="type">
-            <th mat-header-cell *matHeaderCellDef>Type</th>
-            <td mat-cell *matCellDef="let category">{{ category.type }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let category">
-              <button mat-icon-button (click)="editCategory(category)">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button mat-icon-button color="warn" (click)="deleteCategory(category.id)">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-      </mat-card-content>
-    </mat-card>
-  `,
+  templateUrl: './categories.component.html',
   styles: [`
     .category-form {
       margin: 20px 0;

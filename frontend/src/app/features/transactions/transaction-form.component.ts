@@ -8,24 +8,7 @@ import { Transaction } from '../../core/models';
   selector: 'app-transaction-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  template: `
-    <div class="transaction-form">
-      <h3>{{ editMode ? 'Edit' : 'Create' }} Transaction</h3>
-      <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
-        <input formControlName="amount" type="number" placeholder="Amount" required>
-        <input formControlName="transaction_date" type="datetime-local" required>
-        <input formControlName="description" type="text" placeholder="Description">
-        <select formControlName="type" required>
-          <option value="expense">Expense</option>
-          <option value="income">Income</option>
-        </select>
-        <input formControlName="category_id" type="number" placeholder="Category ID" required>
-        <input formControlName="beneficiary_id" type="number" placeholder="Beneficiary ID" required>
-        <input formControlName="created_by_user_id" type="number" placeholder="User ID" required>
-        <button type="submit" [disabled]="!transactionForm.valid">Submit</button>
-      </form>
-    </div>
-  `
+  templateUrl: './transaction-form.component.html'
 })
 export class TransactionFormComponent implements OnInit {
   @Input() transaction?: Transaction;

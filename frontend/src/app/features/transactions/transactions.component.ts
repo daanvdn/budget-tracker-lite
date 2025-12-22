@@ -14,197 +14,7 @@ import { environment } from '../../../environments/environment';
   selector: 'app-transactions',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  template: `
-    <div class="transactions-container">
-      <header class="header">
-        <h1>Budget Tracker</h1>
-        <div class="user-info" *ngIf="currentUser">
-          <span>Welcome, {{ currentUser.name }}</span>
-          <button class="btn btn-secondary" (click)="logout()">Logout</button>
-        </div>
-      </header>
-
-      <div class="content">
-        <div class="transaction-form-section">
-          <h2>{{ editMode ? 'Edit Transaction' : 'Add Transaction' }}</h2>
-          <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
-            <div class="form-row">
-              <div class="form-group">
-                <label for="description">Description</label>
-                <input
-                  type="text"
-                  id="description"
-                  formControlName="description"
-                  class="form-control"
-                />
-              </div>
-
-              <div class="form-group">
-                <label for="amount">Amount</label>
-                <input
-                  type="number"
-                  id="amount"
-                  formControlName="amount"
-                  class="form-control"
-                  step="0.01"
-                />
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="transaction_date">Transaction Date</label>
-                <input
-                  type="datetime-local"
-                  id="transaction_date"
-                  formControlName="transaction_date"
-                  class="form-control"
-                />
-              </div>
-
-              <div class="form-group">
-                <label for="type">Type</label>
-                <select id="type" formControlName="type" class="form-control" (change)="onTypeChange()">
-                  <option value="expense">Expense</option>
-                  <option value="income">Income</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="category_id">Category</label>
-                <select id="category_id" formControlName="category_id" class="form-control">
-                  <option value="">Select Category</option>
-                  <option *ngFor="let category of filteredCategories" [value]="category.id">
-                    {{ category.name }}
-                  </option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="beneficiary_id">Beneficiary</label>
-                <select id="beneficiary_id" formControlName="beneficiary_id" class="form-control">
-                  <option value="">Select Beneficiary</option>
-                  <option *ngFor="let beneficiary of beneficiaries" [value]="beneficiary.id">
-                    {{ beneficiary.name }}
-                  </option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group image-upload-group">
-                <label>Receipt Image (Optional)</label>
-                <div class="image-upload-controls">
-                  <input
-                    type="file"
-                    #fileInput
-                    accept="image/*"
-                    (change)="onFileSelected($event)"
-                    style="display: none"
-                  />
-                  <input
-                    type="file"
-                    #cameraInput
-                    accept="image/*"
-                    capture="environment"
-                    (change)="onFileSelected($event)"
-                    style="display: none"
-                  />
-                  <button type="button" class="btn btn-outline" (click)="fileInput.click()">
-                    📁 Choose File
-                  </button>
-                  <button type="button" class="btn btn-outline" (click)="cameraInput.click()">
-                    📷 Take Photo
-                  </button>
-                </div>
-                <div class="image-preview" *ngIf="selectedImagePreview">
-                  <img [src]="selectedImagePreview" alt="Selected image preview" />
-                  <button type="button" class="btn-remove-image" (click)="removeSelectedImage()">×</button>
-                </div>
-                <div class="upload-status" *ngIf="uploadingImage">Uploading image...</div>
-              </div>
-            </div>
-
-            <div class="error-message" *ngIf="errorMessage">
-              {{ errorMessage }}
-            </div>
-
-            <div class="form-buttons">
-              <button type="submit" class="btn btn-primary" [disabled]="transactionForm.invalid || loading || uploadingImage">
-                {{ loading ? (editMode ? 'Saving...' : 'Adding...') : (editMode ? 'Save Changes' : 'Add Transaction') }}
-              </button>
-              <button type="button" class="btn btn-secondary" *ngIf="editMode" (click)="cancelEdit()">
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <div class="transactions-list-section">
-          <h2>Transactions</h2>
-          
-          <div class="summary" *ngIf="transactions.length > 0">
-            <div class="summary-item income">
-              <span class="label">Total Income:</span>
-              <span class="value">\${{ totalIncome.toFixed(2) }}</span>
-            </div>
-            <div class="summary-item expense">
-              <span class="label">Total Expenses:</span>
-              <span class="value">\${{ totalExpenses.toFixed(2) }}</span>
-            </div>
-            <div class="summary-item balance">
-              <span class="label">Balance:</span>
-              <span class="value" [class.negative]="balance < 0">\${{ balance.toFixed(2) }}</span>
-            </div>
-          </div>
-
-          <div class="transactions-list" *ngIf="transactions.length > 0; else noTransactions">
-            <div class="transaction-item" *ngFor="let transaction of transactions" [class]="transaction.type">
-              <div class="transaction-info">
-                <div class="transaction-description">{{ transaction.description }}</div>
-                <div class="transaction-meta">
-                  <span class="transaction-category">{{ transaction.category?.name }}</span>
-                  <span class="transaction-beneficiary" *ngIf="transaction.beneficiary">• {{ transaction.beneficiary.name }}</span>
-                </div>
-                <div class="transaction-dates">
-                  <span class="transaction-date">Date: {{ formatDate(transaction.transaction_date) }}</span>
-                  <span class="transaction-created">Created: {{ formatDate(transaction.created_at) }}</span>
-                </div>
-                <div class="transaction-image" *ngIf="transaction.image_path">
-                  <button type="button" class="btn-view-image" (click)="viewImage(transaction.image_path)">
-                    🖼️ View Receipt
-                  </button>
-                </div>
-              </div>
-              <div class="transaction-amount" [class]="transaction.type">
-                {{ transaction.type === 'income' ? '+' : '-' }}\${{ transaction.amount.toFixed(2) }}
-              </div>
-              <div class="transaction-actions">
-                <button class="btn-edit" (click)="editTransaction(transaction)">Edit</button>
-                <button class="btn-delete" (click)="deleteTransaction(transaction.id)">Delete</button>
-              </div>
-            </div>
-          </div>
-
-          <ng-template #noTransactions>
-            <div class="no-transactions">
-              <p>No transactions yet. Add your first transaction above!</p>
-            </div>
-          </ng-template>
-        </div>
-      </div>
-
-      <!-- Image Modal -->
-      <div class="image-modal" *ngIf="viewingImage" (click)="closeImageModal()">
-        <div class="image-modal-content" (click)="$event.stopPropagation()">
-          <button class="btn-close-modal" (click)="closeImageModal()">×</button>
-          <img [src]="viewingImage" alt="Receipt image" />
-        </div>
-      </div>
-    </div>
-  `,
+  templateUrl: './transactions.component.html',
   styles: [`
     .transactions-container {
       min-height: 100vh;
@@ -291,6 +101,59 @@ import { environment } from '../../../environments/environment';
       border: 1px solid #ddd;
       border-radius: 4px;
       font-size: 14px;
+    }
+
+    /* Filter Section Styles */
+    .filter-section {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .filter-section h3 {
+      margin: 0 0 15px 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .filter-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .filter-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .filter-group label {
+      margin-bottom: 5px;
+      color: #555;
+      font-weight: 500;
+      font-size: 13px;
+    }
+
+    .filter-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .filter-buttons .btn {
+      flex: 0 0 auto;
+    }
+
+    .filter-buttons .btn-primary {
+      width: auto;
     }
 
     .image-upload-controls {
@@ -633,6 +496,7 @@ export class TransactionsComponent implements OnInit {
   @ViewChild('cameraInput') cameraInput!: ElementRef<HTMLInputElement>;
 
   transactionForm: FormGroup;
+  filterForm: FormGroup;
   transactions: Transaction[] = [];
   categories: Category[] = [];
   beneficiaries: Beneficiary[] = [];
@@ -668,6 +532,14 @@ export class TransactionsComponent implements OnInit {
       category_id: ['', Validators.required],
       beneficiary_id: ['', Validators.required]
     });
+
+    this.filterForm = this.fb.group({
+      start_date: [null],
+      end_date: [null],
+      transaction_type: [null],
+      category_id: [null],
+      beneficiary_id: [null]
+    });
   }
 
   ngOnInit(): void {
@@ -690,7 +562,16 @@ export class TransactionsComponent implements OnInit {
   }
 
   loadTransactions(): void {
-    this.transactionService.getTransactions().subscribe({
+    const filters = this.filterForm.value;
+
+    // Build filter parameters
+    const type = filters.transaction_type || undefined;
+    const category_id = filters.category_id ? parseInt(filters.category_id, 10) : undefined;
+    const beneficiary_id = filters.beneficiary_id ? parseInt(filters.beneficiary_id, 10) : undefined;
+    const start_date = filters.start_date ? new Date(filters.start_date).toISOString() : undefined;
+    const end_date = filters.end_date ? new Date(filters.end_date + 'T23:59:59').toISOString() : undefined;
+
+    this.transactionService.getTransactions(0, 100, type, category_id, beneficiary_id, start_date, end_date).subscribe({
       next: (transactions: Transaction[]) => {
         this.transactions = transactions;
       },
@@ -904,6 +785,40 @@ export class TransactionsComponent implements OnInit {
         }
       });
     }
+  }
+
+  // Filter methods
+  applyFilters(): void {
+    this.loadTransactions();
+  }
+
+  setLastMonth(): void {
+    const now = new Date();
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+    this.filterForm.patchValue({
+      start_date: this.formatDateForInput(lastMonth),
+      end_date: this.formatDateForInput(now)
+    });
+    this.loadTransactions();
+  }
+
+  setLast2Months(): void {
+    const now = new Date();
+    const twoMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 2, now.getDate());
+    this.filterForm.patchValue({
+      start_date: this.formatDateForInput(twoMonthsAgo),
+      end_date: this.formatDateForInput(now)
+    });
+    this.loadTransactions();
+  }
+
+  clearFilters(): void {
+    this.filterForm.reset();
+    this.loadTransactions();
+  }
+
+  private formatDateForInput(date: Date): string {
+    return date.toISOString().split('T')[0];
   }
 
   logout(): void {
