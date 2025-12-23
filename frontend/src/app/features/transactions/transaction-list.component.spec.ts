@@ -70,18 +70,18 @@ describe('TransactionListComponent', () => {
     expect(component.transactions.length).toBe(2);
   });
 
-  it('should display transactions in table', () => {
+  it('should display transactions in the list', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    const rows = compiled.querySelectorAll('tbody tr');
-    expect(rows.length).toBe(2);
+    const items = compiled.querySelectorAll('.transaction-item');
+    expect(items.length).toBe(2);
   });
 
   it('should show message when no transactions', () => {
     mockTransactionService.getTransactions.and.returnValue(of([]));
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.textContent).toContain('No transactions found');
+    expect(compiled.textContent).toContain('No transactions');
   });
 
   it('should apply filters', () => {

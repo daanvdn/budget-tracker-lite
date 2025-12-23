@@ -235,6 +235,60 @@ h2 {
   gap: 10px;
 }
 
+/* Monthly Subtotal Row Styles */
+.month-subtotal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.month-subtotal-row:first-child {
+  margin-top: 0;
+}
+
+.month-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+}
+
+.month-totals {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.month-income {
+  font-weight: 600;
+  color: #a8f0c6;
+  font-size: 14px;
+}
+
+.month-expenses {
+  font-weight: 600;
+  color: #ffb3b3;
+  font-size: 14px;
+}
+
+.month-balance {
+  font-weight: 700;
+  color: white;
+  font-size: 15px;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+}
+
+.month-balance.negative {
+  background: rgba(220, 53, 69, 0.4);
+}
+
 .transaction-item {
   display: flex;
   align-items: flex-start;
@@ -436,6 +490,27 @@ h2 {
     text-align: center;
   }
 
+  .month-subtotal-row {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .month-totals {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .month-income,
+  .month-expenses {
+    font-size: 13px;
+  }
+
+  .month-balance {
+    font-size: 14px;
+  }
 
   .transaction-item {
     flex-direction: column;

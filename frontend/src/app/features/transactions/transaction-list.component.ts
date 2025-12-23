@@ -158,4 +158,45 @@ export class TransactionListComponent implements OnInit {
   get balance(): number {
     return this.totalIncome - this.totalExpenses;
   }
+
+  get transactionsGroupedByMonth(): { monthKey: string; monthLabel: string; income: number; expenses: number; balance: number; transactions: Transaction[] }[] {
+    const grouped = new Map<string, { income: number; expenses: number; transactions: Transaction[] }>();
+
+    for (const transaction of this.transactions) {
+      const date = new Date(transaction.transaction_date);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+      if (!grouped.has(monthKey)) {
+        grouped.set(monthKey, { income: 0, expenses: 0, transactions: [] });
+      }
+
+      const group = grouped.get(monthKey)!;
+      group.transactions.push(transaction);
+
+      if (transaction.type === 'income') {
+        group.income += transaction.amount;
+      } else {
+        group.expenses += transaction.amount;
+      }
+    }
+
+    // Sort by month key descending (newest first)
+    const sortedKeys = Array.from(grouped.keys()).sort((a, b) => b.localeCompare(a));
+
+    return sortedKeys.map(monthKey => {
+      const group = grouped.get(monthKey)!;
+      const [year, month] = monthKey.split('-');
+      const monthDate = new Date(parseInt(year), parseInt(month) - 1, 1);
+      const monthLabel = monthDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+
+      return {
+        monthKey,
+        monthLabel,
+        income: group.income,
+        expenses: group.expenses,
+        balance: group.income - group.expenses,
+        transactions: group.transactions
+      };
+    });
+  }
 }
