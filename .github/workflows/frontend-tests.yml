@@ -42,9 +42,16 @@ jobs:
       working-directory: ./frontend
       run: npm list --depth=0
 
-    - name: Run tests
+    - name: Ensure Chrome dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libnss3 libatk-bridge2.0-0 libxss1 libgtk-3-0 libasound2
+
+    - name: Run tests with extra browser logging
       working-directory: ./frontend
-      run: npm test -- --browsers=ChromeHeadless --watch=false --code-coverage
+      run: |
+        npx karma --show-config test -- --browsers=ChromeHeadless --watch=false --code-coverage || true
+        npm test -- --browsers=ChromeHeadless --watch=false --code-coverage
 
     - name: Upload coverage reports
       uses: codecov/codecov-action@v4
