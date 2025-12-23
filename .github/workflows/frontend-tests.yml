@@ -45,8 +45,7 @@ jobs:
     - name: Ensure Chrome dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libnss3 libatk-bridge2.0-0 libxss1 libgtk-3-0 libasound2
-
+        sudo apt-get install -y libnss3 libatk-bridge2.0-0 libxss1 libgtk-3-0 libasound2t64 || sudo apt-get install -y libasound2
     - name: Run tests with extra browser logging
       working-directory: ./frontend
       run: |
