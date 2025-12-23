@@ -5,17 +5,98 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-header h2 {
+  margin: 0;
+  color: #333;
+}
+
 h2 {
   margin: 0 0 20px 0;
   color: #333;
 }
 
+/* Add Transaction Button */
+.btn-add-transaction {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: #28a745;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.4);
+  transition: all 0.2s ease;
+}
+
+.btn-add-transaction:hover {
+  background: #218838;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.5);
+}
+
+.add-icon {
+  line-height: 1;
+  font-weight: 300;
+}
+
 /* Filter Section Styles */
 .filter-section {
   background: #f8f9fa;
-  padding: 20px;
   border-radius: 8px;
   margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.filter-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.filter-toggle h3 {
+  margin: 0;
+  color: #333;
+  font-size: 16px;
+}
+
+.filter-toggle-icon {
+  font-size: 12px;
+  color: #666;
+  transition: transform 0.3s ease;
+  display: inline-block;
+}
+
+.filter-toggle-icon.expanded {
+  transform: rotate(90deg);
+}
+
+.filter-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  padding: 0 20px;
+}
+
+.filter-content.expanded {
+  max-height: 500px;
+  padding: 0 20px 20px 20px;
 }
 
 .filter-section h3 {
@@ -326,4 +407,52 @@ h2 {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .transactions-list-section {
+    padding: 15px;
+  }
+
+  .section-header {
+    margin-bottom: 15px;
+  }
+
+  .section-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .filter-row {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-buttons {
+    flex-direction: column;
+  }
+
+  .filter-buttons .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .summary {
+    grid-template-columns: 1fr;
+  }
+
+  .transaction-item {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .transaction-amount {
+    margin: 0;
+    text-align: left;
+    font-size: 16px;
+  }
+
+  .transaction-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }

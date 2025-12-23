@@ -28,17 +28,95 @@
 }
 
 .content {
-  max-width: 1200px;
+  max-width: 900px;
   margin: 40px auto;
   padding: 0 20px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 30px;
 }
 
 @media (max-width: 768px) {
+  .header {
+    padding: 15px 20px;
+  }
+
+  .header h1 {
+    font-size: 1.2rem;
+  }
+
   .content {
-    grid-template-columns: 1fr;
+    margin: 20px auto;
+    padding: 0 10px;
+  }
+}
+
+/* Form Dialog Overlay */
+.form-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.form-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.form-dialog app-transaction-form {
+  display: block;
+}
+
+.form-dialog ::ng-deep .transaction-form-section {
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.btn-close-dialog {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: #f0f0f0;
+  color: #333;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background-color 0.2s;
+}
+
+.btn-close-dialog:hover {
+  background: #e0e0e0;
+}
+
+@media (max-width: 768px) {
+  .form-dialog-overlay {
+    padding: 10px;
+    align-items: flex-start;
+    padding-top: 20px;
+  }
+
+  .form-dialog {
+    max-width: 100%;
+    max-height: calc(100vh - 40px);
   }
 }
 

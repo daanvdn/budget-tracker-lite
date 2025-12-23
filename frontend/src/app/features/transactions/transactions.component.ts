@@ -23,6 +23,7 @@ export class TransactionsComponent implements OnInit {
   beneficiaries: Beneficiary[] = [];
   currentUser: User | null = null;
   editingTransaction: Transaction | null = null;
+  showFormDialog = false;
 
   constructor(
     private authService: AuthService,
@@ -67,20 +68,31 @@ export class TransactionsComponent implements OnInit {
 
   onTransactionCreated(transaction: Transaction): void {
     this.transactionList.addTransaction(transaction);
+    this.closeFormDialog();
   }
 
   onTransactionUpdated(transaction: Transaction): void {
     this.transactionList.updateTransaction(transaction);
-    this.editingTransaction = null;
+    this.closeFormDialog();
   }
 
   onEditTransaction(transaction: Transaction): void {
     this.editingTransaction = transaction;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    this.showFormDialog = true;
+  }
+
+  onCreateTransaction(): void {
+    this.editingTransaction = null;
+    this.showFormDialog = true;
+  }
+
+  closeFormDialog(): void {
+    this.showFormDialog = false;
+    this.editingTransaction = null;
   }
 
   onEditCancelled(): void {
-    this.editingTransaction = null;
+    this.closeFormDialog();
   }
 
   logout(): void {

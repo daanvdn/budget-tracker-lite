@@ -8,21 +8,28 @@
   </header>
 
   <div class="content">
-    <app-transaction-form
-      [categories]="categories"
-      [beneficiaries]="beneficiaries"
-      [currentUserId]="currentUser?.id ?? null"
-      [editingTransaction]="editingTransaction"
-      (transactionCreated)="onTransactionCreated($event)"
-      (transactionUpdated)="onTransactionUpdated($event)"
-      (editCancelled)="onEditCancelled()">
-    </app-transaction-form>
-
     <app-transaction-list
       [categories]="categories"
       [beneficiaries]="beneficiaries"
-      (editTransaction)="onEditTransaction($event)">
+      (editTransaction)="onEditTransaction($event)"
+      (createTransaction)="onCreateTransaction()">
     </app-transaction-list>
+  </div>
+
+  <!-- Transaction Form Dialog -->
+  <div class="form-dialog-overlay" *ngIf="showFormDialog" (click)="closeFormDialog()">
+    <div class="form-dialog" (click)="$event.stopPropagation()">
+      <button class="btn-close-dialog" (click)="closeFormDialog()">×</button>
+      <app-transaction-form
+        [categories]="categories"
+        [beneficiaries]="beneficiaries"
+        [currentUserId]="currentUser?.id ?? null"
+        [editingTransaction]="editingTransaction"
+        (transactionCreated)="onTransactionCreated($event)"
+        (transactionUpdated)="onTransactionUpdated($event)"
+        (editCancelled)="onEditCancelled()">
+      </app-transaction-form>
+    </div>
   </div>
 </div>
 

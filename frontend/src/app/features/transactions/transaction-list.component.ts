@@ -17,10 +17,12 @@ export class TransactionListComponent implements OnInit {
   @Input() beneficiaries: Beneficiary[] = [];
 
   @Output() editTransaction = new EventEmitter<Transaction>();
+  @Output() createTransaction = new EventEmitter<void>();
 
   transactions: Transaction[] = [];
   filterForm: FormGroup;
   viewingImage: string | null = null;
+  filtersExpanded = false;
 
   constructor(
     private fb: FormBuilder,
@@ -71,6 +73,14 @@ export class TransactionListComponent implements OnInit {
 
   onEditTransaction(transaction: Transaction): void {
     this.editTransaction.emit(transaction);
+  }
+
+  onCreateTransaction(): void {
+    this.createTransaction.emit();
+  }
+
+  toggleFilters(): void {
+    this.filtersExpanded = !this.filtersExpanded;
   }
 
   deleteTransaction(id: number): void {

@@ -45,6 +45,10 @@ export class TransactionFormComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.initForm();
+    // Check if we're in edit mode on init (component may be recreated with editingTransaction already set)
+    if (this.editingTransaction) {
+      this.setEditMode();
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
