@@ -50,7 +50,7 @@ jobs:
 
       - name: Run tests
         working-directory: ./frontend
-        run: npm test -- --browsers=ChromeHeadlessCI --watch=false --code-coverage
+        run: npm test -- --browsers=ChromeHeadless --watch=false --code-coverage
         env:
           CHROME_BIN: /usr/bin/google-chrome
 
