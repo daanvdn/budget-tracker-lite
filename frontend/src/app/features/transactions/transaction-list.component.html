@@ -1,32 +1,123 @@
-<div class="transaction-list">
+<div class="transactions-list-section">
   <h2>Transactions</h2>
-  <div class="filters">
-    <input type="date" [(ngModel)]="filters.start_date" placeholder="Start Date">
-    <input type="date" [(ngModel)]="filters.end_date" placeholder="End Date">
-    <button (click)="applyFilters()">Filter</button>
+
+  <!-- Filter Section -->
+  <div class="filter-section">
+    <h3>Filters</h3>
+    <form [formGroup]="filterForm" class="filter-form">
+      <div class="filter-row">
+        <div class="filter-group">
+          <label for="filter_start_date">Start Date</label>
+          <input
+            type="date"
+            id="filter_start_date"
+            formControlName="start_date"
+            class="form-control"
+          />
+        </div>
+        <div class="filter-group">
+          <label for="filter_end_date">End Date</label>
+          <input
+            type="date"
+            id="filter_end_date"
+            formControlName="end_date"
+            class="form-control"
+          />
+        </div>
+      </div>
+      <div class="filter-row">
+        <div class="filter-group">
+          <label for="filter_type">Transaction Type</label>
+          <select id="filter_type" formControlName="transaction_type" class="form-control">
+            <option [value]="null">All</option>
+            <option value="expense">Expense</option>
+            <option value="income">Income</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="filter_category">Category</label>
+          <select id="filter_category" formControlName="category_id" class="form-control">
+            <option [value]="null">All</option>
+            <option *ngFor="let category of categories" [value]="category.id">
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="filter-row">
+        <div class="filter-group">
+          <label for="filter_beneficiary">Beneficiary</label>
+          <select id="filter_beneficiary" formControlName="beneficiary_id" class="form-control">
+            <option [value]="null">All</option>
+            <option *ngFor="let beneficiary of beneficiaries" [value]="beneficiary.id">
+              {{ beneficiary.name }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="filter-buttons">
+        <button type="button" class="btn btn-outline" (click)="setLastMonth()">Last Month</button>
+        <button type="button" class="btn btn-outline" (click)="setLast2Months()">Last 2 Months</button>
+        <button type="button" class="btn btn-outline" (click)="clearFilters()">Clear Filters</button>
+        <button type="button" class="btn btn-primary" (click)="applyFilters()">Apply Filters</button>
+      </div>
+    </form>
   </div>
-  <table *ngIf="transactions.length > 0">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Amount</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Category</th>
-        <th>Beneficiary</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let transaction of transactions">
-        <td>{{ transaction.transaction_date }}</td>
-        <td>{{ transaction.amount }}</td>
-        <td>{{ transaction.type }}</td>
-        <td>{{ transaction.description }}</td>
-        <td>{{ transaction.category?.name }}</td>
-        <td>{{ transaction.beneficiary?.name }}</td>
-      </tr>
-    </tbody>
-  </table>
-  <p *ngIf="transactions.length === 0">No transactions found.</p>
+
+  <div class="summary" *ngIf="transactions.length > 0">
+    <div class="summary-item income">
+      <span class="label">Total Income:</span>
+      <span class="value">${{ totalIncome.toFixed(2) }}</span>
+    </div>
+    <div class="summary-item expense">
+      <span class="label">Total Expenses:</span>
+      <span class="value">${{ totalExpenses.toFixed(2) }}</span>
+    </div>
+    <div class="summary-item balance">
+      <span class="label">Balance:</span>
+      <span class="value" [class.negative]="balance < 0">${{ balance.toFixed(2) }}</span>
+    </div>
+  </div>
+
+  <div class="transactions-list" *ngIf="transactions.length > 0; else noTransactions">
+    <div class="transaction-item" *ngFor="let transaction of transactions" [class]="transaction.type">
+      <div class="transaction-info">
+        <div class="transaction-description">{{ transaction.description }}</div>
+        <div class="transaction-meta">
+          <span class="transaction-category">{{ transaction.category?.name }}</span>
+          <span class="transaction-beneficiary" *ngIf="transaction.beneficiary">• {{ transaction.beneficiary.name }}</span>
+        </div>
+        <div class="transaction-dates">
+          <span class="transaction-date">Date: {{ formatDate(transaction.transaction_date) }}</span>
+          <span class="transaction-created">Created: {{ formatDate(transaction.created_at) }}</span>
+        </div>
+        <div class="transaction-image" *ngIf="transaction.image_path">
+          <button type="button" class="btn-view-image" (click)="viewImage(transaction.image_path)">
+            🖼️ View Receipt
+          </button>
+        </div>
+      </div>
+      <div class="transaction-amount" [class]="transaction.type">
+        {{ transaction.type === 'income' ? '+' : '-' }}${{ transaction.amount.toFixed(2) }}
+      </div>
+      <div class="transaction-actions">
+        <button class="btn-edit" (click)="onEditTransaction(transaction)">Edit</button>
+        <button class="btn-delete" (click)="deleteTransaction(transaction.id)">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noTransactions>
+    <div class="no-transactions">
+      <p>No transactions yet. Add your first transaction above!</p>
+    </div>
+  </ng-template>
 </div>
 
+<!-- Image Modal -->
+<div class="image-modal" *ngIf="viewingImage" (click)="closeImageModal()">
+  <div class="image-modal-content" (click)="$event.stopPropagation()">
+    <button class="btn-close-modal" (click)="closeImageModal()">×</button>
+    <img [src]="viewingImage" alt="Transaction image" />
+  </div>
+</div>

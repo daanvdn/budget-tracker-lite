@@ -1,34 +1,151 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TransactionService, Transaction } from '../../core/services/transaction.service';
+import { Category, Beneficiary } from '../../shared/models/models';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-transaction-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './transaction-list.component.html',
   styleUrls: ['./transaction-list.component.css']
 })
 export class TransactionListComponent implements OnInit {
-  transactions: Transaction[] = [];
-  filters: any = {};
+  @Input() categories: Category[] = [];
+  @Input() beneficiaries: Beneficiary[] = [];
 
-  constructor(private transactionService: TransactionService) {}
+  @Output() editTransaction = new EventEmitter<Transaction>();
+
+  transactions: Transaction[] = [];
+  filterForm: FormGroup;
+  viewingImage: string | null = null;
+
+  constructor(
+    private fb: FormBuilder,
+    private transactionService: TransactionService
+  ) {
+    this.filterForm = this.fb.group({
+      start_date: [null],
+      end_date: [null],
+      transaction_type: [null],
+      category_id: [null],
+      beneficiary_id: [null]
+    });
+  }
 
   ngOnInit(): void {
     this.loadTransactions();
   }
 
   loadTransactions(): void {
-    this.transactionService.getTransactions().subscribe(
-      data => this.transactions = data
-    );
+    const filters = this.filterForm.value;
+
+    const type = filters.transaction_type || undefined;
+    const category_id = filters.category_id ? parseInt(filters.category_id, 10) : undefined;
+    const beneficiary_id = filters.beneficiary_id ? parseInt(filters.beneficiary_id, 10) : undefined;
+    const start_date = filters.start_date ? new Date(filters.start_date).toISOString() : undefined;
+    const end_date = filters.end_date ? new Date(filters.end_date + 'T23:59:59').toISOString() : undefined;
+
+    this.transactionService.getTransactions(0, 100, type, category_id, beneficiary_id, start_date, end_date).subscribe({
+      next: (transactions: Transaction[]) => {
+        this.transactions = transactions;
+      },
+      error: (error: any) => {
+        console.error('Failed to load transactions', error);
+      }
+    });
+  }
+
+  addTransaction(transaction: Transaction): void {
+    this.transactions.unshift(transaction);
+  }
+
+  updateTransaction(updatedTransaction: Transaction): void {
+    const index = this.transactions.findIndex(t => t.id === updatedTransaction.id);
+    if (index !== -1) {
+      this.transactions[index] = updatedTransaction;
+    }
+  }
+
+  onEditTransaction(transaction: Transaction): void {
+    this.editTransaction.emit(transaction);
+  }
+
+  deleteTransaction(id: number): void {
+    if (confirm('Are you sure you want to delete this transaction?')) {
+      this.transactionService.deleteTransaction(id).subscribe({
+        next: () => {
+          this.transactions = this.transactions.filter(t => t.id !== id);
+        },
+        error: (error: any) => {
+          console.error('Failed to delete transaction', error);
+        }
+      });
+    }
   }
 
   applyFilters(): void {
-    this.transactionService.getTransactions().subscribe(
-      data => this.transactions = data
-    );
+    this.loadTransactions();
+  }
+
+  setLastMonth(): void {
+    const now = new Date();
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+    this.filterForm.patchValue({
+      start_date: this.formatDateForInput(lastMonth),
+      end_date: this.formatDateForInput(now)
+    });
+    this.loadTransactions();
+  }
+
+  setLast2Months(): void {
+    const now = new Date();
+    const twoMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 2, now.getDate());
+    this.filterForm.patchValue({
+      start_date: this.formatDateForInput(twoMonthsAgo),
+      end_date: this.formatDateForInput(now)
+    });
+    this.loadTransactions();
+  }
+
+  clearFilters(): void {
+    this.filterForm.reset();
+    this.loadTransactions();
+  }
+
+  private formatDateForInput(date: Date): string {
+    return date.toISOString().split('T')[0];
+  }
+
+  formatDate(dateString: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  viewImage(imagePath: string): void {
+    this.viewingImage = `${environment.apiUrl}${imagePath.replace('/api', '')}`;
+  }
+
+  closeImageModal(): void {
+    this.viewingImage = null;
+  }
+
+  get totalIncome(): number {
+    return this.transactions
+      .filter(t => t.type === 'income')
+      .reduce((sum, t) => sum + t.amount, 0);
+  }
+
+  get totalExpenses(): number {
+    return this.transactions
+      .filter(t => t.type === 'expense')
+      .reduce((sum, t) => sum + t.amount, 0);
+  }
+
+  get balance(): number {
+    return this.totalIncome - this.totalExpenses;
   }
 }
