@@ -410,7 +410,7 @@ h2 {
 }
 
 /* Mobile Responsive Styles */
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   .transactions-list-section {
     padding: 15px;
   }
@@ -436,9 +436,6 @@ h2 {
     text-align: center;
   }
 
-  .summary {
-    grid-template-columns: 1fr;
-  }
 
   .transaction-item {
     flex-direction: column;
