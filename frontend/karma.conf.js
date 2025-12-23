@@ -25,11 +25,12 @@ module.exports = function (config) {
       suppressAll: true // removes the duplicated traces
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, './coverage/budget-tracker-frontend'),
+      dir: require('path').join(__dirname, './coverage'),
       subdir: '.',
       reporters: [
         { type: 'html' },
-        { type: 'text-summary' }
+        { type: 'text-summary' },
+        { type: 'lcovonly' }  // Add this for Codecov
       ]
     },
     reporters: ['progress', 'kjhtml'],
@@ -37,7 +38,13 @@ module.exports = function (config) {
     customLaunchers: {
       ChromeHeadlessCI: {
         base: 'ChromeHeadless',
-        flags: ['--no-sandbox', '--disable-gpu']
+        flags: [
+          '--no-sandbox',
+          '--disable-gpu',
+          '--disable-dev-shm-usage',
+          '--disable-software-rasterizer',
+          '--disable-extensions'
+        ]
       }
     },
     restartOnFileChange: true,
@@ -45,6 +52,10 @@ module.exports = function (config) {
     browserNoActivityTimeout: 60000,
     captureTimeout: 210000,
     browserDisconnectTolerance: 3,
-    processKillTimeout: 10000
+    processKillTimeout: 10000,
+    singleRun: false,  // Will be overridden by CLI flag
+    // Add this to prevent the double-close issue
+    forceJSONP: false,
+    retryLimit: 1
   });
 };
