@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ..auth.dependencies import get_current_active_user
 from ..database import get_db
+from ..models import User
 from ..schemas import AggregationFilters, AggregationSummary
 from ..services.aggregation import get_aggregation_summary
 
@@ -9,7 +11,11 @@ router = APIRouter(prefix="/aggregations", tags=["aggregations"])
 
 
 @router.get("/summary", response_model=AggregationSummary)
-async def aggregation_summary(filters: AggregationFilters = Depends(), db: AsyncSession = Depends(get_db)):
+async def aggregation_summary(
+    filters: AggregationFilters = Depends(),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
     """
     Get aggregation summary with optional filters
 

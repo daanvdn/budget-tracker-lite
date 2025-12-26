@@ -6,8 +6,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from ..auth.dependencies import get_current_active_user
 from ..database import get_db
 from ..models import Transaction as TransactionModel
+from ..models import User
 from ..schemas import Transaction, TransactionCreate, TransactionType, TransactionUpdate
 
 router = APIRouter(prefix="/transactions", tags=["transactions"])
@@ -24,6 +26,7 @@ async def list_transactions(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
 ):
     """List transactions with optional filters"""
     query = select(TransactionModel).options(
@@ -68,7 +71,11 @@ router.add_api_route(
 
 
 @router.post("", response_model=Transaction, status_code=status.HTTP_201_CREATED)
-async def create_transaction(transaction: TransactionCreate, db: AsyncSession = Depends(get_db)):
+async def create_transaction(
+    transaction: TransactionCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
     """Create a new transaction"""
     db_transaction = TransactionModel(**transaction.model_dump())
     db.add(db_transaction)
@@ -89,7 +96,11 @@ async def create_transaction(transaction: TransactionCreate, db: AsyncSession = 
 
 
 @router.get("/{transaction_id}", response_model=Transaction)
-async def get_transaction(transaction_id: int, db: AsyncSession = Depends(get_db)):
+async def get_transaction(
+    transaction_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
     """Get a transaction by ID"""
     result = await db.execute(
         select(TransactionModel)
@@ -107,7 +118,12 @@ async def get_transaction(transaction_id: int, db: AsyncSession = Depends(get_db
 
 
 @router.put("/{transaction_id}", response_model=Transaction)
-async def update_transaction(transaction_id: int, transaction: TransactionUpdate, db: AsyncSession = Depends(get_db)):
+async def update_transaction(
+    transaction_id: int,
+    transaction: TransactionUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
     """Update a transaction"""
     result = await db.execute(select(TransactionModel).where(TransactionModel.id == transaction_id))
     db_transaction = result.scalar_one_or_none()
@@ -135,7 +151,11 @@ async def update_transaction(transaction_id: int, transaction: TransactionUpdate
 
 
 @router.delete("/{transaction_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_transaction(transaction_id: int, db: AsyncSession = Depends(get_db)):
+async def delete_transaction(
+    transaction_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
     """Delete a transaction"""
     result = await db.execute(select(TransactionModel).where(TransactionModel.id == transaction_id))
     db_transaction = result.scalar_one_or_none()

@@ -5,8 +5,10 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 
 from fastapi import FastAPI, Request
+from fastapi import HTTPException as FastAPIHTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.config.settings import settings
 
@@ -181,15 +183,28 @@ app.add_middleware(
 
 @app.middleware("http")
 async def log_exceptions_middleware(request: Request, call_next):
-    """Middleware to catch and log all exceptions with full tracebacks"""
+    """Middleware to catch and log all exceptions with full tracebacks.
+
+    - For HTTP exceptions (Starlette/FastAPI), return a JSON response with the proper status code.
+    - For other exceptions, log and return a 500 JSON response. Do not re-raise to avoid crashing the worker.
+    """
     try:
-        return await call_next(request)
+        response = await call_next(request)
+        return response
+    except (StarletteHTTPException, FastAPIHTTPException) as http_exc:
+        # Log at info level — these are expected client errors (e.g., 400/401/404)
+        logger.info(f"HTTP exception during request {request.method} {request.url.path}: {http_exc}")
+        # Try to extract detail if available
+        detail = getattr(http_exc, "detail", str(http_exc))
+        status_code = getattr(http_exc, "status_code", 400)
+        return JSONResponse(status_code=status_code, content={"detail": detail})
     except Exception as exc:
         logger.error(
             f"Unhandled exception during request {request.method} {request.url.path}:\n"
             f"{''.join(traceback.format_exception(type(exc), exc, exc.__traceback__))}"
         )
-        raise
+        # Return a generic 500 response instead of re-raising to avoid crashing the worker
+        return JSONResponse(status_code=500, content={"detail": "Internal server error"})
 
 
 @app.exception_handler(Exception)

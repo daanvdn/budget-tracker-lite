@@ -5,6 +5,7 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+from app.auth.security import create_access_token, get_password_hash
 from app.database import Base, get_db
 from app.database import async_engine as production_engine
 from app.main import app
@@ -60,8 +61,37 @@ async def db():
 
 
 @pytest_asyncio.fixture(scope="function")
+async def authenticated_user(db):
+    """Create an authenticated user for testing"""
+    user = User(
+        name="Test Auth User",
+        email="testauth@example.com",
+        hashed_password=get_password_hash("TestPassword123"),
+        is_active=True,
+        created_at=datetime.utcnow(),
+    )
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
+@pytest_asyncio.fixture(scope="function")
+async def auth_token(authenticated_user):
+    """Create an auth token for the authenticated user"""
+    token = create_access_token(data={"sub": authenticated_user.email})
+    return token
+
+
+@pytest_asyncio.fixture(scope="function")
+async def auth_headers(auth_token):
+    """Return authorization headers for authenticated requests"""
+    return {"Authorization": f"Bearer {auth_token}"}
+
+
+@pytest_asyncio.fixture(scope="function")
 async def client(db):
-    """Create a test client with the test database"""
+    """Create a test client with the test database (unauthenticated)"""
 
     async def override_get_db():
         yield db
@@ -70,6 +100,22 @@ async def client(db):
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as test_client:
+        yield test_client
+
+    app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture(scope="function")
+async def authenticated_client(db, auth_headers):
+    """Create a test client with authentication"""
+
+    async def override_get_db():
+        yield db
+
+    app.dependency_overrides[get_db] = override_get_db
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test", headers=auth_headers) as test_client:
         yield test_client
 
     app.dependency_overrides.clear()

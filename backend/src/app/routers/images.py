@@ -1,16 +1,21 @@
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 
+from app.auth.dependencies import get_current_active_user
 from app.config.settings import settings
+from app.models import User
 
 router = APIRouter(prefix="/images", tags=["images"])
 
 
 @router.post("/upload")
-async def upload_image(file: UploadFile = File(...)):
+async def upload_image(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_active_user),
+):
     """
     Upload an image file
     Returns the path that can be stored in transaction
@@ -40,7 +45,10 @@ async def upload_image(file: UploadFile = File(...)):
 
 
 @router.get("/{filename}")
-async def get_image(filename: str):
+async def get_image(
+    filename: str,
+    current_user: User = Depends(get_current_active_user),
+):
     """
     Serve an uploaded image
     """

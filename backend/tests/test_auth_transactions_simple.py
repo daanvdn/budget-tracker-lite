@@ -57,17 +57,19 @@ async def test_auth_flow_and_transaction_creation(simple_client: AsyncClient):
     me_resp = await simple_client.get("/api/auth/me", headers=headers)
     assert me_resp.status_code == 200
 
-    # Create a category first
+    # Create a category first (now requires auth)
     category_resp = await simple_client.post(
         "/api/categories",
+        headers=headers,
         json={"name": "Food", "type": "expense"},
     )
     assert category_resp.status_code == 201
     category_id = category_resp.json()["id"]
 
-    # Create a beneficiary
+    # Create a beneficiary (now requires auth)
     beneficiary_resp = await simple_client.post(
         "/api/beneficiaries",
+        headers=headers,
         json={"name": "Self"},
     )
     assert beneficiary_resp.status_code == 201
