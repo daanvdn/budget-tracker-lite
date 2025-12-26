@@ -5,6 +5,7 @@
     min-height: 100vh;
     background: #f5f5f5;
     padding: 20px;
+    box-sizing: border-box; /* ensure padding doesn't cause overflow */
 }
 
 .login-card {
@@ -14,6 +15,30 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     max-width: 400px;
     width: 100%;
+}
+
+/* Make the card adapt to narrow screens (S23 FE width ~393px) */
+@media (max-width: 420px) {
+  .login-container {
+    padding: 12px; /* reduce outer padding */
+    align-items: flex-start; /* prevent tiny vertical centering issues on very small heights */
+  }
+
+  .login-card {
+    padding: 20px; /* reduce inner padding */
+    max-width: 92vw; /* ensure it never overflows viewport */
+    margin: 8px 0;
+  }
+
+  h2 {
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+  }
+
+  .btn {
+    padding: 12px;
+    font-size: 16px;
+  }
 }
 
 h2 {

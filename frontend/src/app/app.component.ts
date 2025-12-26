@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from './core/services/auth.service';
@@ -13,6 +13,8 @@ import { map, shareReplay } from 'rxjs';
 })
 export class AppComponent {
   title = 'Budget Tracker Lite';
+  mobileNavOpen = false;
+  showScrollTop = false;
 
   constructor(
     private authService: AuthService,
@@ -24,8 +26,29 @@ export class AppComponent {
     shareReplay(1)
   );
 
+  // Expose the current user observable for template welcome message
+  readonly currentUser$ = this.authService.currentUser$.pipe(shareReplay(1));
+
+  toggleMobileNav(): void {
+    this.mobileNavOpen = !this.mobileNavOpen;
+  }
+
+  closeMobileNav(): void {
+    this.mobileNavOpen = false;
+  }
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  @HostListener('window:scroll', [])
+  onWindowScroll(): void {
+    const y = window.scrollY || window.pageYOffset;
+    this.showScrollTop = y > 200;
+  }
+
+  scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }

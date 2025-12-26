@@ -3,29 +3,7 @@
   background: #f5f5f5;
 }
 
-.header {
-  background: white;
-  padding: 20px 40px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.header h1 {
-  margin: 0;
-  color: #333;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.user-info span {
-  color: #555;
-}
+/* Header removed from this component - header now lives in AppComponent */
 
 .content {
   max-width: 900px;
@@ -33,18 +11,10 @@
   padding: 0 20px;
 }
 
-@media (max-width: 768px) {
-  .header {
-    padding: 15px 20px;
-  }
-
-  .header h1 {
-    font-size: 1.2rem;
-  }
-
+@media (max-width: 420px) {
   .content {
     margin: 20px auto;
-    padding: 0 10px;
+    padding: 0 12px;
   }
 }
 
@@ -88,8 +58,8 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  width: 36px;
-  height: 36px;
+  width: 44px; /* larger for touch */
+  height: 44px;
   border-radius: 50%;
   border: none;
   background: #f0f0f0;
@@ -121,10 +91,10 @@
 }
 
 .btn {
-  padding: 10px 20px;
+  padding: 12px 20px; /* slightly larger buttons for touch */
   border: none;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 15px;
   cursor: pointer;
   transition: background-color 0.3s;
 }

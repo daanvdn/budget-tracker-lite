@@ -1,25 +1,43 @@
 <div class="app-shell">
   <header class="app-header">
     <div class="brand">Budget Tracker Lite</div>
+
+    <button class="hamburger" [class.open]="mobileNavOpen" type="button" (click)="toggleMobileNav()" aria-label="Toggle navigation" [attr.aria-expanded]="mobileNavOpen">
+      <span class="hamburger-box">
+        <span class="hamburger-inner"></span>
+      </span>
+    </button>
+
     <ng-container *ngIf="isAuthenticated$ | async; else authLinks">
       <div class="nav-actions">
-        <nav class="nav-links">
-          <a routerLink="/transactions" routerLinkActive="active">Transactions</a>
-          <a routerLink="/categories" routerLinkActive="active">Categories</a>
-          <a routerLink="/beneficiaries" routerLinkActive="active">Beneficiaries</a>
-          <a routerLink="/reports" routerLinkActive="active">Reports</a>
-          <a routerLink="/users" routerLinkActive="active">Users</a>
+
+        <nav class="nav-links" [class.open]="mobileNavOpen">
+          <a routerLink="/transactions" routerLinkActive="active" (click)="closeMobileNav()">Transactions</a>
+          <a routerLink="/categories" routerLinkActive="active" (click)="closeMobileNav()">Categories</a>
+          <a routerLink="/beneficiaries" routerLinkActive="active" (click)="closeMobileNav()">Beneficiaries</a>
+          <a routerLink="/reports" routerLinkActive="active" (click)="closeMobileNav()">Reports</a>
+          <a routerLink="/users" routerLinkActive="active" (click)="closeMobileNav()">Users</a>
+
+          <!-- Mobile-only logout inside menu -->
+          <button class="mobile-logout" type="button" (click)="logout(); closeMobileNav()" aria-label="Logout">Logout</button>
         </nav>
-        <button class="logout-btn" type="button" (click)="logout()">Logout</button>
+
+        <div class="user-area">
+          <span class="welcome" *ngIf="currentUser$ | async as user">Welcome, {{ user.name }}</span>
+          <button class="logout-btn" type="button" (click)="logout()"><span class="logout-text">Logout</span><span class="logout-icon">🔒</span></button>
+        </div>
       </div>
     </ng-container>
+
     <ng-template #authLinks>
-      <div class="nav-links">
-        <a routerLink="/login" routerLinkActive="active">Login</a>
-        <a routerLink="/register" routerLinkActive="active">Register</a>
+      <div class="nav-links" [class.open]="mobileNavOpen">
+        <a routerLink="/login" routerLinkActive="active" (click)="closeMobileNav()">Login</a>
+        <a routerLink="/register" routerLinkActive="active" (click)="closeMobileNav()">Register</a>
       </div>
     </ng-template>
   </header>
   <router-outlet></router-outlet>
+
+  <button class="scroll-to-top" *ngIf="showScrollTop" (click)="scrollToTop()" aria-label="Scroll to top">▲</button>
 </div>
 

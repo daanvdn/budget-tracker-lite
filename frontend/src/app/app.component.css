@@ -4,6 +4,7 @@
 }
 
 .app-header {
+  position: relative; /* allow absolute positioning of the hamburger */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -24,6 +25,7 @@
   gap: 12px;
 }
 
+/* Navigation links - desktop */
 .nav-links {
   display: flex;
   gap: 16px;
@@ -34,8 +36,8 @@
   color: #fff;
   text-decoration: none;
   font-weight: 500;
-  padding: 6px 10px;
-  border-radius: 4px;
+  padding: 10px 12px; /* larger tap targets */
+  border-radius: 6px;
   transition: background-color 0.2s ease;
 }
 
@@ -48,8 +50,8 @@
   border: 1px solid rgba(255, 255, 255, 0.7);
   background: transparent;
   color: #fff;
-  padding: 6px 12px;
-  border-radius: 4px;
+  padding: 8px 14px; /* larger tap area */
+  border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
@@ -58,3 +60,272 @@
   background: rgba(255, 255, 255, 0.15);
 }
 
+.user-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.welcome {
+  font-size: 0.95rem;
+  opacity: 0.95;
+}
+
+/* Hamburger button - hidden on desktop, visible on mobile */
+.hamburger {
+  display: none; /* hide by default (desktop) */
+  border: none;
+  background: transparent;
+  padding: 8px;
+  margin-right: 6px;
+  cursor: pointer;
+}
+.hamburger-box {
+  width: 24px;
+  height: 18px;
+  display: inline-block;
+  position: relative;
+}
+.hamburger-inner,
+.hamburger-inner::before,
+.hamburger-inner::after {
+  width: 24px;
+  height: 2px;
+  background-color: #fff;
+  position: absolute;
+  left: 0;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.hamburger-inner {
+  top: 50%;
+  transform: translateY(-50%);
+}
+.hamburger-inner::before {
+  content: '';
+  top: -7px;
+}
+.hamburger-inner::after {
+  content: '';
+  top: 7px;
+}
+
+/* Hamburger animation */
+.hamburger .hamburger-box {
+  transition: transform 0.2s ease;
+}
+.hamburger .hamburger-inner {
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.hamburger .hamburger-inner::before, .hamburger .hamburger-inner::after {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* When open, morph to X */
+.hamburger.open .hamburger-inner {
+  background-color: transparent; /* hide center bar */
+}
+.hamburger.open .hamburger-inner::before {
+  transform: translateY(7px) rotate(45deg);
+}
+.hamburger.open .hamburger-inner::after {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ensure pseudo elements are visible */
+.hamburger .hamburger-inner::before,
+.hamburger .hamburger-inner::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 24px;
+  height: 2px;
+  background-color: #fff;
+}
+
+/* adjust for mobile display */
+@media (max-width: 420px) {
+  .app-header {
+    padding: 12px 16px;
+  }
+
+  /* Show hamburger on mobile and pin it to the right inside header */
+  .hamburger {
+    display: inline-flex !important;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; /* ensure it's above other header elements */
+    background: transparent;
+    border: none;
+    padding: 8px;
+  }
+
+  .hamburger-box {
+    width: 24px;
+    height: 18px;
+    display: inline-block;
+    position: relative;
+    z-index: 3003;
+  }
+
+  .hamburger .hamburger-inner {
+    background-color: #fff;
+  }
+  .hamburger .hamburger-inner::before {
+    top: -7px;
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 24px;
+    height: 2px;
+    background-color: #fff;
+  }
+  .hamburger .hamburger-inner::after {
+    top: 7px;
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 24px;
+    height: 2px;
+    background-color: #fff;
+  }
+
+  /* Hide desktop user area (duplicate welcome + logout) on mobile */
+  .user-area {
+    display: none;
+  }
+
+  /* mobile welcome is hidden on desktop by default */
+  .mobile-welcome {
+    display: none;
+  }
+
+  /* Show mobile welcome inside the mobile nav */
+  .mobile-welcome {
+    display: block;
+    color: #fff;
+    padding: 8px 12px;
+    font-weight: 500;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Hide desktop nav by default on mobile */
+  .nav-links {
+    position: absolute;
+    top: 64px; /* below header */
+    right: 12px;
+    background: #0d6efd;
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    z-index: 2000;
+    min-width: 180px;
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-links a {
+    padding: 12px 14px; /* larger touch targets */
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Mobile logout styling inside the nav */
+  .mobile-logout {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    margin-top: 8px;
+    text-align: left;
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .mobile-logout:hover {
+    background: rgba(255,255,255,0.12);
+  }
+
+  /* Adjust nav top to account for header height on small devices like S23 FE */
+  .nav-links {
+    top: 56px;
+    right: 8px;
+    min-width: 160px;
+  }
+
+  /* Hide logout text on small screens and show only icon when user-area appears (edge cases) */
+  .logout-btn .logout-text {
+    display: none;
+  }
+  .logout-btn .logout-icon {
+    display: inline-block;
+  }
+}
+
+/* Ensure mobile-only logout is hidden on desktop by explicit min-width rule */
+@media (min-width: 421px) {
+  .mobile-logout {
+    display: none !important;
+  }
+}
+
+/* Ensure mobile-only logout is hidden on desktop by default */
+.mobile-logout {
+  display: none;
+}
+
+/* Scroll to top floating button */
+.scroll-to-top {
+  position: fixed;
+  right: 16px;
+  bottom: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.5);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 3000;
+  transition: opacity 0.2s ease, transform 0.12s ease;
+}
+
+.scroll-to-top:hover {
+  opacity: 0.95;
+  transform: translateY(-2px);
+}
+
+.scroll-to-top:active {
+  transform: translateY(0);
+}
+
+/* Improve general touch target sizes across the app */
+button,
+input[type="button"],
+button[type="button"],
+a.button-like {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+}
+
+/* Ensure accessible focus outlines */
+:focus {
+  outline: 3px solid rgba(13,110,253,0.25);
+  outline-offset: 2px;
+}

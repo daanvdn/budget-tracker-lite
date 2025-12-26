@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 import { Transaction } from '../../core/services/transaction.service';
 import { AuthService, User } from '../../core/services/auth.service';
 import { CategoryService } from '../../core/services/category.service';
@@ -28,8 +27,7 @@ export class TransactionsComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private categoryService: CategoryService,
-    private beneficiaryService: BeneficiaryService,
-    private router: Router
+    private beneficiaryService: BeneficiaryService
   ) {}
 
   ngOnInit(): void {
@@ -93,10 +91,5 @@ export class TransactionsComponent implements OnInit {
 
   onEditCancelled(): void {
     this.closeFormDialog();
-  }
-
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
   }
 }

@@ -1,12 +1,4 @@
 <div class="transactions-container">
-  <header class="header">
-    <h1>Budget Tracker</h1>
-    <div class="user-info" *ngIf="currentUser">
-      <span>Welcome, {{ currentUser.name }}</span>
-      <button class="btn btn-secondary" (click)="logout()">Logout</button>
-    </div>
-  </header>
-
   <div class="content">
     <app-transaction-list
       [categories]="categories"
@@ -32,4 +24,3 @@
     </div>
   </div>
 </div>
-

@@ -528,3 +528,73 @@ h2 {
     justify-content: flex-end;
   }
 }
+
+/* Mobile tweaks specifically for S23 FE and similar narrow devices */
+@media (max-width: 420px) {
+  .transactions-list-section {
+    padding: 12px;
+  }
+
+  /* Move add button left by making header space wrap nicely */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-start; /* align items to the left */
+    flex-wrap: wrap; /* allow title to wrap under if needed */
+  }
+
+  .section-header h2 {
+    flex: 1 1 auto;
+    min-width: 0; /* allow to shrink */
+    margin: 0; /* tighten spacing */
+  }
+
+  .btn-add-transaction {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 auto;
+    margin-left: 0;
+    margin-right: 8px; /* small gap to title */
+  }
+
+  /* Make summary stack vertically and reduce width */
+  .summary {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .summary-item {
+    padding: 8px;
+  }
+
+  /* Ensure transactions-list doesn't cause horizontal scrolling */
+  .transactions-list {
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 4px; /* small padding to avoid clipping */
+    overflow: hidden;
+  }
+
+  /* Reduce forced width on amounts */
+  .transaction-amount {
+    min-width: 0;
+    margin: 0 8px 0 0;
+    text-align: right;
+    font-size: 16px;
+  }
+
+  .transaction-item {
+    padding: 12px;
+    gap: 8px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .transaction-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
