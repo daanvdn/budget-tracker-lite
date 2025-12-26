@@ -281,11 +281,6 @@
   }
 }
 
-/* Ensure mobile-only logout is hidden on desktop by default */
-.mobile-logout {
-  display: none;
-}
-
 /* Scroll to top floating button */
 .scroll-to-top {
   position: fixed;
