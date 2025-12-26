@@ -10,6 +10,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -29,6 +30,13 @@ export class AuthInterceptor implements HttpInterceptor {
           Authorization: `Bearer ${authToken}`
         }
       });
+    }
+
+    // DEV: add dev bypass header when running in dev
+    if (!environment.production && environment.devBypassHeader) {
+      const headerName = environment.devBypassHeader;
+      // If we already set headers above, merge; otherwise set new header
+      req = req.clone({ setHeaders: { ...(req.headers as any), [headerName]: '1' } });
     }
 
     // Handle the request and catch errors

@@ -23,6 +23,14 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: list = ["http://localhost:4200", "http://localhost:8080", "http://localhost:34217"]
 
+    # Development helpers
+    # When DEV_AUTH_BYPASS=True and a request contains the header DEV_BYPASS_HEADER with value '1',
+    # the auth dependency will return the first user from the database (local dev convenience only).
+    DEV_AUTH_BYPASS: bool = False
+    DEV_BYPASS_HEADER: str = "X-DEV-AUTH"
+    # Optional: if set, the bypass will try to find a user with this email; otherwise it returns the first user.
+    DEV_BYPASS_USER_EMAIL: str | None = None
+
     class Config:
         env_file = ".env"
 

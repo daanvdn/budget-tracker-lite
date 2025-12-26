@@ -186,12 +186,12 @@ h2 {
 .summary {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
+  gap: 5px;
   margin-bottom: 20px;
 }
 
 .summary-item {
-  padding: 15px;
+  padding: 5px;
   border-radius: 4px;
   text-align: center;
 }
@@ -232,7 +232,7 @@ h2 {
 .transactions-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 2px;
 }
 
 /* Monthly Subtotal Row Styles */

@@ -37,6 +37,39 @@ All transaction endpoints require authentication. Include the JWT token in the A
 Authorization: Bearer <your-token>
 ```
 
+## Development helper: Dev auth bypass (opt-in, local only)
+
+A small dev-only convenience has been implemented to avoid repeated logins during local frontend development.
+
+- How it works
+  - When enabled, the backend auth dependency will return a local user when a special header is present on a request. This allows the frontend to make authenticated requests during development without performing the login flow.
+
+- How to enable (local only)
+  1. In `backend/.env` set:
+     ```env
+     DEV_AUTH_BYPASS=true
+     # Optional: target a specific dev user by email (fallback is the first user in the DB)
+     DEV_BYPASS_USER_EMAIL=dev@local
+     ```
+  2. Restart the backend so the new env values are picked up.
+  3. Send the header `X-DEV-AUTH: 1` with requests you want to bypass authentication for. Example using curl (PowerShell):
+     ```powershell
+     Invoke-RestMethod -Uri http://localhost:8000/api/auth/me -Headers @{ 'X-DEV-AUTH' = '1' }
+     ```
+
+- Notes
+  - The header name is configurable via the `DEV_BYPASS_HEADER` setting but defaults to `X-DEV-AUTH`.
+  - The bypass returns an existing user from the database (either the one matching `DEV_BYPASS_USER_EMAIL`, if set, or the first user). Make sure you have at least one user in the dev DB.
+  - This feature is strictly for local development. Do NOT enable `DEV_AUTH_BYPASS` on any public or production environment and do not commit a .env containing `DEV_AUTH_BYPASS=true`.
+
+- Where the code lives
+  - Backend settings: `backend/src/app/config/settings.py` (new `DEV_AUTH_BYPASS` settings)
+  - Backend auth dependency: `backend/src/app/auth/dependencies.py` (bypass logic)
+  - Frontend helper (optional): the frontend interceptor can add the header automatically in dev — see `frontend/src/app/core/interceptors/auth.interceptor.ts`.
+
+- Tests
+  - A small test verifying the bypass behavior has been added at `backend/tests/test_dev_bypass.py`.
+
 ## Endpoints
 
 ### Authentication
