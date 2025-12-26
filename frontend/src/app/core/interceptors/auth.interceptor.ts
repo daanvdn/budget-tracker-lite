@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import {
   HttpEvent,
   HttpInterceptor,
@@ -15,37 +15,42 @@ import { environment } from '../../../environments/environment';
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   constructor(
-    private authService: AuthService,
+    private injector: Injector,
     private router: Router
   ) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // Get the auth token from the service
-    const authToken = this.authService.getToken();
+    // Resolve AuthService lazily to avoid circular DI (AuthService -> HttpClient -> interceptors)
+    const authService = this.injector.get(AuthService);
 
-    // Clone the request and add authorization header if token exists
+    // Build headers map to pass to clone() as a plain object
+    const headersToSet: Record<string, string> = {};
+
+    // Get the auth token from the service and include it if present
+    const authToken = authService.getToken();
     if (authToken) {
-      req = req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${authToken}`
-        }
-      });
+      headersToSet['Authorization'] = `Bearer ${authToken}`;
     }
 
     // DEV: add dev bypass header when running in dev
     if (!environment.production && environment.devBypassHeader) {
-      const headerName = environment.devBypassHeader;
-      // If we already set headers above, merge; otherwise set new header
-      req = req.clone({ setHeaders: { ...(req.headers as any), [headerName]: '1' } });
+      headersToSet[environment.devBypassHeader] = '1';
+    }
+
+    // Clone the request once with the computed headers (if any)
+    if (Object.keys(headersToSet).length > 0) {
+      req = req.clone({ setHeaders: headersToSet });
     }
 
     // Handle the request and catch errors
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
+          console.error('Error 401 Unauthorized - redirecting to login.', error);
           // Unauthorized - redirect to login
-          this.authService.logout();
+          authService.logout();
           this.router.navigate(['/login']);
+          console.error("Redirected to login due to 401 Unauthorized.");
         }
         return throwError(() => error);
       })

@@ -24,6 +24,18 @@ uv run uvicorn src.app.main:app --reload --host 0.0.0.0 --port 8000
 
 The API will be available at http://localhost:8000
 
+## Frontend HMR (optional)
+
+For faster frontend development without losing in-memory state (such as auth state during edits), you can run the frontend with Hot Module Replacement:
+
+```bash
+cd ../frontend
+npm install        # only required once
+npm run start:hmr  # starts the dev server with HMR enabled
+```
+
+HMR updates components in-place and avoids a full page reload on most code changes, which helps preserve developer sessions while you iterate. This is a development convenience only and is not used in production builds.
+
 ## API Documentation
 
 Interactive API documentation is available at:

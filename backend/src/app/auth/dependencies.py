@@ -25,6 +25,7 @@ async def get_current_user(
         if header_val == "1":
             # Try to find specific user by email if configured
             if settings.DEV_BYPASS_USER_EMAIL:
+                print("DEV_AUTH_BYPASS active: returning user with email", settings.DEV_BYPASS_USER_EMAIL)
                 result = await db.execute(select(User).filter(User.email == settings.DEV_BYPASS_USER_EMAIL))
                 user = result.scalar_one_or_none()
                 if user:
@@ -33,6 +34,7 @@ async def get_current_user(
             result = await db.execute(select(User).limit(1))
             user = result.scalar_one_or_none()
             if user:
+                print("DEV_AUTH_BYPASS active: returning first user in database")
                 return user
             # If no user exists, fall through to normal credentials flow
 

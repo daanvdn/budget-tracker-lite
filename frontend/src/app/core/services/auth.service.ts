@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, tap } from 'rxjs';
+import { Observable, BehaviorSubject, tap, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface User {
@@ -41,9 +42,14 @@ export class AuthService {
   public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(private http: HttpClient) {
-    // Check if user is already logged in
+    // If a token is present, load the current user
     if (this.getToken()) {
       this.loadCurrentUser();
+    }
+
+    // If running in dev and the dev bypass header is configured, probe /me so dev header can authenticate the session
+    if (!environment.production && environment.devBypassHeader) {
+      this.loadCurrentUser({ suppressLogoutOnErrorIfNoToken: true });
     }
   }
 
@@ -82,6 +88,13 @@ export class AuthService {
     );
   }
 
+  // Public helper to trigger /me probe and return null on error instead of throwing
+  public probeCurrentUser(): Observable<User | null> {
+    return this.getCurrentUser().pipe(
+      catchError(() => of(null))
+    );
+  }
+
   isAuthenticated(): boolean {
     const token = this.getToken();
     if (!token) return false;
@@ -104,9 +117,15 @@ export class AuthService {
     localStorage.setItem('access_token', token);
   }
 
-  private loadCurrentUser(): void {
-    this.getCurrentUser().subscribe({
-      error: () => this.logout()
+  private loadCurrentUser(options?: { suppressLogoutOnErrorIfNoToken?: boolean }): void {
+    this.probeCurrentUser().subscribe({
+      error: () => {
+        // On errors during app bootstrap, only force logout if a token exists.
+        // This avoids immediately logging out dev sessions that rely on the header-only bypass.
+        if (this.getToken() && !options?.suppressLogoutOnErrorIfNoToken) {
+          this.logout();
+        }
+      }
     });
   }
 }

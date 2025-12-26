@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 from pydantic_settings import BaseSettings
 
@@ -33,6 +34,11 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
+
+    def model_post_init(self, context: Any, /) -> None:
+        super().model_post_init(context)
+        if self.DEV_AUTH_BYPASS:
+            print("WARNING: DEV_AUTH_BYPASS is ENABLED. This should only be used in local development environments.")
 
 
 settings = Settings()

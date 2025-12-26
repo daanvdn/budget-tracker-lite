@@ -42,6 +42,8 @@ export class LoginComponent {
           this.router.navigate([this.returnUrl]);
         },
         error: (error) => {
+          //print error to console
+          console.error('Login error:', error);
           this.loading = false;
           this.errorMessage = error.error?.detail || 'Login failed. Please try again.';
         }
