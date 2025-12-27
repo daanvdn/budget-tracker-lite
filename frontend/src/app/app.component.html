@@ -1,43 +1,48 @@
 <div class="app-shell">
-  <header class="app-header">
-    <div class="brand">Budget Tracker Lite</div>
+    <header class="app-header">
+        <div class="brand">Budget Tracker Lite</div>
 
-    <button class="hamburger" [class.open]="mobileNavOpen" type="button" (click)="toggleMobileNav()" aria-label="Toggle navigation" [attr.aria-expanded]="mobileNavOpen">
+        <button (click)="toggleMobileNav()" [attr.aria-expanded]="mobileNavOpen" [class.open]="mobileNavOpen" aria-label="Toggle navigation"
+                class="hamburger" type="button">
       <span class="hamburger-box">
         <span class="hamburger-inner"></span>
       </span>
-    </button>
+        </button>
 
-    <ng-container *ngIf="isAuthenticated$ | async; else authLinks">
-      <div class="nav-actions">
+        <ng-container *ngIf="isDevBypass$ || (isAuthenticated$ | async); else authLinks">
+            <div class="nav-actions">
 
-        <nav class="nav-links" [class.open]="mobileNavOpen">
-          <a routerLink="/transactions" routerLinkActive="active" (click)="closeMobileNav()">Transactions</a>
-          <a routerLink="/categories" routerLinkActive="active" (click)="closeMobileNav()">Categories</a>
-          <a routerLink="/beneficiaries" routerLinkActive="active" (click)="closeMobileNav()">Beneficiaries</a>
-          <a routerLink="/reports" routerLinkActive="active" (click)="closeMobileNav()">Reports</a>
-          <a routerLink="/users" routerLinkActive="active" (click)="closeMobileNav()">Users</a>
+                <nav [class.open]="mobileNavOpen" class="nav-links">
+                    <a (click)="closeMobileNav()" routerLink="/transactions" routerLinkActive="active">Transactions</a>
+                    <a (click)="closeMobileNav()" routerLink="/categories" routerLinkActive="active">Categories</a>
+                    <a (click)="closeMobileNav()" routerLink="/beneficiaries"
+                       routerLinkActive="active">Beneficiaries</a>
+                    <a (click)="closeMobileNav()" routerLink="/reports" routerLinkActive="active">Reports</a>
+                    <a (click)="closeMobileNav()" routerLink="/users" routerLinkActive="active">Users</a>
 
-          <!-- Mobile-only logout inside menu -->
-          <button class="mobile-logout" type="button" (click)="logout(); closeMobileNav()" aria-label="Logout">Logout</button>
-        </nav>
+                    <!-- Mobile-only logout inside menu -->
+                    <button (click)="logout(); closeMobileNav()" aria-label="Logout" class="mobile-logout"
+                            type="button">Logout
+                    </button>
+                </nav>
 
-        <div class="user-area">
-          <span class="welcome" *ngIf="currentUser$ | async as user">Welcome, {{ user.name }}</span>
-          <button class="logout-btn" type="button" (click)="logout()"><span class="logout-text">Logout</span><span class="logout-icon">🔒</span></button>
-        </div>
-      </div>
-    </ng-container>
+                <div class="user-area">
+                    <span *ngIf="currentUser$ | async as user" class="welcome">Welcome, {{ user.name }}</span>
+                    <button (click)="logout()" class="logout-btn" type="button"><span
+                            class="logout-text">Logout</span><span class="logout-icon">🔒</span></button>
+                </div>
+            </div>
+        </ng-container>
 
-    <ng-template #authLinks>
-      <div class="nav-links" [class.open]="mobileNavOpen">
-        <a routerLink="/login" routerLinkActive="active" (click)="closeMobileNav()">Login</a>
-        <a routerLink="/register" routerLinkActive="active" (click)="closeMobileNav()">Register</a>
-      </div>
-    </ng-template>
-  </header>
-  <router-outlet></router-outlet>
+        <ng-template #authLinks>
+            <div [class.open]="mobileNavOpen" class="nav-links">
+                <a (click)="closeMobileNav()" routerLink="/login" routerLinkActive="active">Login</a>
+                <a (click)="closeMobileNav()" routerLink="/register" routerLinkActive="active">Register</a>
+            </div>
+        </ng-template>
+    </header>
+    <router-outlet></router-outlet>
 
-  <button class="scroll-to-top" *ngIf="showScrollTop" (click)="scrollToTop()" aria-label="Scroll to top">▲</button>
+    <button (click)="scrollToTop()" *ngIf="showScrollTop" aria-label="Scroll to top" class="scroll-to-top">▲</button>
 </div>
 

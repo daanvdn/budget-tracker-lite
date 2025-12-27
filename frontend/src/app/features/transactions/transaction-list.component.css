@@ -1,600 +1,627 @@
 .transactions-list-section {
-  background: white;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
 .section-header h2 {
-  margin: 0;
-  color: #333;
+    margin: 0;
+    color: #333;
 }
 
 h2 {
-  margin: 0 0 20px 0;
-  color: #333;
+    margin: 0 0 20px 0;
+    color: #333;
 }
 
 /* Add Transaction Button */
 .btn-add-transaction {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: none;
-  background: #28a745;
-  color: white;
-  font-size: 24px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.4);
-  transition: all 0.2s ease;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: #28a745;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.4);
+    transition: all 0.2s ease;
 }
 
 .btn-add-transaction:hover {
-  background: #218838;
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.5);
+    background: #218838;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.5);
 }
 
 .add-icon {
-  line-height: 1;
-  font-weight: 300;
+    line-height: 1;
+    font-weight: 300;
 }
 
 /* Filter Section Styles */
 .filter-section {
-  background: #f8f9fa;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  overflow: hidden;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
 }
 
 .filter-toggle {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 15px 20px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  text-align: left;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
 }
 
 .filter-toggle h3 {
-  margin: 0;
-  color: #333;
-  font-size: 16px;
+    margin: 0;
+    color: #333;
+    font-size: 16px;
 }
 
 .filter-toggle-icon {
-  font-size: 12px;
-  color: #666;
-  transition: transform 0.3s ease;
-  display: inline-block;
+    font-size: 12px;
+    color: #666;
+    transition: transform 0.3s ease;
+    display: inline-block;
 }
 
 .filter-toggle-icon.expanded {
-  transform: rotate(90deg);
+    transform: rotate(90deg);
 }
 
 .filter-content {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease, padding 0.3s ease;
-  padding: 0 20px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding: 0 20px;
 }
 
 .filter-content.expanded {
-  max-height: 500px;
-  padding: 0 20px 20px 20px;
+    max-height: 500px;
+    padding: 0 20px 20px 20px;
 }
 
 .filter-section h3 {
-  margin: 0 0 15px 0;
-  color: #333;
-  font-size: 16px;
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 16px;
 }
 
 .filter-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 .filter-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
 }
 
 .filter-group {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .filter-group label {
-  margin-bottom: 5px;
-  color: #555;
-  font-weight: 500;
-  font-size: 13px;
+    margin-bottom: 5px;
+    color: #555;
+    font-weight: 500;
+    font-size: 13px;
 }
 
 .form-control {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
 }
 
 .filter-buttons {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 10px;
 }
 
 .filter-buttons .btn {
-  flex: 0 0 auto;
+    flex: 0 0 auto;
 }
 
 .filter-buttons .btn-primary {
-  width: auto;
+    width: auto;
 }
 
 .btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 .btn-outline {
-  padding: 8px 16px;
-  border: 1px solid #007bff;
-  background: white;
-  color: #007bff;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
+    padding: 8px 16px;
+    border: 1px solid #007bff;
+    background: white;
+    color: #007bff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
 }
 
 .btn-outline:hover {
-  background: #f0f7ff;
+    background: #f0f7ff;
 }
 
 .btn-primary {
-  background: #007bff;
-  color: white;
+    background: #007bff;
+    color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #0056b3;
+    background: #0056b3;
 }
 
 .summary {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 5px;
-  margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    margin-bottom: 20px;
 }
 
 .summary-item {
-  padding: 5px;
-  border-radius: 4px;
-  text-align: center;
+    padding: 5px;
+    border-radius: 4px;
+    text-align: center;
 }
 
 .summary-item.income {
-  background: #d4edda;
-  border: 1px solid #c3e6cb;
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
 }
 
 .summary-item.expense {
-  background: #f8d7da;
-  border: 1px solid #f5c6cb;
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
 }
 
 .summary-item.balance {
-  background: #d1ecf1;
-  border: 1px solid #bee5eb;
+    background: #d1ecf1;
+    border: 1px solid #bee5eb;
 }
 
 .summary-item .label {
-  display: block;
-  font-size: 12px;
-  color: #666;
-  margin-bottom: 5px;
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
 }
 
 .summary-item .value {
-  display: block;
-  font-size: 20px;
-  font-weight: bold;
-  color: #333;
+    display: block;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
 }
 
 .summary-item .value.negative {
-  color: #dc3545;
+    color: #dc3545;
 }
 
 .transactions-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 /* Monthly Subtotal Row Styles */
 .month-subtotal-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 8px;
-  margin-top: 10px;
-  margin-bottom: 5px;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 8px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
 .month-subtotal-row:first-child {
-  margin-top: 0;
+    margin-top: 0;
 }
 
 .month-label {
-  font-size: 16px;
-  font-weight: 600;
-  color: white;
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
 }
 
 .month-totals {
-  display: flex;
-  gap: 20px;
-  align-items: center;
+    display: flex;
+    gap: 20px;
+    align-items: center;
 }
 
 .month-income {
-  font-weight: 600;
-  color: #a8f0c6;
-  font-size: 14px;
+    font-weight: 600;
+    color: #a8f0c6;
+    font-size: 14px;
 }
 
 .month-expenses {
-  font-weight: 600;
-  color: #ffb3b3;
-  font-size: 14px;
+    font-weight: 600;
+    color: #ffb3b3;
+    font-size: 14px;
 }
 
 .month-balance {
-  font-weight: 700;
-  color: white;
-  font-size: 15px;
-  padding: 4px 12px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
+    font-weight: 700;
+    color: white;
+    font-size: 15px;
+    padding: 4px 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
 }
 
 .month-balance.negative {
-  background: rgba(220, 53, 69, 0.4);
+    background: rgba(220, 53, 69, 0.4);
 }
 
 .transaction-item {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: background-color 0.2s;
 }
 
 .transaction-item:hover {
-  background: #f9f9f9;
+    background: #f9f9f9;
 }
 
 .transaction-item.income {
-  border-left: 4px solid #28a745;
+    border-left: 4px solid #28a745;
 }
 
 .transaction-item.expense {
-  border-left: 4px solid #dc3545;
+    border-left: 4px solid #dc3545;
 }
 
 .transaction-info {
-  flex: 1;
+    flex: 1;
 }
 
 .transaction-description {
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 5px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 5px;
 }
 
 .transaction-meta {
-  font-size: 12px;
-  color: #666;
-  margin-bottom: 4px;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
 }
 
 .transaction-category {
-  background: #e9ecef;
-  padding: 2px 8px;
-  border-radius: 10px;
+    background: #e9ecef;
+    padding: 2px 8px;
+    border-radius: 10px;
 }
 
 .transaction-beneficiary {
-  margin-left: 8px;
-  color: #888;
+    margin-left: 8px;
+    color: #888;
 }
 
 .transaction-dates {
-  font-size: 11px;
-  color: #999;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+    font-size: 11px;
+    color: #999;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .transaction-image {
-  margin-top: 8px;
+    margin-top: 8px;
 }
 
 .btn-view-image {
-  padding: 4px 10px;
-  font-size: 12px;
-  background: #17a2b8;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+    padding: 4px 10px;
+    font-size: 12px;
+    background: #17a2b8;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 .btn-view-image:hover {
-  background: #138496;
+    background: #138496;
 }
 
 .transaction-amount {
-  font-size: 18px;
-  font-weight: bold;
-  margin: 0 15px;
-  min-width: 100px;
-  text-align: right;
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0 15px;
+    min-width: 100px;
+    text-align: right;
 }
 
 .transaction-amount.income {
-  color: #28a745;
+    color: #28a745;
 }
 
 .transaction-amount.expense {
-  color: #dc3545;
+    color: #dc3545;
 }
 
 .transaction-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
+    display: flex;
+    gap: 8px;
+    align-items: center;
 }
 
 .btn-edit {
-  padding: 5px 15px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 12px;
-  cursor: pointer;
+    padding: 5px 15px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
 }
 
 .btn-edit:hover {
-  background: #0056b3;
+    background: #0056b3;
 }
 
 .btn-delete {
-  padding: 5px 15px;
-  background: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 12px;
-  cursor: pointer;
+    padding: 5px 15px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
 }
 
 .btn-delete:hover {
-  background: #c82333;
+    background: #c82333;
 }
 
 .no-transactions {
-  text-align: center;
-  padding: 40px;
-  color: #666;
+    text-align: center;
+    padding: 40px;
+    color: #666;
 }
 
 /* Image Modal */
 .image-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
 }
 
 .image-modal-content {
-  position: relative;
-  max-width: 90%;
-  max-height: 90%;
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
 }
 
 .image-modal-content img {
-  max-width: 100%;
-  max-height: 80vh;
-  border-radius: 8px;
+    max-width: 100%;
+    max-height: 80vh;
+    border-radius: 8px;
 }
 
 .btn-close-modal {
-  position: absolute;
-  top: -40px;
-  right: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: none;
-  background: white;
-  color: #333;
-  font-size: 24px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    position: absolute;
+    top: -40px;
+    right: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: white;
+    color: #333;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Mobile Responsive Styles */
 @media (max-width: 480px) {
-  .transactions-list-section {
-    padding: 15px;
-  }
+    .transactions-list-section {
+        padding: 15px;
+    }
 
-  .section-header {
-    margin-bottom: 15px;
-  }
+    .section-header {
+        margin-bottom: 15px;
+    }
 
-  .section-header h2 {
-    font-size: 1.25rem;
-  }
+    .section-header h2 {
+        font-size: 1.25rem;
+    }
 
-  .filter-row {
-    grid-template-columns: 1fr;
-  }
+    .filter-row {
+        grid-template-columns: 1fr;
+    }
 
-  .filter-buttons {
-    flex-direction: column;
-  }
+    .filter-buttons {
+        flex-direction: column;
+    }
 
-  .filter-buttons .btn {
-    width: 100%;
-    text-align: center;
-  }
+    .filter-buttons .btn {
+        width: 100%;
+        text-align: center;
+    }
 
-  .month-subtotal-row {
-    flex-direction: column;
-    gap: 10px;
-    align-items: flex-start;
-  }
+    .month-subtotal-row {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
 
-  .month-totals {
-    width: 100%;
-    justify-content: space-between;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
+    .month-totals {
+        width: 100%;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
 
-  .month-income,
-  .month-expenses {
-    font-size: 13px;
-  }
+    .month-income,
+    .month-expenses {
+        font-size: 13px;
+    }
 
-  .month-balance {
-    font-size: 14px;
-  }
+    .month-balance {
+        font-size: 14px;
+    }
 
-  .transaction-item {
-    flex-direction: column;
-    gap: 10px;
-  }
+    .transaction-item {
+        flex-direction: column;
+        gap: 10px;
+    }
 
-  .transaction-amount {
-    margin: 0;
-    text-align: left;
-    font-size: 16px;
-  }
+    .transaction-amount {
+        margin: 0;
+        text-align: left;
+        font-size: 16px;
+    }
 
-  .transaction-actions {
-    width: 100%;
-    justify-content: flex-end;
-  }
+    .transaction-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
 }
 
 /* Mobile tweaks specifically for S23 FE and similar narrow devices */
 @media (max-width: 420px) {
-  .transactions-list-section {
-    padding: 12px;
-  }
+    .transactions-list-section {
+        padding: 12px;
+    }
 
-  /* Move add button left by making header space wrap nicely */
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    justify-content: flex-start; /* align items to the left */
-    flex-wrap: wrap; /* allow title to wrap under if needed */
-  }
+    /* Move add button left by making header space wrap nicely */
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: flex-start; /* align items to the left */
+        flex-wrap: wrap; /* allow title to wrap under if needed */
+    }
 
-  .section-header h2 {
-    flex: 1 1 auto;
-    min-width: 0; /* allow to shrink */
-    margin: 0; /* tighten spacing */
-  }
+    .section-header h2 {
+        flex: 1 1 auto;
+        min-width: 0; /* allow to shrink */
+        margin: 0; /* tighten spacing */
+    }
 
-  .btn-add-transaction {
-    width: 44px;
-    height: 44px;
-    flex: 0 0 auto;
-    margin-left: 0;
-    margin-right: 8px; /* small gap to title */
-  }
+    .btn-add-transaction {
+        width: 44px;
+        height: 44px;
+        flex: 0 0 auto;
+        margin-left: 0;
+        margin-right: 8px; /* small gap to title */
+    }
 
-  /* Make summary stack vertically and reduce width */
-  .summary {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
-    margin-bottom: 12px;
-  }
+    /* Keep summary items side-by-side on narrow screens but make them shrink to avoid horizontal scroll */
+    .summary {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+        width: 100%;
+        box-sizing: border-box;
+        /* Prevent accidental horizontal scroll on very small devices */
+        overflow-x: hidden;
+    }
 
-  .summary-item {
-    padding: 8px;
-  }
+    .summary-item {
+        padding: 8px;
+        flex: 1 1 0; /* allow items to shrink and share available space */
+        min-width: 0; /* ensures children can shrink/wrap instead of forcing overflow */
+    }
 
-  /* Ensure transactions-list doesn't cause horizontal scrolling */
-  .transactions-list {
-    width: 100%;
-    box-sizing: border-box;
-    padding-right: 4px; /* small padding to avoid clipping */
-    overflow: hidden;
-  }
+    /* Slightly reduce label/value sizes so numbers fit better on small screens */
+    .summary-item .label {
+        font-size: 11px;
+    }
 
-  /* Reduce forced width on amounts */
-  .transaction-amount {
-    min-width: 0;
-    margin: 0 8px 0 0;
-    text-align: right;
-    font-size: 16px;
-  }
+    .summary-item .value {
+        font-size: 18px;
+    }
 
-  .transaction-item {
-    padding: 12px;
-    gap: 8px;
-    flex-direction: column;
-    align-items: stretch;
-  }
+    /* Fallback: on extremely narrow viewports allow wrapping to multiple rows so nothing gets cut off */
+    @media (max-width: 340px) {
+        .summary {
+            flex-wrap: wrap;
+            gap: 6px;
+        }
 
-  .transaction-actions {
-    width: 100%;
-    justify-content: flex-end;
-  }
+        .summary-item {
+            flex: 0 0 33.333%; /* try to keep three per row but allow wrap */
+            box-sizing: border-box;
+        }
+    }
+
+    /* Ensure transactions-list doesn't cause horizontal scrolling */
+    .transactions-list {
+        width: 100%;
+        box-sizing: border-box;
+        padding-right: 4px; /* small padding to avoid clipping */
+        overflow: hidden;
+    }
+
+    /* Reduce forced width on amounts */
+    .transaction-amount {
+        min-width: 0;
+        margin: 0 8px 0 0;
+        text-align: right;
+        font-size: 16px;
+    }
+
+    .transaction-item {
+        padding: 12px;
+        gap: 8px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .transaction-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
 }

@@ -16,7 +16,8 @@ async def get_current_user(
     """Get the current authenticated user
 
     - If DEV_AUTH_BYPASS is enabled and the request contains the DEV_BYPASS_HEADER set to '1',
-      return a local dev user (first user or by configured email).
+      return a local dev user (first user or by configured email). If no user exists, create and return
+      a dummy dev user.
     - Otherwise validate the JWT token from the Authorization header (Bearer token).
     """
     # Dev bypass: explicit opt-in only
@@ -36,7 +37,13 @@ async def get_current_user(
             if user:
                 print("DEV_AUTH_BYPASS active: returning first user in database")
                 return user
-            # If no user exists, fall through to normal credentials flow
+            # If no user exists, create a dummy dev user and return it
+            dummy_user = User(name="Dev Bypass User", email="dev-bypass@local", is_active=True)
+            db.add(dummy_user)
+            await db.commit()
+            await db.refresh(dummy_user)
+            print("DEV_AUTH_BYPASS active: created and returned dummy dev user")
+            return dummy_user
 
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
