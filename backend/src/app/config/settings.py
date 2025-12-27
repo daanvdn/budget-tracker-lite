@@ -39,6 +39,13 @@ class Settings(BaseSettings):
         super().model_post_init(context)
         if self.DEV_AUTH_BYPASS:
             print("WARNING: DEV_AUTH_BYPASS is ENABLED. This should only be used in local development environments.")
+        # print absolute paths to upload dir and database file
+        print(f"Upload directory: {self.upload_dir.resolve()}")
+        if self.DATABASE_URL.startswith("sqlite+aiosqlite:///"):
+            db_path = self.DATABASE_URL.replace("sqlite+aiosqlite:///", "")
+            print(f"Database file: {Path(db_path).resolve()}")
+        else:
+            print(f"Database URL: {self.DATABASE_URL}")
 
 
 settings = Settings()
