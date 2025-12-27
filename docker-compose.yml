@@ -9,7 +9,7 @@ services:
     volumes:
       - ./data:/data
     environment:
-      - DATABASE_URL=sqlite+aiosqlite:///data/budget_tracker.db
+      - DATABASE_URL=sqlite+aiosqlite:////data/budget_tracker.db
     restart: unless-stopped
     networks:
       - budget-tracker-network
