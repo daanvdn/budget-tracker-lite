@@ -18,7 +18,7 @@ RUN npm run build
 FROM nginx:alpine
 
 # Copy built application from build stage
-COPY --from=build /app/dist/budget-tracker-frontend/browser /usr/share/nginx/html
+COPY --from=build /app/dist/budget-tracker-lite /usr/share/nginx/html
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
