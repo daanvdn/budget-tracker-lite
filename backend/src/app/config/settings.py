@@ -22,7 +22,13 @@ class Settings(BaseSettings):
     RESET_TOKEN_EXPIRE_MINUTES: int = 60  # 1 hour
 
     # CORS
-    CORS_ORIGINS: list = ["http://localhost:4200", "http://localhost:8080", "http://localhost:34217"]
+    CORS_ORIGINS: list = [
+        "http://localhost",
+        "http://localhost:4200",
+        "http://localhost:8080",
+        "http://localhost:8000",
+        "http://localhost:34217",
+    ]
 
     # Development helpers
     # When DEV_AUTH_BYPASS=True and a request contains the header DEV_BYPASS_HEADER with value '1',
