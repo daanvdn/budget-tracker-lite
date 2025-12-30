@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: budget-tracker-backend
     ports:
-      - "8000:8000"
+      - "8001:8001"
     volumes:
       - ./data:/data
     environment:
@@ -21,7 +21,7 @@ services:
       dockerfile: Dockerfile
     container_name: budget-tracker-frontend
     ports:
-      - "80:80"
+      - "81:81"
     depends_on:
       - backend
     restart: unless-stopped
