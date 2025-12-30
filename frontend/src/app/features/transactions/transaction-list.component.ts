@@ -4,6 +4,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TransactionService, Transaction } from '../../core/services/transaction.service';
 import { Category, Beneficiary } from '../../shared/models/models';
 import { environment } from '../../../environments/environment';
+import { ImageService } from '../../core/services/image.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-transaction-list',
@@ -22,11 +24,14 @@ export class TransactionListComponent implements OnInit {
   transactions: Transaction[] = [];
   filterForm: FormGroup;
   viewingImage: string | null = null;
+  viewingImageBlobUrl: string | null = null;
   filtersExpanded = false;
 
   constructor(
     private fb: FormBuilder,
-    private transactionService: TransactionService
+    private transactionService: TransactionService,
+    private imageService: ImageService,
+    private authService: AuthService
   ) {
     this.filterForm = this.fb.group({
       start_date: [null],
@@ -136,11 +141,27 @@ export class TransactionListComponent implements OnInit {
   }
 
   viewImage(imagePath: string): void {
-    this.viewingImage = `${environment.apiUrl}${imagePath.replace('/api', '')}`;
+    const filename = imagePath.split('/').pop();
+    const token = this.authService.getToken();
+    if (!filename || !token) {
+      this.viewingImageBlobUrl = null;
+      return;
+    }
+    this.imageService.getImageBlob(filename, token).subscribe({
+      next: (blob: Blob) => {
+        this.viewingImageBlobUrl = URL.createObjectURL(blob);
+      },
+      error: () => {
+        this.viewingImageBlobUrl = null;
+      }
+    });
   }
 
   closeImageModal(): void {
-    this.viewingImage = null;
+    if (this.viewingImageBlobUrl) {
+      URL.revokeObjectURL(this.viewingImageBlobUrl);
+    }
+    this.viewingImageBlobUrl = null;
   }
 
   get totalIncome(): number {

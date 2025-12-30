@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { TransactionService, Transaction, TransactionCreate, TransactionUpdate } from '../../core/services/transaction.service';
 import { ImageService } from '../../core/services/image.service';
+import { AuthService } from '../../core/services/auth.service';
 import { Category, Beneficiary } from '../../shared/models/models';
 import { environment } from '../../../environments/environment';
 
@@ -40,7 +41,8 @@ export class TransactionFormComponent implements OnInit, OnChanges {
   constructor(
     private fb: FormBuilder,
     private transactionService: TransactionService,
-    private imageService: ImageService
+    private imageService: ImageService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -94,7 +96,20 @@ export class TransactionFormComponent implements OnInit, OnChanges {
     // Handle existing image
     if (this.editingTransaction.image_path) {
       this.uploadedImagePath = this.editingTransaction.image_path;
-      this.selectedImagePreview = `${environment.apiUrl}${this.editingTransaction.image_path.replace('/api', '')}`;
+      const filename = this.editingTransaction.image_path.split('/').pop();
+      const token = this.authService.getToken();
+      if (filename && token) {
+        this.imageService.getImageBlob(filename, token).subscribe({
+          next: (blob: Blob) => {
+            this.selectedImagePreview = URL.createObjectURL(blob);
+          },
+          error: () => {
+            this.selectedImagePreview = null;
+          }
+        });
+      } else {
+        this.selectedImagePreview = null;
+      }
     }
   }
 

@@ -40,6 +40,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
+        ignore_extra = True
 
     def model_post_init(self, context: Any, /) -> None:
         super().model_post_init(context)

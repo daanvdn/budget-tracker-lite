@@ -140,9 +140,9 @@
 </div>
 
 <!-- Image Modal -->
-<div class="image-modal" *ngIf="viewingImage" (click)="closeImageModal()">
+<div class="image-modal" *ngIf="viewingImageBlobUrl" (click)="closeImageModal()">
   <div class="image-modal-content" (click)="$event.stopPropagation()">
     <button class="btn-close-modal" (click)="closeImageModal()">×</button>
-    <img [src]="viewingImage" alt="Transaction image" />
+    <img [src]="viewingImageBlobUrl" alt="Transaction image" />
   </div>
 </div>
