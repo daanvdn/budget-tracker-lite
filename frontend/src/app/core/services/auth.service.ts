@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, Observable, of, tap} from 'rxjs';
-import {catchError} from 'rxjs/operators';
+import {catchError, finalize} from 'rxjs/operators';
 import {environment} from '../../../environments/environment';
 
 export interface User {
@@ -31,6 +31,10 @@ export interface LoginData {
 export interface ForgotPasswordResponse {
     message: string;
     reset_token?: string;
+}
+
+export interface LogoutResponse {
+    message: string;
 }
 
 @Injectable({
@@ -68,6 +72,21 @@ export class AuthService {
     }
 
     logout(): void {
+        // Call backend to blocklist the token, then clear local state
+        // We fire-and-forget since we want to clear local state regardless of API success
+        if (this.getToken()) {
+            this.http.post<LogoutResponse>(`${this.apiUrl}/logout`, {}).pipe(
+                catchError(() => of(null)),  // Ignore errors, clear local state anyway
+                finalize(() => {
+                    this.clearLocalAuth();
+                })
+            ).subscribe();
+        } else {
+            this.clearLocalAuth();
+        }
+    }
+
+    private clearLocalAuth(): void {
         localStorage.removeItem('access_token');
         this.currentUserSubject.next(null);
     }

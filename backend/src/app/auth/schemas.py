@@ -81,3 +81,9 @@ class ResetPasswordResponse(BaseModel):
     """Schema for reset password response"""
 
     message: str
+
+
+class LogoutResponse(BaseModel):
+    """Schema for logout response"""
+
+    message: str

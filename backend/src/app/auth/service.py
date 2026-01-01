@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import re
 import secrets
@@ -8,12 +9,89 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.schemas import Token, UserLogin, UserRegister
-from app.auth.security import create_access_token, get_password_hash, verify_password
+from app.auth.security import create_access_token, decode_access_token, get_password_hash, verify_password
 from app.config.settings import settings
 from app.models.password_reset_token import PasswordResetToken
+from app.models.token_blocklist import TokenBlocklist
 from app.models.user import User
 
 logger = logging.getLogger(__name__)
+
+
+def _get_token_jti(token: str) -> str:
+    """Get the unique identifier for a token
+
+    Uses the embedded jti claim if present, otherwise falls back to a hash of the token.
+    """
+    # Try to extract jti from token payload first
+    payload = decode_access_token(token)
+    if payload and "jti" in payload:
+        return payload["jti"]
+    # Fall back to hash for tokens without embedded jti
+    return hashlib.sha256(token.encode()).hexdigest()
+
+
+async def blocklist_token(db: AsyncSession, token: str) -> bool:
+    """Add a token to the blocklist
+
+    Returns True if token was blocklisted, False if already blocklisted or invalid
+    """
+    # Decode the token to get expiration
+    payload = decode_access_token(token)
+    if payload is None:
+        logger.warning("Attempted to blocklist an invalid token")
+        return False
+
+    # Get expiration from token
+    exp_timestamp = payload.get("exp")
+    if exp_timestamp is None:
+        logger.warning("Token has no expiration claim")
+        return False
+
+    expires_at = datetime.utcfromtimestamp(exp_timestamp)
+
+    # Generate JTI (JWT ID) from token hash
+    jti = _get_token_jti(token)
+
+    # Check if already blocklisted
+    result = await db.execute(select(TokenBlocklist).filter(TokenBlocklist.jti == jti))
+    existing = result.scalar_one_or_none()
+    if existing:
+        logger.debug("Token already blocklisted")
+        return True  # Already blocklisted, consider it success
+
+    # Add to blocklist
+    blocklist_entry = TokenBlocklist(jti=jti, token=token, expires_at=expires_at, created_at=datetime.utcnow())
+
+    db.add(blocklist_entry)
+    await db.commit()
+
+    logger.info(f"Token blocklisted, expires at {expires_at}")
+    return True
+
+
+async def is_token_blocklisted(db: AsyncSession, token: str) -> bool:
+    """Check if a token is in the blocklist"""
+    jti = _get_token_jti(token)
+    result = await db.execute(select(TokenBlocklist).filter(TokenBlocklist.jti == jti))
+    return result.scalar_one_or_none() is not None
+
+
+async def cleanup_expired_blocklist_tokens(db: AsyncSession) -> int:
+    """Remove expired tokens from the blocklist
+
+    Returns the number of tokens removed
+    """
+    from sqlalchemy import delete
+
+    stmt = delete(TokenBlocklist).where(TokenBlocklist.expires_at < datetime.utcnow())
+    result = await db.execute(stmt)
+    await db.commit()
+    # For async SQLAlchemy, rowcount may not always be available, return 0 if not
+    try:
+        return result.rowcount or 0
+    except AttributeError:
+        return 0
 
 
 def validate_password_strength(password: str) -> tuple[bool, str]:

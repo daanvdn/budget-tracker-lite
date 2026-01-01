@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.schemas import TokenData
 from app.auth.security import decode_access_token
+from app.auth.service import is_token_blocklisted
 from app.config.settings import settings
 from app.database.session import get_db
 from app.models.user import User
@@ -19,6 +20,7 @@ async def get_current_user(
       return a local dev user (first user or by configured email). If no user exists, create and return
       a dummy dev user.
     - Otherwise validate the JWT token from the Authorization header (Bearer token).
+    - Also checks if the token has been blocklisted (logged out).
     """
     # Dev bypass: explicit opt-in only
     if settings.DEV_AUTH_BYPASS:
@@ -66,6 +68,10 @@ async def get_current_user(
 
     payload = decode_access_token(token)
     if payload is None:
+        raise credentials_exception
+
+    # Check if token is blocklisted (user logged out)
+    if await is_token_blocklisted(db, token):
         raise credentials_exception
 
     email: str = payload.get("sub")

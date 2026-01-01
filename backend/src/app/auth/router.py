@@ -1,13 +1,14 @@
 import logging
 import traceback
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_active_user
 from app.auth.schemas import (
     ForgotPasswordRequest,
     ForgotPasswordResponse,
+    LogoutResponse,
     ResetPasswordRequest,
     ResetPasswordResponse,
     Token,
@@ -17,6 +18,7 @@ from app.auth.schemas import (
 )
 from app.auth.service import (
     authenticate_user,
+    blocklist_token,
     create_password_reset_token,
     create_user_token,
     register_user,
@@ -82,6 +84,31 @@ async def login(login_data: UserLogin, db: AsyncSession = Depends(get_db)):
 async def get_current_user_info(current_user: User = Depends(get_current_active_user)):
     """Get current authenticated user information"""
     return current_user
+
+
+@router.post("/logout", response_model=LogoutResponse)
+async def logout(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    """Logout user by blocklisting their current token
+
+    This invalidates the current access token so it cannot be used again,
+    even if it hasn't expired yet.
+    """
+    # Extract the token from the Authorization header
+    auth_header = request.headers.get("authorization") or request.headers.get("Authorization")
+    if auth_header:
+        try:
+            _, token = auth_header.split()
+            await blocklist_token(db, token)
+            logger.info(f"User {current_user.email} logged out successfully")
+        except Exception as e:
+            logger.error(f"Error during logout: {e}")
+            # Even if blocklisting fails, we return success as the frontend will clear the token
+
+    return LogoutResponse(message="Successfully logged out")
 
 
 @router.post("/forgot-password", response_model=ForgotPasswordResponse)
