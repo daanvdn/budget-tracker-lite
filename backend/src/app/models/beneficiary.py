@@ -13,3 +13,5 @@ class Beneficiary(Base):
     name = Column(String, nullable=False, unique=True)
 
     transactions = relationship("Transaction", back_populates="beneficiary")
+    gift_occasions = relationship("GiftOccasion", back_populates="person")
+    gift_entries = relationship("GiftEntry", back_populates="person")

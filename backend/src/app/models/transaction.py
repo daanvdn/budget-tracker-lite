@@ -1,6 +1,16 @@
 from datetime import datetime
 
-from sqlalchemy import JSON, Column, DateTime, Enum, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import (
+    JSON,
+    Column,
+    DateTime,
+    Enum,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
 from sqlalchemy.orm import relationship
 
 from app.database.session import Base
@@ -29,3 +39,5 @@ class Transaction(Base):
     category = relationship("Category", back_populates="transactions")
     beneficiary = relationship("Beneficiary", back_populates="transactions")
     created_by_user = relationship("User", back_populates="transactions")
+    gift_entries = relationship("GiftEntry", back_populates="transaction")
+    gift_purchases = relationship("GiftPurchase", back_populates="transaction")

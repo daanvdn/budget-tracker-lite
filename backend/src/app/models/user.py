@@ -19,3 +19,6 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     transactions = relationship("Transaction", back_populates="created_by_user")
+    gift_occasions = relationship("GiftOccasion", back_populates="created_by_user")
+    gift_entries = relationship("GiftEntry", back_populates="created_by_user")
+    gift_purchases = relationship("GiftPurchase", back_populates="created_by_user")

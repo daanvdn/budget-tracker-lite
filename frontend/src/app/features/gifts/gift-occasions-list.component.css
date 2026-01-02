@@ -1,0 +1,241 @@
+.gift-occasions-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #333;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #45a049;
+}
+
+.btn-icon {
+    padding: 6px 10px;
+    background: transparent;
+    font-size: 1rem;
+}
+
+.btn-icon:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.btn-danger:hover {
+    background-color: rgba(255, 0, 0, 0.1);
+}
+
+.error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+}
+
+.occasions-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.occasion-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.occasion-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.occasion-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.occasion-icon {
+    font-size: 2rem;
+}
+
+.occasion-title {
+    flex: 1;
+}
+
+.occasion-title h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.occasion-date {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.occasion-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.occasion-person {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 12px;
+    padding-left: 44px;
+}
+
+.occasion-summary {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 12px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.summary-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.summary-item .label {
+    font-size: 0.8rem;
+    color: #666;
+    text-transform: uppercase;
+}
+
+.summary-item .value {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.summary-item.received .value {
+    color: #4CAF50;
+}
+
+.summary-item.given .value {
+    color: #2196F3;
+}
+
+.summary-item.spent .value {
+    color: #FF9800;
+}
+
+.summary-item.balance .value.positive {
+    color: #4CAF50;
+}
+
+.summary-item.balance .value.negative {
+    color: #f44336;
+}
+
+.occasion-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.tag {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    background-color: #e3f2fd;
+    color: #1976d2;
+    text-transform: capitalize;
+}
+
+.tag.type-tag {
+    background-color: #f3e5f5;
+    color: #7b1fa2;
+}
+
+/* Dialog styles */
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.dialog-content {
+    background: white;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+    }
+
+    .occasions-list {
+        grid-template-columns: 1fr;
+    }
+
+    .occasion-summary {
+        grid-template-columns: 1fr;
+    }
+}
+

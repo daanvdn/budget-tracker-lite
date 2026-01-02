@@ -1,0 +1,189 @@
+<div *ngIf="!loading && occasion" class="detail-container">
+    <!-- Header -->
+    <div class="detail-header">
+        <button (click)="goBack()" class="btn btn-back">← Back</button>
+        <div class="header-title">
+            <span class="occasion-icon">{{ getOccasionIcon(occasion.occasion_type) }}</span>
+            <div>
+                <h1>{{ occasion.name }}</h1>
+                <span class="occasion-meta">
+          <span *ngIf="occasion.occasion_date">{{ formatDate(occasion.occasion_date) }}</span>
+          <span *ngIf="occasion.person"> • For: {{ occasion.person.name }}</span>
+        </span>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+    </div>
+
+    <!-- Summary Cards -->
+    <div *ngIf="occasion.is_pool_account" class="summary-cards">
+        <div class="summary-card received">
+            <span class="summary-label">Received</span>
+            <span class="summary-value">{{ formatCurrency(totalReceived) }}</span>
+        </div>
+        <div class="summary-card spent">
+            <span class="summary-label">Spent</span>
+            <span class="summary-value">{{ formatCurrency(totalPurchases) }}</span>
+        </div>
+        <div [class.negative]="balance < 0" [class.positive]="balance >= 0" class="summary-card balance">
+            <span class="summary-label">Balance</span>
+            <span class="summary-value">{{ formatCurrency(balance) }}</span>
+        </div>
+    </div>
+
+    <!-- Non-pool account summary -->
+    <div *ngIf="!occasion.is_pool_account" class="summary-cards">
+        <div *ngIf="totalReceived > 0" class="summary-card received">
+            <span class="summary-label">Total Received</span>
+            <span class="summary-value">{{ formatCurrency(totalReceived) }}</span>
+        </div>
+        <div *ngIf="totalGiven > 0" class="summary-card given">
+            <span class="summary-label">Total Given</span>
+            <span class="summary-value">{{ formatCurrency(totalGiven) }}</span>
+        </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div [class.pool-mode]="occasion.is_pool_account" class="content-grid">
+        <!-- Money Received Section -->
+        <div *ngIf="occasion.is_pool_account || receivedEntries.length > 0" class="section">
+            <div class="section-header">
+                <h2>💰 Money Received</h2>
+                <button (click)="openAddEntry(GiftDirection.RECEIVED)" class="btn btn-add">+ Add</button>
+            </div>
+            <div class="entries-list">
+                <div
+                        (click)="openEditEntry(entry)"
+                        *ngFor="let entry of receivedEntries"
+                        class="entry-card"
+                >
+                    <div class="entry-main">
+                        <span class="entry-date">{{ formatDate(entry.gift_date) }}</span>
+                        <span class="entry-person">{{ entry.person?.name || 'Unknown' }}</span>
+                        <span class="entry-amount received">{{ formatCurrency(entry.amount) }}</span>
+                    </div>
+                    <div *ngIf="entry.description" class="entry-details">
+                        {{ entry.description }}
+                    </div>
+                    <div *ngIf="entry.transaction" class="entry-link">
+                        🔗 Linked to transaction #{{ entry.transaction.id }}
+                    </div>
+                    <button (click)="deleteEntry(entry, $event)" class="btn btn-delete">🗑️</button>
+                </div>
+                <div *ngIf="receivedEntries.length === 0" class="empty-section">
+                    No money received yet
+                </div>
+            </div>
+        </div>
+
+        <!-- Money Given Section (for non-pool accounts) -->
+        <div *ngIf="!occasion.is_pool_account" class="section">
+            <div class="section-header">
+                <h2>🎁 Money Given</h2>
+                <button (click)="openAddEntry(GiftDirection.GIVEN)" class="btn btn-add">+ Add</button>
+            </div>
+            <div class="entries-list">
+                <div
+                        (click)="openEditEntry(entry)"
+                        *ngFor="let entry of givenEntries"
+                        class="entry-card"
+                >
+                    <div class="entry-main">
+                        <span class="entry-date">{{ formatDate(entry.gift_date) }}</span>
+                        <span class="entry-person">{{ entry.person?.name || 'Unknown' }}</span>
+                        <span class="entry-amount given">{{ formatCurrency(entry.amount) }}</span>
+                    </div>
+                    <div *ngIf="entry.description" class="entry-details">
+                        {{ entry.description }}
+                    </div>
+                    <div *ngIf="entry.transaction" class="entry-link">
+                        🔗 Linked to transaction #{{ entry.transaction.id }}
+                    </div>
+                    <button (click)="deleteEntry(entry, $event)" class="btn btn-delete">🗑️</button>
+                </div>
+                <div *ngIf="givenEntries.length === 0" class="empty-section">
+                    No money given yet
+                </div>
+            </div>
+        </div>
+
+        <!-- Purchases Section (only for pool accounts) -->
+        <div *ngIf="occasion.is_pool_account" class="section">
+            <div class="section-header">
+                <h2>🛒 Purchases Made</h2>
+                <button (click)="openAddPurchase()" class="btn btn-add">+ Add</button>
+            </div>
+            <div class="entries-list">
+                <div
+                        (click)="openEditPurchase(purchase)"
+                        *ngFor="let purchase of sortedPurchases"
+                        class="entry-card"
+                >
+                    <div class="entry-main">
+                        <span class="entry-date">{{ formatDate(purchase.purchase_date) }}</span>
+                        <span class="entry-description">{{ purchase.description }}</span>
+                        <span class="entry-amount spent">{{ formatCurrency(purchase.amount) }}</span>
+                    </div>
+                    <div *ngIf="purchase.transaction" class="entry-link">
+                        🔗 Linked to transaction #{{ purchase.transaction.id }}
+                    </div>
+                    <button (click)="deletePurchase(purchase, $event)" class="btn btn-delete">🗑️</button>
+                </div>
+                <div *ngIf="sortedPurchases.length === 0" class="empty-section">
+                    No purchases made yet
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes -->
+    <div *ngIf="occasion.notes" class="notes-section">
+        <h3>Notes</h3>
+        <p>{{ occasion.notes }}</p>
+    </div>
+</div>
+
+<div *ngIf="loading" class="loading">
+    Loading...
+</div>
+
+<div *ngIf="!loading && !occasion" class="error-state">
+    <p>Gift occasion not found</p>
+    <button (click)="goBack()" class="btn btn-primary">Go Back</button>
+</div>
+
+<!-- Entry Form Dialog -->
+<div (click)="closeEntryForm()" *ngIf="showEntryForm" class="dialog-overlay">
+    <div (click)="$event.stopPropagation()" class="dialog-content">
+        <app-gift-entry-form
+                (cancelled)="closeEntryForm()"
+                (entryCreated)="onEntryCreated($event)"
+                (entryUpdated)="onEntryUpdated($event)"
+                [beneficiaries]="beneficiaries"
+                [currentUserId]="currentUserId"
+                [defaultDirection]="defaultEntryDirection"
+                [editingEntry]="editingEntry"
+                [occasionId]="occasion?.id || 0"
+                [transactions]="transactions"
+        ></app-gift-entry-form>
+    </div>
+</div>
+
+<!-- Purchase Form Dialog -->
+<div (click)="closePurchaseForm()" *ngIf="showPurchaseForm" class="dialog-overlay">
+    <div (click)="$event.stopPropagation()" class="dialog-content">
+        <app-gift-purchase-form
+                (cancelled)="closePurchaseForm()"
+                (purchaseCreated)="onPurchaseCreated($event)"
+                (purchaseUpdated)="onPurchaseUpdated($event)"
+                [currentUserId]="currentUserId"
+                [editingPurchase]="editingPurchase"
+                [occasionId]="occasion?.id || 0"
+                [transactions]="transactions"
+        ></app-gift-purchase-form>
+    </div>
+</div>
+

@@ -20,6 +20,22 @@ class CategoryType(str, Enum):
     BOTH = "both"
 
 
+class OccasionType(str, Enum):
+    """Occasion type enumeration for gift occasions"""
+
+    BIRTHDAY = "birthday"
+    HOLIDAY = "holiday"
+    CELEBRATION = "celebration"
+    OTHER = "other"
+
+
+class GiftDirection(str, Enum):
+    """Gift direction enumeration"""
+
+    GIVEN = "given"
+    RECEIVED = "received"
+
+
 # User Schemas
 class UserBase(BaseModel):
     """Base user schema"""
@@ -171,3 +187,6 @@ class AggregationSummary(BaseModel):
     net_total: float = 0.0
     net_balance: float = 0.0
     transaction_count: int = 0
+
+
+# Gift Schemas

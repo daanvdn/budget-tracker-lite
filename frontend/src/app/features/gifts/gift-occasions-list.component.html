@@ -1,0 +1,92 @@
+<div class="gift-occasions-container">
+    <div class="header">
+        <h1>Gift Occasions</h1>
+        <button (click)="openCreateDialog()" class="btn btn-primary">+ New Occasion</button>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+    </div>
+
+    <div *ngIf="loading" class="loading">
+        Loading...
+    </div>
+
+    <div *ngIf="!loading && occasions.length === 0" class="empty-state">
+        <p>No gift occasions yet. Create your first one!</p>
+    </div>
+
+    <div *ngIf="!loading && occasions.length > 0" class="occasions-list">
+        <div
+                (click)="viewOccasion(occasion)"
+                *ngFor="let occasion of occasions"
+                class="occasion-card"
+        >
+            <div class="occasion-header">
+                <span class="occasion-icon">{{ getOccasionIcon(occasion.occasion_type) }}</span>
+                <div class="occasion-title">
+                    <h3>{{ occasion.name }}</h3>
+                    <span *ngIf="occasion.occasion_date" class="occasion-date">
+            {{ formatDate(occasion.occasion_date) }}
+          </span>
+                </div>
+                <div class="occasion-actions">
+                    <button (click)="openEditDialog(occasion); $event.stopPropagation()" class="btn btn-icon"
+                            title="Edit">
+                        ✏️
+                    </button>
+                    <button (click)="deleteOccasion(occasion, $event)" class="btn btn-icon btn-danger" title="Delete">
+                        🗑️
+                    </button>
+                </div>
+            </div>
+
+            <div *ngIf="occasion.person" class="occasion-person">
+                For: {{ occasion.person.name }}
+            </div>
+
+            <div class="occasion-summary">
+                <div *ngIf="occasion.summary.total_received > 0" class="summary-item received">
+                    <span class="label">Received:</span>
+                    <span class="value">{{ formatCurrency(occasion.summary.total_received) }}</span>
+                </div>
+                <div *ngIf="occasion.summary.total_given > 0" class="summary-item given">
+                    <span class="label">Given:</span>
+                    <span class="value">{{ formatCurrency(occasion.summary.total_given) }}</span>
+                </div>
+                <div *ngIf="occasion.is_pool_account && occasion.summary.total_purchases > 0"
+                     class="summary-item spent">
+                    <span class="label">Spent:</span>
+                    <span class="value">{{ formatCurrency(occasion.summary.total_purchases) }}</span>
+                </div>
+                <div *ngIf="occasion.is_pool_account" class="summary-item balance">
+                    <span class="label">Balance:</span>
+                    <span [class.negative]="occasion.summary.balance < 0" [class.positive]="occasion.summary.balance >= 0"
+                          class="value">
+            {{ formatCurrency(occasion.summary.balance) }}
+          </span>
+                </div>
+            </div>
+
+            <div class="occasion-tags">
+                <span *ngIf="occasion.is_pool_account" class="tag">Pool Account</span>
+                <span class="tag type-tag">{{ occasion.occasion_type }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form Dialog -->
+<div (click)="closeFormDialog()" *ngIf="showFormDialog" class="dialog-overlay">
+    <div (click)="$event.stopPropagation()" class="dialog-content">
+        <app-gift-occasion-form
+                (cancelled)="closeFormDialog()"
+                (occasionCreated)="onOccasionCreated($event)"
+                (occasionUpdated)="onOccasionUpdated($event)"
+                [beneficiaries]="beneficiaries"
+                [currentUserId]="currentUserId"
+                [editingOccasion]="editingOccasion"
+        ></app-gift-occasion-form>
+    </div>
+</div>
+

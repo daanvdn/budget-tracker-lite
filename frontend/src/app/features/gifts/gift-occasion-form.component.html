@@ -1,0 +1,85 @@
+<div class="form-container">
+    <h2>{{ isEditMode ? 'Edit' : 'New' }} Gift Occasion</h2>
+
+    <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+    </div>
+
+    <form (ngSubmit)="onSubmit()" [formGroup]="form">
+        <div class="form-group">
+            <label for="name">Name *</label>
+            <input
+                    formControlName="name"
+                    id="name"
+                    placeholder="e.g., Child's Birthday 2026"
+                    type="text"
+            />
+            <div *ngIf="form.get('name')?.invalid && form.get('name')?.touched" class="error">
+                Name is required
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="occasion_type">Occasion Type *</label>
+            <select formControlName="occasion_type" id="occasion_type">
+                <option *ngFor="let type of occasionTypes" [value]="type">
+                    {{ formatOccasionType(type) }}
+                </option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="occasion_date">Date</label>
+            <input
+                    formControlName="occasion_date"
+                    id="occasion_date"
+                    type="date"
+            />
+        </div>
+
+        <div class="form-group">
+            <label for="person_id">For Person (Optional)</label>
+            <select formControlName="person_id" id="person_id">
+                <option [ngValue]="null">-- None --</option>
+                <option *ngFor="let b of beneficiaries" [ngValue]="b.id">
+                    {{ b.name }}
+                </option>
+            </select>
+        </div>
+
+        <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+                <input formControlName="is_pool_account" type="checkbox"/>
+                <span>Pool Account</span>
+            </label>
+            <p class="help-text">
+                Enable this to track money received for someone (e.g., child's birthday money)
+                and purchases made from that pool.
+            </p>
+        </div>
+
+        <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea
+                    formControlName="notes"
+                    id="notes"
+                    placeholder="Any additional notes..."
+                    rows="3"
+            ></textarea>
+        </div>
+
+        <div class="form-actions">
+            <button (click)="onCancel()" class="btn btn-secondary" type="button">
+                Cancel
+            </button>
+            <button
+                    [disabled]="form.invalid || loading"
+                    class="btn btn-primary"
+                    type="submit"
+            >
+                {{ loading ? 'Saving...' : (isEditMode ? 'Update' : 'Create') }}
+            </button>
+        </div>
+    </form>
+</div>
+

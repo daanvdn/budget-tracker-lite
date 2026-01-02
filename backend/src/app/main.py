@@ -26,6 +26,7 @@ from .routers import (
     aggregations,
     beneficiaries,
     categories,
+    gift_occasions,
     images,
     transactions,
     users,
@@ -228,6 +229,7 @@ app.include_router(beneficiaries.router, prefix=settings.api_prefix)
 app.include_router(transactions.router, prefix=settings.api_prefix)
 app.include_router(aggregations.router, prefix=settings.api_prefix)
 app.include_router(images.router, prefix=settings.api_prefix)
+app.include_router(gift_occasions.router, prefix=settings.api_prefix)
 
 
 @app.get("/")
