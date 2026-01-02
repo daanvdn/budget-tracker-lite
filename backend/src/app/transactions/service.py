@@ -56,6 +56,8 @@ def _to_response(transaction: Transaction, category_name: str, user_id: int) -> 
         type=transaction.type.value,
         date=transaction.transaction_date,
         created_at=transaction.created_at,
+        notes=transaction.notes,
+        tags=transaction.tags or [],
     )
 
 
@@ -73,6 +75,8 @@ async def create_transaction(db: AsyncSession, transaction_data: TransactionCrea
         category_id=category.id,
         beneficiary_id=beneficiary.id,
         created_by_user_id=user.id,
+        notes=transaction_data.notes,
+        tags=transaction_data.tags or [],
     )
 
     db.add(transaction)
@@ -147,6 +151,10 @@ async def update_transaction(
         transaction.type = TransactionType(transaction_data.type)
     if transaction_data.date is not None:
         transaction.transaction_date = transaction_data.date
+    if transaction_data.notes is not None:
+        transaction.notes = transaction_data.notes
+    if transaction_data.tags is not None:
+        transaction.tags = transaction_data.tags
 
     category_name: Optional[str] = None
     if transaction_data.category is not None:

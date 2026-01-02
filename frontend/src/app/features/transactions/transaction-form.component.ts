@@ -70,7 +70,9 @@ export class TransactionFormComponent implements OnInit, OnChanges {
       transaction_date: [this.getCurrentDateTime(), Validators.required],
       type: ['expense', Validators.required],
       category_id: ['', Validators.required],
-      beneficiary_id: ['', Validators.required]
+      beneficiary_id: ['', Validators.required],
+      notes: [''],
+      tags: ['']  // Will be stored as comma-separated string, converted to array on submit
     });
   }
 
@@ -83,6 +85,9 @@ export class TransactionFormComponent implements OnInit, OnChanges {
     const transactionDate = new Date(this.editingTransaction.transaction_date);
     const formattedDate = transactionDate.toISOString().slice(0, 16);
 
+    // Convert tags array to comma-separated string for editing
+    const tagsString = this.editingTransaction.tags?.join(', ') || '';
+
     // Populate the form with existing values
     this.transactionForm.patchValue({
       description: this.editingTransaction.description,
@@ -90,7 +95,9 @@ export class TransactionFormComponent implements OnInit, OnChanges {
       transaction_date: formattedDate,
       type: this.editingTransaction.type,
       category_id: this.editingTransaction.category_id,
-      beneficiary_id: this.editingTransaction.beneficiary_id
+      beneficiary_id: this.editingTransaction.beneficiary_id,
+      notes: this.editingTransaction.notes || '',
+      tags: tagsString
     });
 
     // Handle existing image
@@ -169,6 +176,19 @@ export class TransactionFormComponent implements OnInit, OnChanges {
     this.uploadedImagePath = null;
   }
 
+  /**
+   * Parse comma-separated tags string into array of trimmed, non-empty strings
+   */
+  private parseTags(tagsString: string): string[] {
+    if (!tagsString || !tagsString.trim()) {
+      return [];
+    }
+    return tagsString
+      .split(',')
+      .map(tag => tag.trim())
+      .filter(tag => tag.length > 0);
+  }
+
   onSubmit(): void {
     if (this.transactionForm.valid && this.currentUserId) {
       this.loading = true;
@@ -176,6 +196,7 @@ export class TransactionFormComponent implements OnInit, OnChanges {
 
       const formValue = this.transactionForm.value;
       const transactionDate = new Date(formValue.transaction_date).toISOString();
+      const tags = this.parseTags(formValue.tags);
 
       if (this.editMode && this.editingTransaction) {
         const updateData: TransactionUpdate = {
@@ -185,7 +206,9 @@ export class TransactionFormComponent implements OnInit, OnChanges {
           transaction_date: transactionDate,
           category_id: parseInt(formValue.category_id, 10),
           beneficiary_id: parseInt(formValue.beneficiary_id, 10),
-          image_path: this.uploadedImagePath || this.editingTransaction.image_path || undefined
+          image_path: this.uploadedImagePath || this.editingTransaction.image_path || undefined,
+          notes: formValue.notes || undefined,
+          tags: tags.length > 0 ? tags : undefined
         };
 
         this.transactionService.updateTransaction(this.editingTransaction.id, updateData).subscribe({
@@ -208,7 +231,9 @@ export class TransactionFormComponent implements OnInit, OnChanges {
           category_id: parseInt(formValue.category_id, 10),
           beneficiary_id: parseInt(formValue.beneficiary_id, 10),
           created_by_user_id: this.currentUserId,
-          image_path: this.uploadedImagePath || undefined
+          image_path: this.uploadedImagePath || undefined,
+          notes: formValue.notes || undefined,
+          tags: tags.length > 0 ? tags : undefined
         };
 
         this.transactionService.createTransaction(transactionData).subscribe({
@@ -235,7 +260,9 @@ export class TransactionFormComponent implements OnInit, OnChanges {
     this.editMode = false;
     this.transactionForm.reset({
       type: 'expense',
-      transaction_date: this.getCurrentDateTime()
+      transaction_date: this.getCurrentDateTime(),
+      notes: '',
+      tags: ''
     });
     this.removeSelectedImage();
   }

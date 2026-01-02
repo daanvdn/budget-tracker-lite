@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, Enum, Float, ForeignKey, Integer, String
+from sqlalchemy import JSON, Column, DateTime, Enum, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 from app.database.session import Base
@@ -18,6 +18,8 @@ class Transaction(Base):
     description = Column(String, nullable=False)
     type = Column(Enum(TransactionType), nullable=False, index=True)
     image_path = Column(String, nullable=True)
+    notes = Column(Text, nullable=True)  # Free text field for large notes
+    tags = Column(JSON, nullable=True, default=list)  # List of strings
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)

@@ -111,6 +111,12 @@
             <span class="transaction-category">{{ transaction.category?.name }}</span>
             <span class="transaction-beneficiary" *ngIf="transaction.beneficiary">• {{ transaction.beneficiary.name }}</span>
           </div>
+          <div class="transaction-tags" *ngIf="transaction.tags && transaction.tags.length > 0">
+            <span class="tag" *ngFor="let tag of transaction.tags">{{ tag }}</span>
+          </div>
+          <div class="transaction-notes" *ngIf="transaction.notes">
+            <span class="notes-preview">{{ transaction.notes | slice:0:100 }}{{ transaction.notes.length > 100 ? '...' : '' }}</span>
+          </div>
           <div class="transaction-dates">
             <span class="transaction-date">Date: {{ formatDate(transaction.transaction_date) }}</span>
             <span class="transaction-created">Created: {{ formatDate(transaction.created_at) }}</span>

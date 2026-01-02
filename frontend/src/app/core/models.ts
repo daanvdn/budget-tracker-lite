@@ -8,6 +8,8 @@ export interface Transaction {
   beneficiary_id: number;
   created_by_user_id: number;
   image_path?: string;
+  notes?: string;
+  tags?: string[];
   created_at?: string;
   category?: Category;
   beneficiary?: Beneficiary;

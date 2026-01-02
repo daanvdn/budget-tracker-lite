@@ -27,6 +27,8 @@ export interface Transaction {
   description: string;
   transaction_date: string;
   image_path?: string;
+  notes?: string;
+  tags?: string[];
   category_id: number;
   beneficiary_id: number;
   created_by_user_id: number;
@@ -45,6 +47,8 @@ export interface TransactionCreate {
   beneficiary_id: number;
   created_by_user_id: number;
   image_path?: string;
+  notes?: string;
+  tags?: string[];
 }
 
 export interface TransactionUpdate {
@@ -56,6 +60,8 @@ export interface TransactionUpdate {
   beneficiary_id?: number;
   created_by_user_id?: number;
   image_path?: string;
+  notes?: string;
+  tags?: string[];
 }
 
 @Injectable({

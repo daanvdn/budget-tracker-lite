@@ -42,6 +42,89 @@ Interactive API documentation is available at:
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
 
+## Database Migrations
+
+This project uses [Alembic](https://alembic.sqlalchemy.org/) for database migrations.
+
+### Automatic Migrations (Docker)
+
+**Migrations run automatically when the Docker container starts.** The entrypoint script handles all cases:
+
+| Database State | What Happens |
+|---------------|--------------|
+| New database | All migrations run to create schema |
+| Existing DB, no alembic tracking | Auto-detects and stamps appropriately, then applies pending migrations |
+| Existing DB with alembic tracking | Only pending migrations are applied |
+| Already up to date | Nothing happens (fast startup) |
+
+Alembic tracks applied migrations in an `alembic_version` table, so it knows exactly what needs to run.
+
+**Deployment workflow:**
+1. Pull the latest code on your NAS
+2. Rebuild and restart the container: `docker-compose up -d --build`
+3. Migrations happen automatically on startup!
+
+You can check the container logs to see migration output:
+```bash
+docker logs budget-tracker-backend
+```
+
+### Running Migrations Manually
+
+**Locally (Windows PowerShell):**
+```powershell
+cd backend
+.\run-migrations.ps1
+```
+
+**Locally (Linux/macOS):**
+```bash
+cd backend
+./run-migrations.sh
+```
+
+**On NAS (via Docker):**
+```bash
+# SSH into your NAS and run:
+cd /path/to/budget-tracker-lite/backend
+./run-migrations.sh --docker
+```
+
+**Or directly with the Python script:**
+```bash
+# Set DATABASE_URL if needed (for production database)
+DATABASE_URL=sqlite:////data/budget_tracker.db uv run python migrate.py
+```
+
+### Migration Commands
+
+```bash
+# Check migration status
+uv run python migrate.py --status
+
+# Upgrade to latest
+uv run python migrate.py
+
+# Downgrade one revision
+uv run python migrate.py --downgrade
+
+# Stamp existing database (for databases that already have the schema)
+uv run python migrate.py --stamp-head
+```
+
+### Creating New Migrations
+
+When you change the database models, create a new migration:
+```bash
+cd backend
+uv run alembic revision --autogenerate -m "description_of_changes"
+```
+
+Then review the generated migration file in `alembic/versions/` and run:
+```bash
+uv run alembic upgrade head
+```
+
 ## Authentication
 
 All transaction endpoints require authentication. Include the JWT token in the Authorization header:

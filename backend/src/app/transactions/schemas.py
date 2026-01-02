@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -12,6 +12,8 @@ class TransactionCreate(BaseModel):
     category: str = Field(..., min_length=1, max_length=50)
     type: str = Field(..., pattern="^(income|expense)$")
     date: Optional[datetime] = None
+    notes: Optional[str] = None
+    tags: Optional[List[str]] = Field(default_factory=list)
 
     class Config:
         json_schema_extra = {
@@ -21,6 +23,8 @@ class TransactionCreate(BaseModel):
                 "category": "Food",
                 "type": "expense",
                 "date": "2024-01-15T10:00:00",
+                "notes": "Weekly groceries from local supermarket",
+                "tags": ["groceries", "weekly", "essential"],
             }
         }
 
@@ -33,6 +37,8 @@ class TransactionUpdate(BaseModel):
     category: Optional[str] = Field(None, min_length=1, max_length=50)
     type: Optional[str] = Field(None, pattern="^(income|expense)$")
     date: Optional[datetime] = None
+    notes: Optional[str] = None
+    tags: Optional[List[str]] = None
 
 
 class TransactionResponse(BaseModel):
@@ -46,6 +52,8 @@ class TransactionResponse(BaseModel):
     type: str
     date: datetime
     created_at: datetime
+    notes: Optional[str] = None
+    tags: Optional[List[str]] = Field(default_factory=list)
 
     class Config:
         from_attributes = True

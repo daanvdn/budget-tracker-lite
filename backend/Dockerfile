@@ -17,8 +17,19 @@ ENV PYTHONPATH="/app/src:${PYTHONPATH}"
 # Copy application code
 COPY src/ ./src/
 
+# Copy alembic migration files
+COPY alembic.ini ./
+COPY alembic/ ./alembic/
+COPY migrate.py ./
+COPY auto_migrate.py ./
+
+# Copy and setup entrypoint script
+COPY docker-entrypoint.sh ./
+RUN chmod +x docker-entrypoint.sh
+
 # Expose port
 EXPOSE 8000
 
-# Run the application - use the package name `app` (not `src.app`) so imports resolve
+# Use entrypoint to run migrations before starting the app
+ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

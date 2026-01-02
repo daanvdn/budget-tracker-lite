@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -115,6 +115,8 @@ class TransactionBase(BaseModel):
     beneficiary_id: int
     created_by_user_id: int
     image_path: Optional[str] = None
+    notes: Optional[str] = None
+    tags: Optional[List[str]] = Field(default_factory=list)
 
 
 class TransactionCreate(TransactionBase):
@@ -134,6 +136,8 @@ class TransactionUpdate(BaseModel):
     beneficiary_id: Optional[int] = None
     created_by_user_id: Optional[int] = None
     image_path: Optional[str] = None
+    notes: Optional[str] = None
+    tags: Optional[List[str]] = None
 
 
 class Transaction(TransactionBase):
