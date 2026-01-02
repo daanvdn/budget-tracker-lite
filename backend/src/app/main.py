@@ -10,11 +10,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from app.auth.router import router as auth_router
 from app.config.settings import settings
-
-from .auth.router import router as auth_router
-from .database import AsyncSessionLocal, init_db
-from .models import (
+from app.database import AsyncSessionLocal, init_db
+from app.models import (
     Beneficiary,
     Category,
     CategoryType,
@@ -22,7 +21,7 @@ from .models import (
     TransactionType,
     User,
 )
-from .routers import (
+from app.routers import (
     aggregations,
     beneficiaries,
     categories,
@@ -242,3 +241,9 @@ async def root():
 async def health():
     """Health check endpoint"""
     return {"status": "healthy"}
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

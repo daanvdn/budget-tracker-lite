@@ -190,3 +190,20 @@ class AggregationSummary(BaseModel):
 
 
 # Gift Schemas
+from .gift import (  # noqa: E402, I001
+    BeneficiaryRef,  # noqa: F401
+    GiftEntry,  # noqa: F401
+    GiftEntryCreate,  # noqa: F401
+    GiftEntryUpdate,  # noqa: F401
+    GiftOccasion,  # noqa: F401
+    GiftOccasionCreate,  # noqa: F401
+    GiftOccasionSummary,  # noqa: F401
+    GiftOccasionUpdate,  # noqa: F401
+    GiftOccasionWithEntries,  # noqa: F401
+    GiftOccasionWithSummary,  # noqa: F401
+    GiftPurchase,  # noqa: F401
+    GiftPurchaseCreate,  # noqa: F401
+    GiftPurchaseUpdate,  # noqa: F401
+    TransactionRef,  # noqa: F401
+    UserRef,  # noqa: F401
+)
