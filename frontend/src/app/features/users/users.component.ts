@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { UserService } from '../../core/services/user.service';
 import { User } from '../../shared/models/models';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-users',
@@ -23,7 +24,8 @@ import { User } from '../../shared/models/models';
     MatIconModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    TranslateModule
   ],
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']

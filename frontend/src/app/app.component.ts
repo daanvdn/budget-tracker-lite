@@ -4,11 +4,13 @@ import {Router, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/route
 import {AuthService} from './core/services/auth.service';
 import {map, shareReplay} from 'rxjs';
 import {environment} from '../environments/environment';
+import {TranslateModule} from '@ngx-translate/core';
+import {LanguageSelectorComponent} from './shared/components/language-selector/language-selector.component';
 
 @Component({
     selector: 'app-root',
     standalone: true,
-    imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+    imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, TranslateModule, LanguageSelectorComponent],
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css']
 })

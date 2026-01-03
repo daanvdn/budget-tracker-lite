@@ -66,6 +66,12 @@
   gap: 10px;
 }
 
+.auth-area {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .welcome {
   font-size: 0.95rem;
   opacity: 0.95;

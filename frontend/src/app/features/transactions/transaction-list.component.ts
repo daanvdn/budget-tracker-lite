@@ -6,11 +6,12 @@ import { Category, Beneficiary } from '../../shared/models/models';
 import { environment } from '../../../environments/environment';
 import { ImageService } from '../../core/services/image.service';
 import { AuthService } from '../../core/services/auth.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-transaction-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslateModule],
   templateUrl: './transaction-list.component.html',
   styleUrls: ['./transaction-list.component.css']
 })

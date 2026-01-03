@@ -6,6 +6,7 @@ import {BeneficiaryService} from '../../core/services/beneficiary.service';
 import {AuthService} from '../../core/services/auth.service';
 import {Beneficiary, GiftOccasionWithSummary, OccasionType} from '../../shared/models/models';
 import {GiftOccasionFormComponent} from './gift-occasion-form.component';
+import {TranslateModule} from '@ngx-translate/core';
 
 interface MonthGroup {
     monthKey: string;
@@ -16,7 +17,7 @@ interface MonthGroup {
 @Component({
     selector: 'app-gift-occasions-list',
     standalone: true,
-    imports: [CommonModule, GiftOccasionFormComponent],
+    imports: [CommonModule, GiftOccasionFormComponent, TranslateModule],
     templateUrl: './gift-occasions-list.component.html',
     styleUrls: ['./gift-occasions-list.component.css']
 })

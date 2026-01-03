@@ -15,11 +15,12 @@ import {
 } from '../../shared/models/models';
 import {GiftEntryFormComponent} from './gift-entry-form.component';
 import {GiftPurchaseFormComponent} from './gift-purchase-form.component';
+import {TranslateModule} from '@ngx-translate/core';
 
 @Component({
     selector: 'app-gift-occasion-detail',
     standalone: true,
-    imports: [CommonModule, GiftEntryFormComponent, GiftPurchaseFormComponent],
+    imports: [CommonModule, GiftEntryFormComponent, GiftPurchaseFormComponent, TranslateModule],
     templateUrl: './gift-occasion-detail.component.html',
     styleUrls: ['./gift-occasion-detail.component.css']
 })

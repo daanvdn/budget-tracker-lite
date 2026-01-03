@@ -1,9 +1,9 @@
 <div class="transaction-form-section">
-  <h2>{{ editMode ? 'Edit Transaction' : 'Add Transaction' }}</h2>
+  <h2>{{ editMode ? ('transactions.editTransaction' | translate) : ('transactions.addTransactionTitle' | translate) }}</h2>
   <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
     <div class="form-row">
       <div class="form-group">
-        <label for="description">Description</label>
+        <label for="description">{{ 'common.description' | translate }}</label>
         <input
           type="text"
           id="description"
@@ -13,7 +13,7 @@
       </div>
 
       <div class="form-group">
-        <label for="amount">Amount</label>
+        <label for="amount">{{ 'common.amount' | translate }}</label>
         <input
           type="number"
           id="amount"
@@ -26,7 +26,7 @@
 
     <div class="form-row">
       <div class="form-group">
-        <label for="transaction_date">Transaction Date</label>
+        <label for="transaction_date">{{ 'transactions.transactionDate' | translate }}</label>
         <input
           type="datetime-local"
           id="transaction_date"
@@ -36,19 +36,19 @@
       </div>
 
       <div class="form-group">
-        <label for="type">Type</label>
+        <label for="type">{{ 'common.type' | translate }}</label>
         <select id="type" formControlName="type" class="form-control" (change)="onTypeChange()">
-          <option value="expense">Expense</option>
-          <option value="income">Income</option>
+          <option value="expense">{{ 'transactions.expense' | translate }}</option>
+          <option value="income">{{ 'transactions.income' | translate }}</option>
         </select>
       </div>
     </div>
 
     <div class="form-row">
       <div class="form-group">
-        <label for="category_id">Category</label>
+        <label for="category_id">{{ 'transactions.category' | translate }}</label>
         <select id="category_id" formControlName="category_id" class="form-control">
-          <option value="">Select Category</option>
+          <option value="">{{ 'transactions.selectCategory' | translate }}</option>
           <option *ngFor="let category of filteredCategories" [value]="category.id">
             {{ category.name }}
           </option>
@@ -56,15 +56,15 @@
       </div>
 
       <div class="form-group">
-        <label for="beneficiary_id">Beneficiary</label>
+        <label for="beneficiary_id">{{ 'transactions.beneficiary' | translate }}</label>
         <div class="beneficiary-select-wrapper">
           <select id="beneficiary_id" formControlName="beneficiary_id" class="form-control">
-            <option value="">Select Beneficiary</option>
+            <option value="">{{ 'transactions.selectBeneficiary' | translate }}</option>
             <option *ngFor="let beneficiary of beneficiaries" [value]="beneficiary.id">
               {{ beneficiary.name }}
             </option>
           </select>
-          <button type="button" class="btn-add-new" (click)="toggleNewBeneficiaryInput()" [title]="showNewBeneficiaryInput ? 'Cancel' : 'Add new beneficiary'">
+          <button type="button" class="btn-add-new" (click)="toggleNewBeneficiaryInput()" [title]="showNewBeneficiaryInput ? ('common.cancel' | translate) : ('transactions.addNewBeneficiary' | translate)">
             {{ showNewBeneficiaryInput ? '×' : '+' }}
           </button>
         </div>
@@ -73,7 +73,7 @@
             type="text"
             [(ngModel)]="newBeneficiaryName"
             [ngModelOptions]="{standalone: true}"
-            placeholder="Enter new beneficiary name"
+            [placeholder]="'transactions.enterBeneficiaryName' | translate"
             class="form-control"
             (keyup.enter)="createNewBeneficiary()"
           />
@@ -83,7 +83,7 @@
             (click)="createNewBeneficiary()"
             [disabled]="!newBeneficiaryName.trim() || creatingBeneficiary"
           >
-            {{ creatingBeneficiary ? 'Creating...' : 'Create' }}
+            {{ creatingBeneficiary ? ('common.creating' | translate) : ('common.create' | translate) }}
           </button>
         </div>
       </div>
@@ -91,33 +91,33 @@
 
     <div class="form-row">
       <div class="form-group full-width">
-        <label for="tags">Tags (comma-separated)</label>
+        <label for="tags">{{ 'transactions.tags' | translate }}</label>
         <input
           type="text"
           id="tags"
           formControlName="tags"
           class="form-control"
-          placeholder="e.g., groceries, weekly, essential"
+          [placeholder]="'transactions.tagsPlaceholder' | translate"
         />
       </div>
     </div>
 
     <div class="form-row">
       <div class="form-group full-width">
-        <label for="notes">Notes (Optional)</label>
+        <label for="notes">{{ 'transactions.notesOptional' | translate }}</label>
         <textarea
           id="notes"
           formControlName="notes"
           class="form-control"
           rows="3"
-          placeholder="Add any additional notes..."
+          [placeholder]="'transactions.notesPlaceholder' | translate"
         ></textarea>
       </div>
     </div>
 
     <div class="form-row">
       <div class="form-group image-upload-group">
-        <label>Image Image (Optional)</label>
+        <label>{{ 'transactions.imageOptional' | translate }}</label>
         <div class="image-upload-controls">
           <input
             type="file"
@@ -135,17 +135,17 @@
             style="display: none"
           />
           <button type="button" class="btn btn-outline" (click)="fileInput.click()">
-            📁 Choose File
+            📁 {{ 'transactions.chooseFile' | translate }}
           </button>
           <button type="button" class="btn btn-outline" (click)="cameraInput.click()">
-            📷 Take Photo
+            📷 {{ 'transactions.takePhoto' | translate }}
           </button>
         </div>
         <div class="image-preview" *ngIf="selectedImagePreview">
           <img [src]="selectedImagePreview" alt="Selected image preview" />
           <button type="button" class="btn-remove-image" (click)="removeSelectedImage()">×</button>
         </div>
-        <div class="upload-status" *ngIf="uploadingImage">Uploading image...</div>
+        <div class="upload-status" *ngIf="uploadingImage">{{ 'transactions.uploadingImage' | translate }}</div>
       </div>
     </div>
 
@@ -155,10 +155,10 @@
 
     <div class="form-buttons">
       <button type="submit" class="btn btn-primary" [disabled]="transactionForm.invalid || loading || uploadingImage">
-        {{ loading ? (editMode ? 'Saving...' : 'Adding...') : (editMode ? 'Save Changes' : 'Add Transaction') }}
+        {{ loading ? (editMode ? ('common.saving' | translate) : ('transactions.adding' | translate)) : (editMode ? ('transactions.saveChanges' | translate) : ('transactions.addTransactionTitle' | translate)) }}
       </button>
       <button type="button" class="btn btn-secondary" *ngIf="editMode" (click)="cancelEdit()">
-        Cancel
+        {{ 'common.cancel' | translate }}
       </button>
     </div>
   </form>

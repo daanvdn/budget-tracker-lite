@@ -1,7 +1,7 @@
 <div class="transactions-list-section">
   <div class="section-header">
-    <h2>Transactions</h2>
-    <button class="btn-add-transaction" (click)="onCreateTransaction()" title="Add new transaction">
+    <h2>{{ 'transactions.title' | translate }}</h2>
+    <button class="btn-add-transaction" (click)="onCreateTransaction()" [title]="'transactions.addTransaction' | translate">
       <span class="add-icon">+</span>
     </button>
   </div>
@@ -10,13 +10,13 @@
   <div class="filter-section">
     <button class="filter-toggle" (click)="toggleFilters()">
       <span class="filter-toggle-icon" [class.expanded]="filtersExpanded">▶</span>
-      <h3>Filters</h3>
+      <h3>{{ 'transactions.filters' | translate }}</h3>
     </button>
     <div class="filter-content" [class.expanded]="filtersExpanded">
       <form [formGroup]="filterForm" class="filter-form">
       <div class="filter-row">
         <div class="filter-group">
-          <label for="filter_start_date">Start Date</label>
+          <label for="filter_start_date">{{ 'transactions.startDate' | translate }}</label>
           <input
             type="date"
             id="filter_start_date"
@@ -25,7 +25,7 @@
           />
         </div>
         <div class="filter-group">
-          <label for="filter_end_date">End Date</label>
+          <label for="filter_end_date">{{ 'transactions.endDate' | translate }}</label>
           <input
             type="date"
             id="filter_end_date"
@@ -36,17 +36,17 @@
       </div>
       <div class="filter-row">
         <div class="filter-group">
-          <label for="filter_type">Transaction Type</label>
+          <label for="filter_type">{{ 'transactions.transactionType' | translate }}</label>
           <select id="filter_type" formControlName="transaction_type" class="form-control">
-            <option [value]="null">All</option>
-            <option value="expense">Expense</option>
-            <option value="income">Income</option>
+            <option [value]="null">{{ 'common.all' | translate }}</option>
+            <option value="expense">{{ 'transactions.expense' | translate }}</option>
+            <option value="income">{{ 'transactions.income' | translate }}</option>
           </select>
         </div>
         <div class="filter-group">
-          <label for="filter_category">Category</label>
+          <label for="filter_category">{{ 'transactions.category' | translate }}</label>
           <select id="filter_category" formControlName="category_id" class="form-control">
-            <option [value]="null">All</option>
+            <option [value]="null">{{ 'common.all' | translate }}</option>
             <option *ngFor="let category of categories" [value]="category.id">
               {{ category.name }}
             </option>
@@ -55,9 +55,9 @@
       </div>
       <div class="filter-row">
         <div class="filter-group">
-          <label for="filter_beneficiary">Beneficiary</label>
+          <label for="filter_beneficiary">{{ 'transactions.beneficiary' | translate }}</label>
           <select id="filter_beneficiary" formControlName="beneficiary_id" class="form-control">
-            <option [value]="null">All</option>
+            <option [value]="null">{{ 'common.all' | translate }}</option>
             <option *ngFor="let beneficiary of beneficiaries" [value]="beneficiary.id">
               {{ beneficiary.name }}
             </option>
@@ -65,10 +65,10 @@
         </div>
       </div>
       <div class="filter-buttons">
-        <button type="button" class="btn btn-outline" (click)="setLastMonth()">Last Month</button>
-        <button type="button" class="btn btn-outline" (click)="setLast2Months()">Last 2 Months</button>
-        <button type="button" class="btn btn-outline" (click)="clearFilters()">Clear Filters</button>
-        <button type="button" class="btn btn-primary" (click)="applyFilters()">Apply Filters</button>
+        <button type="button" class="btn btn-outline" (click)="setLastMonth()">{{ 'transactions.lastMonth' | translate }}</button>
+        <button type="button" class="btn btn-outline" (click)="setLast2Months()">{{ 'transactions.last2Months' | translate }}</button>
+        <button type="button" class="btn btn-outline" (click)="clearFilters()">{{ 'transactions.clearFilters' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="applyFilters()">{{ 'transactions.applyFilters' | translate }}</button>
       </div>
     </form>
     </div>
@@ -76,16 +76,16 @@
 
   <div class="summary" *ngIf="transactions.length > 0">
     <div class="summary-item income">
-      <span class="label">Total Income:</span>
-      <span class="value">${{ totalIncome.toFixed(2) }}</span>
+      <span class="label">{{ 'transactions.totalIncome' | translate }}</span>
+      <span class="value">€{{ totalIncome.toFixed(2) }}</span>
     </div>
     <div class="summary-item expense">
-      <span class="label">Total Expenses:</span>
-      <span class="value">${{ totalExpenses.toFixed(2) }}</span>
+      <span class="label">{{ 'transactions.totalExpenses' | translate }}</span>
+      <span class="value">€{{ totalExpenses.toFixed(2) }}</span>
     </div>
     <div class="summary-item balance">
-      <span class="label">Balance:</span>
-      <span class="value" [class.negative]="balance < 0">${{ balance.toFixed(2) }}</span>
+      <span class="label">{{ 'transactions.balance' | translate }}</span>
+      <span class="value" [class.negative]="balance < 0">€{{ balance.toFixed(2) }}</span>
     </div>
   </div>
 
@@ -98,10 +98,10 @@
         </div>
         <div class="month-label">{{ monthGroup.monthLabel }}</div>
         <div class="month-totals">
-          <span class="month-income">+${{ monthGroup.income.toFixed(2) }}</span>
-          <span class="month-expenses">-${{ monthGroup.expenses.toFixed(2) }}</span>
+          <span class="month-income">+€{{ monthGroup.income.toFixed(2) }}</span>
+          <span class="month-expenses">-€{{ monthGroup.expenses.toFixed(2) }}</span>
           <span class="month-balance" [class.negative]="monthGroup.balance < 0">
-            {{ monthGroup.balance >= 0 ? '+' : '' }}${{ monthGroup.balance.toFixed(2) }}
+            {{ monthGroup.balance >= 0 ? '+' : '' }}€{{ monthGroup.balance.toFixed(2) }}
           </span>
         </div>
       </div>
@@ -122,21 +122,21 @@
               <span class="notes-preview">{{ transaction.notes | slice:0:100 }}{{ transaction.notes.length > 100 ? '...' : '' }}</span>
             </div>
             <div class="transaction-dates">
-              <span class="transaction-date">Date: {{ formatDate(transaction.transaction_date) }}</span>
-              <span class="transaction-created">Created: {{ formatDate(transaction.created_at) }}</span>
+              <span class="transaction-date">{{ 'transactions.dateLabel' | translate }} {{ formatDate(transaction.transaction_date) }}</span>
+              <span class="transaction-created">{{ 'transactions.createdLabel' | translate }} {{ formatDate(transaction.created_at) }}</span>
             </div>
             <div class="transaction-image" *ngIf="transaction.image_path">
               <button type="button" class="btn-view-image" (click)="viewImage(transaction.image_path)">
-                🖼️ View Image
+                🖼️ {{ 'transactions.viewImage' | translate }}
               </button>
             </div>
           </div>
           <div class="transaction-amount" [class]="transaction.type">
-            {{ transaction.type === 'income' ? '+' : '-' }}${{ transaction.amount.toFixed(2) }}
+            {{ transaction.type === 'income' ? '+' : '-' }}€{{ transaction.amount.toFixed(2) }}
           </div>
           <div class="transaction-actions">
-            <button class="btn-edit" (click)="onEditTransaction(transaction)">Edit</button>
-            <button class="btn-delete" (click)="deleteTransaction(transaction.id)">Delete</button>
+            <button class="btn-edit" (click)="onEditTransaction(transaction)">{{ 'common.edit' | translate }}</button>
+            <button class="btn-delete" (click)="deleteTransaction(transaction.id)">{{ 'common.delete' | translate }}</button>
           </div>
         </div>
       </div>
@@ -145,21 +145,21 @@
     <!-- Pagination Controls -->
     <div class="pagination-controls">
       <button class="btn btn-outline" (click)="goToFirstPage()" [disabled]="currentPage === 0">
-        ⟪ First
+        ⟪ {{ 'pagination.first' | translate }}
       </button>
       <button class="btn btn-outline" (click)="goToPreviousPage()" [disabled]="currentPage === 0">
-        ← Previous
+        ← {{ 'pagination.previous' | translate }}
       </button>
-      <span class="page-indicator">Page {{ currentPage + 1 }}</span>
+      <span class="page-indicator">{{ 'pagination.page' | translate }} {{ currentPage + 1 }}</span>
       <button class="btn btn-outline" (click)="goToNextPage()" [disabled]="!hasMorePages">
-        Next →
+        {{ 'pagination.next' | translate }} →
       </button>
     </div>
   </div>
 
   <ng-template #noTransactions>
     <div class="no-transactions">
-      <p>No transactions yet. Add your first transaction above!</p>
+      <p>{{ 'transactions.noTransactions' | translate }}</p>
     </div>
   </ng-template>
 </div>

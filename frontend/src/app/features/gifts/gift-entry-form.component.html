@@ -1,5 +1,5 @@
 <div class="form-container">
-    <h2>{{ isEditMode ? 'Edit' : 'Add' }} Gift Entry</h2>
+    <h2>{{ isEditMode ? ('gifts.editGiftEntry' | translate) : ('gifts.addGiftEntry' | translate) }}</h2>
 
     <div *ngIf="errorMessage" class="error-message">
         {{ errorMessage }}
@@ -7,7 +7,7 @@
 
     <form (ngSubmit)="onSubmit()" [formGroup]="form">
         <div class="form-group">
-            <label for="direction">Type *</label>
+            <label for="direction">{{ 'gifts.giftType' | translate }} *</label>
             <select formControlName="direction" id="direction">
                 <option *ngFor="let dir of directions" [value]="dir">
                     {{ formatDirection(dir) }}
@@ -16,15 +16,15 @@
         </div>
 
         <div class="form-group">
-            <label for="person_id">{{ form.get('direction')?.value === 'received' ? 'From' : 'To' }} *</label>
+            <label for="person_id">{{ form.get('direction')?.value === 'received' ? ('gifts.from' | translate) : ('gifts.to' | translate) }} *</label>
             <div class="beneficiary-select-wrapper">
                 <select formControlName="person_id" id="person_id">
-                    <option [ngValue]="null" disabled>-- Select Person --</option>
+                    <option [ngValue]="null" disabled>{{ 'gifts.selectPerson' | translate }}</option>
                     <option *ngFor="let b of beneficiaries" [ngValue]="b.id">
                         {{ b.name }}
                     </option>
                 </select>
-                <button type="button" class="btn-add-new" (click)="toggleNewBeneficiaryInput()" [title]="showNewBeneficiaryInput ? 'Cancel' : 'Add new person'">
+                <button type="button" class="btn-add-new" (click)="toggleNewBeneficiaryInput()" [title]="showNewBeneficiaryInput ? ('common.cancel' | translate) : ('gifts.addNewPerson' | translate)">
                     {{ showNewBeneficiaryInput ? '×' : '+' }}
                 </button>
             </div>
@@ -33,7 +33,7 @@
                     type="text"
                     [(ngModel)]="newBeneficiaryName"
                     [ngModelOptions]="{standalone: true}"
-                    placeholder="Enter new person name"
+                    [placeholder]="'gifts.enterPersonName' | translate"
                     (keyup.enter)="createNewBeneficiary()"
                 />
                 <button
@@ -42,17 +42,17 @@
                     (click)="createNewBeneficiary()"
                     [disabled]="!newBeneficiaryName.trim() || creatingBeneficiary"
                 >
-                    {{ creatingBeneficiary ? 'Creating...' : 'Create' }}
+                    {{ creatingBeneficiary ? ('common.creating' | translate) : ('common.create' | translate) }}
                 </button>
             </div>
             <div *ngIf="form.get('person_id')?.invalid && form.get('person_id')?.touched" class="error">
-                Person is required
+                {{ 'gifts.personRequired' | translate }}
             </div>
         </div>
 
         <div class="form-row">
             <div class="form-group">
-                <label for="amount">Amount *</label>
+                <label for="amount">{{ 'common.amount' | translate }} *</label>
                 <input
                         formControlName="amount"
                         id="amount"
@@ -62,12 +62,12 @@
                         type="number"
                 />
                 <div *ngIf="form.get('amount')?.invalid && form.get('amount')?.touched" class="error">
-                    Valid amount is required
+                    {{ 'gifts.amountRequired' | translate }}
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="gift_date">Date *</label>
+                <label for="gift_date">{{ 'common.date' | translate }} *</label>
                 <input
                         formControlName="gift_date"
                         id="gift_date"
@@ -77,7 +77,7 @@
         </div>
 
         <div class="form-group">
-            <label for="description">Description</label>
+            <label for="description">{{ 'common.description' | translate }}</label>
             <input
                     formControlName="description"
                     id="description"
@@ -88,7 +88,7 @@
 
         <!-- Transaction Linking -->
         <div class="form-group">
-            <label>Link to Transaction (Optional)</label>
+            <label>{{ 'gifts.linkToTransaction' | translate }}</label>
             <div class="transaction-picker">
                 <div *ngIf="selectedTransaction; else noTransaction" class="selected-transaction">
           <span class="transaction-info">
@@ -100,13 +100,13 @@
                 </div>
                 <ng-template #noTransaction>
                     <button (click)="toggleTransactionPicker()" class="btn-link" type="button">
-                        🔗 {{ showTransactionPicker ? 'Hide' : 'Select' }} Transaction
+                        🔗 {{ showTransactionPicker ? ('gifts.hideTransaction' | translate) : ('gifts.selectTransaction' | translate) }}
                     </button>
                 </ng-template>
 
                 <div *ngIf="showTransactionPicker" class="transaction-list">
                     <div class="transaction-search-hint">
-                        Showing {{ form.get('direction')?.value === 'received' ? 'income' : 'expense' }} transactions
+                        {{ form.get('direction')?.value === 'received' ? ('gifts.showingIncomeTransactions' | translate) : ('gifts.showingExpenseTransactions' | translate) }}
                     </div>
                     <div
                             (click)="selectTransaction(t)"
@@ -118,32 +118,32 @@
                         <span class="transaction-amount">{{ formatCurrency(t.amount) }}</span>
                     </div>
                     <div *ngIf="filteredTransactions.length === 0" class="no-transactions">
-                        No matching transactions found
+                        {{ form.get('direction')?.value === 'received' ? ('gifts.noIncomeTransactions' | translate) : ('gifts.noExpenseTransactions' | translate) }}
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="form-group">
-            <label for="notes">Notes</label>
+            <label for="notes">{{ 'common.notes' | translate }}</label>
             <textarea
                     formControlName="notes"
                     id="notes"
-                    placeholder="Any additional notes..."
+                    [placeholder]="'transactions.notesPlaceholder' | translate"
                     rows="2"
             ></textarea>
         </div>
 
         <div class="form-actions">
             <button (click)="onCancel()" class="btn btn-secondary" type="button">
-                Cancel
+                {{ 'common.cancel' | translate }}
             </button>
             <button
                     [disabled]="form.invalid || loading"
                     class="btn btn-primary"
                     type="submit"
             >
-                {{ loading ? 'Saving...' : (isEditMode ? 'Update' : 'Add') }}
+                {{ loading ? ('common.saving' | translate) : (isEditMode ? ('common.update' | translate) : ('common.add' | translate)) }}
             </button>
         </div>
     </form>

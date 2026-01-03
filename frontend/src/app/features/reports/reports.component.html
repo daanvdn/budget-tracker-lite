@@ -1,38 +1,38 @@
 <mat-card>
   <mat-card-header>
-    <mat-card-title>Reports & Aggregations</mat-card-title>
+    <mat-card-title>{{ 'reports.title' | translate }}</mat-card-title>
   </mat-card-header>
   <mat-card-content>
     <form [formGroup]="filterForm" class="filter-form">
-      <h3>Filters</h3>
+      <h3>{{ 'transactions.filters' | translate }}</h3>
 
       <mat-form-field class="form-field-full-width">
-        <mat-label>Start Date</mat-label>
+        <mat-label>{{ 'transactions.startDate' | translate }}</mat-label>
         <input matInput [matDatepicker]="startPicker" formControlName="start_date">
         <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
         <mat-datepicker #startPicker></mat-datepicker>
       </mat-form-field>
 
       <mat-form-field class="form-field-full-width">
-        <mat-label>End Date</mat-label>
+        <mat-label>{{ 'transactions.endDate' | translate }}</mat-label>
         <input matInput [matDatepicker]="endPicker" formControlName="end_date">
         <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
         <mat-datepicker #endPicker></mat-datepicker>
       </mat-form-field>
 
       <mat-form-field class="form-field-full-width">
-        <mat-label>Transaction Type</mat-label>
+        <mat-label>{{ 'transactions.transactionType' | translate }}</mat-label>
         <mat-select formControlName="transaction_type">
-          <mat-option [value]="null">All</mat-option>
-          <mat-option value="expense">Expense</mat-option>
-          <mat-option value="income">Income</mat-option>
+          <mat-option [value]="null">{{ 'common.all' | translate }}</mat-option>
+          <mat-option value="expense">{{ 'transactions.expense' | translate }}</mat-option>
+          <mat-option value="income">{{ 'transactions.income' | translate }}</mat-option>
         </mat-select>
       </mat-form-field>
 
       <mat-form-field class="form-field-full-width">
-        <mat-label>Category</mat-label>
+        <mat-label>{{ 'transactions.category' | translate }}</mat-label>
         <mat-select formControlName="category_id">
-          <mat-option [value]="null">All</mat-option>
+          <mat-option [value]="null">{{ 'common.all' | translate }}</mat-option>
           <mat-option *ngFor="let category of categories" [value]="category.id">
             {{ category.name }}
           </mat-option>
@@ -40,9 +40,9 @@
       </mat-form-field>
 
       <mat-form-field class="form-field-full-width">
-        <mat-label>Beneficiary</mat-label>
+        <mat-label>{{ 'transactions.beneficiary' | translate }}</mat-label>
         <mat-select formControlName="beneficiary_id">
-          <mat-option [value]="null">All</mat-option>
+          <mat-option [value]="null">{{ 'common.all' | translate }}</mat-option>
           <mat-option *ngFor="let beneficiary of beneficiaries" [value]="beneficiary.id">
             {{ beneficiary.name }}
           </mat-option>
@@ -50,20 +50,20 @@
       </mat-form-field>
 
       <div class="quick-filters">
-        <button mat-raised-button type="button" (click)="setLastMonth()">Last Month</button>
-        <button mat-raised-button type="button" (click)="setLast2Months()">Last 2 Months</button>
-        <button mat-raised-button type="button" (click)="clearFilters()">Clear Filters</button>
+        <button mat-raised-button type="button" (click)="setLastMonth()">{{ 'transactions.lastMonth' | translate }}</button>
+        <button mat-raised-button type="button" (click)="setLast2Months()">{{ 'transactions.last2Months' | translate }}</button>
+        <button mat-raised-button type="button" (click)="clearFilters()">{{ 'transactions.clearFilters' | translate }}</button>
       </div>
 
       <button mat-raised-button color="primary" type="button" (click)="loadSummary()">
-        Apply Filters
+        {{ 'transactions.applyFilters' | translate }}
       </button>
     </form>
 
     <div class="summary-cards" *ngIf="summary">
       <mat-card class="summary-card income-card">
         <mat-card-header>
-          <mat-card-title>Total Income</mat-card-title>
+          <mat-card-title>{{ 'reports.totalIncome' | translate }}</mat-card-title>
         </mat-card-header>
         <mat-card-content>
           <div class="summary-amount">{{ summary.total_income | currency }}</div>
@@ -72,7 +72,7 @@
 
       <mat-card class="summary-card expense-card">
         <mat-card-header>
-          <mat-card-title>Total Expenses</mat-card-title>
+          <mat-card-title>{{ 'reports.totalExpenses' | translate }}</mat-card-title>
         </mat-card-header>
         <mat-card-content>
           <div class="summary-amount">{{ summary.total_expenses | currency }}</div>
@@ -81,7 +81,7 @@
 
       <mat-card class="summary-card balance-card">
         <mat-card-header>
-          <mat-card-title>Net Balance</mat-card-title>
+          <mat-card-title>{{ 'reports.netBalance' | translate }}</mat-card-title>
         </mat-card-header>
         <mat-card-content>
           <div class="summary-amount" [class.positive]="summary.net_balance > 0" [class.negative]="summary.net_balance < 0">
@@ -92,7 +92,7 @@
 
       <mat-card class="summary-card">
         <mat-card-header>
-          <mat-card-title>Transaction Count</mat-card-title>
+          <mat-card-title>{{ 'reports.transactionCount' | translate }}</mat-card-title>
         </mat-card-header>
         <mat-card-content>
           <div class="summary-amount">{{ summary.transaction_count }}</div>

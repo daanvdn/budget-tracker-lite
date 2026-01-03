@@ -10,11 +10,12 @@ import {
   GiftOccasionWithSummary,
   OccasionType
 } from '../../shared/models/models';
+import {TranslateModule} from '@ngx-translate/core';
 
 @Component({
     selector: 'app-gift-occasion-form',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, FormsModule],
+    imports: [CommonModule, ReactiveFormsModule, FormsModule, TranslateModule],
     templateUrl: './gift-occasion-form.component.html',
     styleUrls: ['./gift-occasion-form.component.css']
 })

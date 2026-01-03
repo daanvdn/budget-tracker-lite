@@ -11,6 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CategoryService } from '../../core/services/category.service';
 import { Category, CategoryType } from '../../shared/models/models';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-categories',
@@ -25,7 +26,8 @@ import { Category, CategoryType } from '../../shared/models/models';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    TranslateModule
   ],
   templateUrl: './categories.component.html',
   styleUrls: ['./categories.component.css']

@@ -1,14 +1,14 @@
 <div *ngIf="!loading && occasion" class="detail-container">
     <!-- Header -->
     <div class="detail-header">
-        <button (click)="goBack()" class="btn btn-back">← Back</button>
+        <button (click)="goBack()" class="btn btn-back">← {{ 'common.back' | translate }}</button>
         <div class="header-title">
             <span class="occasion-icon">{{ getOccasionIcon(occasion.occasion_type) }}</span>
             <div>
                 <h1>{{ occasion.name }}</h1>
                 <span class="occasion-meta">
           <span *ngIf="occasion.occasion_date">{{ formatDate(occasion.occasion_date) }}</span>
-          <span *ngIf="occasion.person"> • For: {{ occasion.person.name }}</span>
+          <span *ngIf="occasion.person"> • {{ 'gifts.for' | translate }} {{ occasion.person.name }}</span>
         </span>
             </div>
         </div>
@@ -21,15 +21,15 @@
     <!-- Summary Cards -->
     <div *ngIf="occasion.is_pool_account" class="summary-cards">
         <div class="summary-card received">
-            <span class="summary-label">Received</span>
+            <span class="summary-label">{{ 'gifts.received' | translate }}</span>
             <span class="summary-value">{{ formatCurrency(totalReceived) }}</span>
         </div>
         <div class="summary-card spent">
-            <span class="summary-label">Spent</span>
+            <span class="summary-label">{{ 'gifts.spent' | translate }}</span>
             <span class="summary-value">{{ formatCurrency(totalPurchases) }}</span>
         </div>
         <div [class.negative]="balance < 0" [class.positive]="balance >= 0" class="summary-card balance">
-            <span class="summary-label">Balance</span>
+            <span class="summary-label">{{ 'transactions.balance' | translate }}</span>
             <span class="summary-value">{{ formatCurrency(balance) }}</span>
         </div>
     </div>
@@ -37,11 +37,11 @@
     <!-- Non-pool account summary -->
     <div *ngIf="!occasion.is_pool_account" class="summary-cards">
         <div *ngIf="totalReceived > 0" class="summary-card received">
-            <span class="summary-label">Total Received</span>
+            <span class="summary-label">{{ 'gifts.totalReceived' | translate }}</span>
             <span class="summary-value">{{ formatCurrency(totalReceived) }}</span>
         </div>
         <div *ngIf="totalGiven > 0" class="summary-card given">
-            <span class="summary-label">Total Given</span>
+            <span class="summary-label">{{ 'gifts.totalGiven' | translate }}</span>
             <span class="summary-value">{{ formatCurrency(totalGiven) }}</span>
         </div>
     </div>
@@ -51,8 +51,8 @@
         <!-- Money Received Section -->
         <div *ngIf="occasion.is_pool_account || receivedEntries.length > 0" class="section">
             <div class="section-header">
-                <h2>💰 Money Received</h2>
-                <button (click)="openAddEntry(GiftDirection.RECEIVED)" class="btn btn-add">+ Add</button>
+                <h2>💰 {{ 'gifts.moneyReceived' | translate }}</h2>
+                <button (click)="openAddEntry(GiftDirection.RECEIVED)" class="btn btn-add">+ {{ 'common.add' | translate }}</button>
             </div>
             <div class="entries-list">
                 <div
@@ -69,12 +69,12 @@
                         {{ entry.description }}
                     </div>
                     <div *ngIf="entry.transaction" class="entry-link">
-                        🔗 Linked to transaction #{{ entry.transaction.id }}
+                        🔗 {{ 'gifts.linkedToTransaction' | translate }} #{{ entry.transaction.id }}
                     </div>
                     <button (click)="deleteEntry(entry, $event)" class="btn btn-delete">🗑️</button>
                 </div>
                 <div *ngIf="receivedEntries.length === 0" class="empty-section">
-                    No money received yet
+                    {{ 'gifts.noMoneyReceived' | translate }}
                 </div>
             </div>
         </div>
@@ -82,8 +82,8 @@
         <!-- Money Given Section (for non-pool accounts) -->
         <div *ngIf="!occasion.is_pool_account" class="section">
             <div class="section-header">
-                <h2>🎁 Money Given</h2>
-                <button (click)="openAddEntry(GiftDirection.GIVEN)" class="btn btn-add">+ Add</button>
+                <h2>🎁 {{ 'gifts.moneyGiven' | translate }}</h2>
+                <button (click)="openAddEntry(GiftDirection.GIVEN)" class="btn btn-add">+ {{ 'common.add' | translate }}</button>
             </div>
             <div class="entries-list">
                 <div
@@ -100,12 +100,12 @@
                         {{ entry.description }}
                     </div>
                     <div *ngIf="entry.transaction" class="entry-link">
-                        🔗 Linked to transaction #{{ entry.transaction.id }}
+                        🔗 {{ 'gifts.linkedToTransaction' | translate }} #{{ entry.transaction.id }}
                     </div>
                     <button (click)="deleteEntry(entry, $event)" class="btn btn-delete">🗑️</button>
                 </div>
                 <div *ngIf="givenEntries.length === 0" class="empty-section">
-                    No money given yet
+                    {{ 'gifts.noMoneyGiven' | translate }}
                 </div>
             </div>
         </div>
@@ -113,8 +113,8 @@
         <!-- Purchases Section (only for pool accounts) -->
         <div *ngIf="occasion.is_pool_account" class="section">
             <div class="section-header">
-                <h2>🛒 Purchases Made</h2>
-                <button (click)="openAddPurchase()" class="btn btn-add">+ Add</button>
+                <h2>🛒 {{ 'gifts.purchasesMade' | translate }}</h2>
+                <button (click)="openAddPurchase()" class="btn btn-add">+ {{ 'common.add' | translate }}</button>
             </div>
             <div class="entries-list">
                 <div
@@ -128,12 +128,12 @@
                         <span class="entry-amount spent">{{ formatCurrency(purchase.amount) }}</span>
                     </div>
                     <div *ngIf="purchase.transaction" class="entry-link">
-                        🔗 Linked to transaction #{{ purchase.transaction.id }}
+                        🔗 {{ 'gifts.linkedToTransaction' | translate }} #{{ purchase.transaction.id }}
                     </div>
                     <button (click)="deletePurchase(purchase, $event)" class="btn btn-delete">🗑️</button>
                 </div>
                 <div *ngIf="sortedPurchases.length === 0" class="empty-section">
-                    No purchases made yet
+                    {{ 'gifts.noPurchases' | translate }}
                 </div>
             </div>
         </div>
@@ -141,13 +141,13 @@
 
     <!-- Notes -->
     <div *ngIf="occasion.notes" class="notes-section">
-        <h3>Notes</h3>
+        <h3>{{ 'common.notes' | translate }}</h3>
         <p>{{ occasion.notes }}</p>
     </div>
 </div>
 
 <div *ngIf="loading" class="loading">
-    Loading...
+    {{ 'common.loading' | translate }}
 </div>
 
 <div *ngIf="!loading && !occasion" class="error-state">

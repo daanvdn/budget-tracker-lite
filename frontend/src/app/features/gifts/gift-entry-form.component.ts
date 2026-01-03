@@ -5,11 +5,12 @@ import {GiftOccasionService} from '../../core/services/gift-occasion.service';
 import {BeneficiaryService} from '../../core/services/beneficiary.service';
 import {Transaction} from '../../core/services/transaction.service';
 import {Beneficiary, GiftDirection, GiftEntry, GiftEntryCreate, GiftEntryUpdate} from '../../shared/models/models';
+import {TranslateModule} from '@ngx-translate/core';
 
 @Component({
     selector: 'app-gift-entry-form',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, FormsModule],
+    imports: [CommonModule, ReactiveFormsModule, FormsModule, TranslateModule],
     templateUrl: './gift-entry-form.component.html',
     styleUrls: ['./gift-entry-form.component.css']
 })

@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { BeneficiaryService } from '../../core/services/beneficiary.service';
 import { Beneficiary } from '../../shared/models/models';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-beneficiaries',
@@ -23,7 +24,8 @@ import { Beneficiary } from '../../shared/models/models';
     MatIconModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    TranslateModule
   ],
   templateUrl: './beneficiaries.component.html',
   styleUrls: ['./beneficiaries.component.css']

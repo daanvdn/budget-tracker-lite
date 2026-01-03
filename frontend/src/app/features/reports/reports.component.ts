@@ -12,6 +12,7 @@ import { AggregationService } from '../../core/services/aggregation.service';
 import { CategoryService } from '../../core/services/category.service';
 import { BeneficiaryService } from '../../core/services/beneficiary.service';
 import { AggregationSummary, Category, Beneficiary } from '../../shared/models/models';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-reports',
@@ -25,7 +26,8 @@ import { AggregationSummary, Category, Beneficiary } from '../../shared/models/m
     MatDatepickerModule,
     MatNativeDateModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
+    TranslateModule
   ],
   templateUrl: './reports.component.html',
   styleUrls: ['./reports.component.css']

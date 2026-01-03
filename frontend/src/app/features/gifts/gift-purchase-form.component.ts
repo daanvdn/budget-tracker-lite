@@ -4,11 +4,12 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {GiftOccasionService} from '../../core/services/gift-occasion.service';
 import {Transaction} from '../../core/services/transaction.service';
 import {GiftPurchase, GiftPurchaseCreate, GiftPurchaseUpdate} from '../../shared/models/models';
+import {TranslateModule} from '@ngx-translate/core';
 
 @Component({
     selector: 'app-gift-purchase-form',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule, TranslateModule],
     templateUrl: './gift-purchase-form.component.html',
     styleUrls: ['./gift-purchase-form.component.css']
 })

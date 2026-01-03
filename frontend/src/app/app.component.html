@@ -1,6 +1,6 @@
 <div class="app-shell">
     <header class="app-header">
-        <div class="brand">Budget Tracker Lite</div>
+        <div class="brand">{{ 'nav.brandName' | translate }}</div>
 
         <button (click)="toggleMobileNav()" [attr.aria-expanded]="mobileNavOpen" [class.open]="mobileNavOpen"
                 aria-label="Toggle navigation"
@@ -14,32 +14,36 @@
             <div class="nav-actions">
 
                 <nav [class.open]="mobileNavOpen" class="nav-links">
-                    <a (click)="closeMobileNav()" routerLink="/transactions" routerLinkActive="active">Transactions</a>
-                    <a (click)="closeMobileNav()" routerLink="/categories" routerLinkActive="active">Categories</a>
+                    <a (click)="closeMobileNav()" routerLink="/transactions" routerLinkActive="active">{{ 'nav.transactions' | translate }}</a>
+                    <a (click)="closeMobileNav()" routerLink="/categories" routerLinkActive="active">{{ 'nav.categories' | translate }}</a>
                     <a (click)="closeMobileNav()" routerLink="/beneficiaries"
-                       routerLinkActive="active">Beneficiaries</a>
-                    <a (click)="closeMobileNav()" routerLink="/gifts" routerLinkActive="active">Gifts</a>
-                    <a (click)="closeMobileNav()" routerLink="/reports" routerLinkActive="active">Reports</a>
-                    <a (click)="closeMobileNav()" routerLink="/users" routerLinkActive="active">Users</a>
+                       routerLinkActive="active">{{ 'nav.beneficiaries' | translate }}</a>
+                    <a (click)="closeMobileNav()" routerLink="/gifts" routerLinkActive="active">{{ 'nav.gifts' | translate }}</a>
+                    <a (click)="closeMobileNav()" routerLink="/reports" routerLinkActive="active">{{ 'nav.reports' | translate }}</a>
+                    <a (click)="closeMobileNav()" routerLink="/users" routerLinkActive="active">{{ 'nav.users' | translate }}</a>
 
                     <!-- Mobile-only logout inside menu -->
                     <button (click)="logout(); closeMobileNav()" aria-label="Logout" class="mobile-logout"
-                            type="button">Logout
+                            type="button">{{ 'nav.logout' | translate }}
                     </button>
                 </nav>
 
                 <div class="user-area">
-                    <span *ngIf="currentUser$ | async as user" class="welcome">Welcome, {{ user.name }}</span>
+                    <app-language-selector></app-language-selector>
+                    <span *ngIf="currentUser$ | async as user" class="welcome">{{ 'nav.welcome' | translate }}, {{ user.name }}</span>
                     <button (click)="logout()" class="logout-btn" type="button"><span
-                            class="logout-text">Logout</span><span class="logout-icon">🔒</span></button>
+                            class="logout-text">{{ 'nav.logout' | translate }}</span><span class="logout-icon">🔒</span></button>
                 </div>
             </div>
         </ng-container>
 
         <ng-template #authLinks>
-            <div [class.open]="mobileNavOpen" class="nav-links">
-                <a (click)="closeMobileNav()" routerLink="/login" routerLinkActive="active">Login</a>
-                <a (click)="closeMobileNav()" routerLink="/register" routerLinkActive="active">Register</a>
+            <div class="auth-area">
+                <app-language-selector></app-language-selector>
+                <div [class.open]="mobileNavOpen" class="nav-links">
+                    <a (click)="closeMobileNav()" routerLink="/login" routerLinkActive="active">{{ 'nav.login' | translate }}</a>
+                    <a (click)="closeMobileNav()" routerLink="/register" routerLinkActive="active">{{ 'nav.register' | translate }}</a>
+                </div>
             </div>
         </ng-template>
     </header>

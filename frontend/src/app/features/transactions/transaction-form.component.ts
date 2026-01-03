@@ -7,11 +7,12 @@ import { AuthService } from '../../core/services/auth.service';
 import { BeneficiaryService } from '../../core/services/beneficiary.service';
 import { Category, Beneficiary } from '../../shared/models/models';
 import { environment } from '../../../environments/environment';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-transaction-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, TranslateModule],
   templateUrl: './transaction-form.component.html',
   styleUrls: ['./transaction-form.component.css']
 })

@@ -1,7 +1,7 @@
 <div class="gift-occasions-container">
     <div class="header">
-        <h1>Gift Occasions</h1>
-        <button (click)="openCreateDialog()" class="btn btn-primary">+ New Occasion</button>
+        <h1>{{ 'gifts.occasionsTitle' | translate }}</h1>
+        <button (click)="openCreateDialog()" class="btn btn-primary">+ {{ 'gifts.newOccasion' | translate }}</button>
     </div>
 
     <div *ngIf="errorMessage" class="error-message">
@@ -9,11 +9,11 @@
     </div>
 
     <div *ngIf="loading" class="loading">
-        Loading...
+        {{ 'common.loading' | translate }}
     </div>
 
     <div *ngIf="!loading && occasions.length === 0" class="empty-state">
-        <p>No gift occasions yet. Create your first one!</p>
+        <p>{{ 'gifts.noOccasions' | translate }}</p>
     </div>
 
     <div *ngIf="!loading && occasions.length > 0" class="occasions-list">
@@ -54,25 +54,25 @@
                     </div>
 
                     <div *ngIf="occasion.person" class="occasion-person">
-                        For: {{ occasion.person.name }}
+                        {{ 'gifts.for' | translate }} {{ occasion.person.name }}
                     </div>
 
                     <div class="occasion-summary">
                         <div *ngIf="occasion.summary.total_received > 0" class="summary-item received">
-                            <span class="label">Received:</span>
+                            <span class="label">{{ 'gifts.received' | translate }}</span>
                             <span class="value">{{ formatCurrency(occasion.summary.total_received) }}</span>
                         </div>
                         <div *ngIf="occasion.summary.total_given > 0" class="summary-item given">
-                            <span class="label">Given:</span>
+                            <span class="label">{{ 'gifts.given' | translate }}</span>
                             <span class="value">{{ formatCurrency(occasion.summary.total_given) }}</span>
                         </div>
                         <div *ngIf="occasion.is_pool_account && occasion.summary.total_purchases > 0"
                              class="summary-item spent">
-                            <span class="label">Spent:</span>
+                            <span class="label">{{ 'gifts.spent' | translate }}</span>
                             <span class="value">{{ formatCurrency(occasion.summary.total_purchases) }}</span>
                         </div>
                         <div *ngIf="occasion.is_pool_account" class="summary-item balance">
-                            <span class="label">Balance:</span>
+                            <span class="label">{{ 'transactions.balance' | translate }}</span>
                             <span [class.negative]="occasion.summary.balance < 0" [class.positive]="occasion.summary.balance >= 0"
                                   class="value">
                 {{ formatCurrency(occasion.summary.balance) }}
@@ -81,7 +81,7 @@
                     </div>
 
                     <div class="occasion-tags">
-                        <span *ngIf="occasion.is_pool_account" class="tag">Pool Account</span>
+                        <span *ngIf="occasion.is_pool_account" class="tag">{{ 'gifts.poolAccount' | translate }}</span>
                         <span class="tag type-tag">{{ occasion.occasion_type }}</span>
                     </div>
                 </div>
@@ -91,14 +91,14 @@
         <!-- Pagination Controls -->
         <div class="pagination-controls">
             <button class="btn btn-outline" (click)="goToFirstPage()" [disabled]="currentPage === 0">
-                ⟪ First
+                ⟪ {{ 'pagination.first' | translate }}
             </button>
             <button class="btn btn-outline" (click)="goToPreviousPage()" [disabled]="currentPage === 0">
-                ← Previous
+                ← {{ 'pagination.previous' | translate }}
             </button>
-            <span class="page-indicator">Page {{ currentPage + 1 }}</span>
+            <span class="page-indicator">{{ 'pagination.page' | translate }} {{ currentPage + 1 }}</span>
             <button class="btn btn-outline" (click)="goToNextPage()" [disabled]="!hasMorePages">
-                Next →
+                {{ 'pagination.next' | translate }} →
             </button>
         </div>
     </div>
