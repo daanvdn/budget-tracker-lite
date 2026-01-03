@@ -68,8 +68,9 @@ async def login(login_data: UserLogin, db: AsyncSession = Depends(get_db)):
 
         token = create_user_token(user)
         return token
-    except HTTPException:
-        raise
+    except HTTPException as e:
+        logger.error(f"Login failed: {e.detail}")
+        raise e
     except Exception as e:
         logger.error(
             f"Unexpected error during login:\n{''.join(traceback.format_exception(type(e), e, e.__traceback__))}"
