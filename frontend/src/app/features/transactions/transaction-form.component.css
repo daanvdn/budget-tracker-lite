@@ -169,3 +169,64 @@ label {
 .form-buttons .btn-secondary {
   flex: 0 0 auto;
 }
+
+/* New Beneficiary Input Styles */
+.beneficiary-select-wrapper {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.beneficiary-select-wrapper select {
+  flex: 1;
+}
+
+.btn-add-new {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #28a745;
+  background: white;
+  color: #28a745;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-add-new:hover {
+  background: #28a745;
+  color: white;
+}
+
+.new-beneficiary-input {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  animation: slideDown 0.2s ease-out;
+}
+
+.new-beneficiary-input input {
+  flex: 1;
+}
+
+.btn-small {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

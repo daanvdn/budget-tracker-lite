@@ -27,6 +27,14 @@ export class TransactionListComponent implements OnInit {
   viewingImageBlobUrl: string | null = null;
   filtersExpanded = false;
 
+  // Pagination
+  currentPage = 0;
+  pageSize = 25;
+  hasMorePages = true;
+
+  // Collapsible months
+  collapsedMonths: Set<string> = new Set();
+
   constructor(
     private fb: FormBuilder,
     private transactionService: TransactionService,
@@ -55,14 +63,50 @@ export class TransactionListComponent implements OnInit {
     const start_date = filters.start_date ? new Date(filters.start_date).toISOString() : undefined;
     const end_date = filters.end_date ? new Date(filters.end_date + 'T23:59:59').toISOString() : undefined;
 
-    this.transactionService.getTransactions(0, 100, type, category_id, beneficiary_id, start_date, end_date).subscribe({
+    const skip = this.currentPage * this.pageSize;
+    this.transactionService.getTransactions(skip, this.pageSize + 1, type, category_id, beneficiary_id, start_date, end_date).subscribe({
       next: (transactions: Transaction[]) => {
-        this.transactions = transactions;
+        // Check if there are more pages by fetching one extra
+        this.hasMorePages = transactions.length > this.pageSize;
+        this.transactions = transactions.slice(0, this.pageSize);
       },
       error: (error: any) => {
         console.error('Failed to load transactions', error);
       }
     });
+  }
+
+  // Pagination methods
+  goToFirstPage(): void {
+    this.currentPage = 0;
+    this.loadTransactions();
+  }
+
+  goToPreviousPage(): void {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+      this.loadTransactions();
+    }
+  }
+
+  goToNextPage(): void {
+    if (this.hasMorePages) {
+      this.currentPage++;
+      this.loadTransactions();
+    }
+  }
+
+  // Collapsible months methods
+  toggleMonthCollapse(monthKey: string): void {
+    if (this.collapsedMonths.has(monthKey)) {
+      this.collapsedMonths.delete(monthKey);
+    } else {
+      this.collapsedMonths.add(monthKey);
+    }
+  }
+
+  isMonthCollapsed(monthKey: string): boolean {
+    return this.collapsedMonths.has(monthKey);
   }
 
   addTransaction(transaction: Transaction): void {
@@ -102,6 +146,7 @@ export class TransactionListComponent implements OnInit {
   }
 
   applyFilters(): void {
+    this.currentPage = 0;
     this.loadTransactions();
   }
 
@@ -112,6 +157,7 @@ export class TransactionListComponent implements OnInit {
       start_date: this.formatDateForInput(lastMonth),
       end_date: this.formatDateForInput(now)
     });
+    this.currentPage = 0;
     this.loadTransactions();
   }
 
@@ -122,11 +168,13 @@ export class TransactionListComponent implements OnInit {
       start_date: this.formatDateForInput(twoMonthsAgo),
       end_date: this.formatDateForInput(now)
     });
+    this.currentPage = 0;
     this.loadTransactions();
   }
 
   clearFilters(): void {
     this.filterForm.reset();
+    this.currentPage = 0;
     this.loadTransactions();
   }
 

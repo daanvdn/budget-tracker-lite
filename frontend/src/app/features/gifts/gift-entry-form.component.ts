@@ -1,14 +1,15 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule} from '@angular/forms';
 import {GiftOccasionService} from '../../core/services/gift-occasion.service';
+import {BeneficiaryService} from '../../core/services/beneficiary.service';
 import {Transaction} from '../../core/services/transaction.service';
 import {Beneficiary, GiftDirection, GiftEntry, GiftEntryCreate, GiftEntryUpdate} from '../../shared/models/models';
 
 @Component({
     selector: 'app-gift-entry-form',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule, FormsModule],
     templateUrl: './gift-entry-form.component.html',
     styleUrls: ['./gift-entry-form.component.css']
 })
@@ -23,6 +24,7 @@ export class GiftEntryFormComponent implements OnInit, OnChanges {
     @Output() entryCreated = new EventEmitter<GiftEntry>();
     @Output() entryUpdated = new EventEmitter<GiftEntry>();
     @Output() cancelled = new EventEmitter<void>();
+    @Output() beneficiaryCreated = new EventEmitter<Beneficiary>();
 
     form!: FormGroup;
     loading = false;
@@ -30,9 +32,15 @@ export class GiftEntryFormComponent implements OnInit, OnChanges {
     directions = Object.values(GiftDirection);
     showTransactionPicker = false;
 
+    // New beneficiary creation
+    showNewBeneficiaryInput = false;
+    newBeneficiaryName = '';
+    creatingBeneficiary = false;
+
     constructor(
         private fb: FormBuilder,
-        private giftOccasionService: GiftOccasionService
+        private giftOccasionService: GiftOccasionService,
+        private beneficiaryService: BeneficiaryService
     ) {
     }
 
@@ -150,6 +158,42 @@ export class GiftEntryFormComponent implements OnInit, OnChanges {
 
     onCancel(): void {
         this.cancelled.emit();
+    }
+
+    // New beneficiary creation methods
+    toggleNewBeneficiaryInput(): void {
+        this.showNewBeneficiaryInput = !this.showNewBeneficiaryInput;
+        if (!this.showNewBeneficiaryInput) {
+            this.newBeneficiaryName = '';
+        }
+    }
+
+    createNewBeneficiary(): void {
+        if (!this.newBeneficiaryName.trim()) {
+            return;
+        }
+
+        this.creatingBeneficiary = true;
+        this.beneficiaryService.createBeneficiary(this.newBeneficiaryName.trim()).subscribe({
+            next: (newBeneficiary: Beneficiary) => {
+                // Add to local list and select it
+                this.beneficiaries = [...this.beneficiaries, newBeneficiary];
+                this.form.patchValue({ person_id: newBeneficiary.id });
+
+                // Emit event so parent can update its list
+                this.beneficiaryCreated.emit(newBeneficiary);
+
+                // Reset the new beneficiary input
+                this.newBeneficiaryName = '';
+                this.showNewBeneficiaryInput = false;
+                this.creatingBeneficiary = false;
+            },
+            error: (error: any) => {
+                console.error('Failed to create beneficiary', error);
+                this.errorMessage = 'Failed to create beneficiary. Please try again.';
+                this.creatingBeneficiary = false;
+            }
+        });
     }
 
     formatDirection(direction: GiftDirection): string {

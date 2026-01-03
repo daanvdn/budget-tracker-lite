@@ -57,12 +57,35 @@
 
       <div class="form-group">
         <label for="beneficiary_id">Beneficiary</label>
-        <select id="beneficiary_id" formControlName="beneficiary_id" class="form-control">
-          <option value="">Select Beneficiary</option>
-          <option *ngFor="let beneficiary of beneficiaries" [value]="beneficiary.id">
-            {{ beneficiary.name }}
-          </option>
-        </select>
+        <div class="beneficiary-select-wrapper">
+          <select id="beneficiary_id" formControlName="beneficiary_id" class="form-control">
+            <option value="">Select Beneficiary</option>
+            <option *ngFor="let beneficiary of beneficiaries" [value]="beneficiary.id">
+              {{ beneficiary.name }}
+            </option>
+          </select>
+          <button type="button" class="btn-add-new" (click)="toggleNewBeneficiaryInput()" [title]="showNewBeneficiaryInput ? 'Cancel' : 'Add new beneficiary'">
+            {{ showNewBeneficiaryInput ? '×' : '+' }}
+          </button>
+        </div>
+        <div class="new-beneficiary-input" *ngIf="showNewBeneficiaryInput">
+          <input
+            type="text"
+            [(ngModel)]="newBeneficiaryName"
+            [ngModelOptions]="{standalone: true}"
+            placeholder="Enter new beneficiary name"
+            class="form-control"
+            (keyup.enter)="createNewBeneficiary()"
+          />
+          <button
+            type="button"
+            class="btn btn-primary btn-small"
+            (click)="createNewBeneficiary()"
+            [disabled]="!newBeneficiaryName.trim() || creatingBeneficiary"
+          >
+            {{ creatingBeneficiary ? 'Creating...' : 'Create' }}
+          </button>
+        </div>
       </div>
     </div>
 

@@ -7,6 +7,12 @@ import {AuthService} from '../../core/services/auth.service';
 import {Beneficiary, GiftOccasionWithSummary, OccasionType} from '../../shared/models/models';
 import {GiftOccasionFormComponent} from './gift-occasion-form.component';
 
+interface MonthGroup {
+    monthKey: string;
+    monthLabel: string;
+    occasions: GiftOccasionWithSummary[];
+}
+
 @Component({
     selector: 'app-gift-occasions-list',
     standalone: true,
@@ -22,6 +28,14 @@ export class GiftOccasionsListComponent implements OnInit {
     editingOccasion: GiftOccasionWithSummary | null = null;
     loading = false;
     errorMessage = '';
+
+    // Pagination
+    currentPage = 0;
+    pageSize = 20;
+    hasMorePages = true;
+
+    // Collapsible months
+    collapsedMonths: Set<string> = new Set();
 
     constructor(
         private giftOccasionService: GiftOccasionService,
@@ -45,9 +59,12 @@ export class GiftOccasionsListComponent implements OnInit {
 
     loadOccasions(): void {
         this.loading = true;
-        this.giftOccasionService.getOccasions().subscribe({
+        const skip = this.currentPage * this.pageSize;
+        this.giftOccasionService.getOccasions(skip, this.pageSize + 1).subscribe({
             next: (occasions) => {
-                this.occasions = occasions;
+                // Check if there are more pages by fetching one extra
+                this.hasMorePages = occasions.length > this.pageSize;
+                this.occasions = occasions.slice(0, this.pageSize);
                 this.loading = false;
             },
             error: (error) => {
@@ -55,6 +72,71 @@ export class GiftOccasionsListComponent implements OnInit {
                 this.errorMessage = 'Failed to load gift occasions';
                 this.loading = false;
             }
+        });
+    }
+
+    // Pagination methods
+    goToFirstPage(): void {
+        this.currentPage = 0;
+        this.loadOccasions();
+    }
+
+    goToPreviousPage(): void {
+        if (this.currentPage > 0) {
+            this.currentPage--;
+            this.loadOccasions();
+        }
+    }
+
+    goToNextPage(): void {
+        if (this.hasMorePages) {
+            this.currentPage++;
+            this.loadOccasions();
+        }
+    }
+
+    // Collapsible months methods
+    toggleMonthCollapse(monthKey: string): void {
+        if (this.collapsedMonths.has(monthKey)) {
+            this.collapsedMonths.delete(monthKey);
+        } else {
+            this.collapsedMonths.add(monthKey);
+        }
+    }
+
+    isMonthCollapsed(monthKey: string): boolean {
+        return this.collapsedMonths.has(monthKey);
+    }
+
+    // Group occasions by month
+    get occasionsGroupedByMonth(): MonthGroup[] {
+        const grouped = new Map<string, GiftOccasionWithSummary[]>();
+
+        for (const occasion of this.occasions) {
+            // Use occasion_date if available, otherwise use created_at or current date
+            const dateStr = occasion.occasion_date || occasion.created_at;
+            const date = dateStr ? new Date(dateStr) : new Date();
+            const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+            if (!grouped.has(monthKey)) {
+                grouped.set(monthKey, []);
+            }
+            grouped.get(monthKey)!.push(occasion);
+        }
+
+        // Sort by month key descending (newest first)
+        const sortedKeys = Array.from(grouped.keys()).sort((a, b) => b.localeCompare(a));
+
+        return sortedKeys.map(monthKey => {
+            const [year, month] = monthKey.split('-');
+            const monthDate = new Date(parseInt(year), parseInt(month) - 1, 1);
+            const monthLabel = monthDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+
+            return {
+                monthKey,
+                monthLabel,
+                occasions: grouped.get(monthKey)!
+            };
         });
     }
 
@@ -95,6 +177,13 @@ export class GiftOccasionsListComponent implements OnInit {
             this.occasions[index] = occasion;
         }
         this.closeFormDialog();
+    }
+
+    onBeneficiaryCreated(beneficiary: Beneficiary): void {
+        // Add the new beneficiary to our list if it's not already there
+        if (!this.beneficiaries.find(b => b.id === beneficiary.id)) {
+            this.beneficiaries = [...this.beneficiaries, beneficiary];
+        }
     }
 
     viewOccasion(occasion: GiftOccasionWithSummary): void {

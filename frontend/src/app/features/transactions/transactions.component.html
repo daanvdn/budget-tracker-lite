@@ -19,7 +19,8 @@
         [editingTransaction]="editingTransaction"
         (transactionCreated)="onTransactionCreated($event)"
         (transactionUpdated)="onTransactionUpdated($event)"
-        (editCancelled)="onEditCancelled()">
+        (editCancelled)="onEditCancelled()"
+        (beneficiaryCreated)="onBeneficiaryCreated($event)">
       </app-transaction-form>
     </div>
   </div>

@@ -17,12 +17,34 @@
 
         <div class="form-group">
             <label for="person_id">{{ form.get('direction')?.value === 'received' ? 'From' : 'To' }} *</label>
-            <select formControlName="person_id" id="person_id">
-                <option [ngValue]="null" disabled>-- Select Person --</option>
-                <option *ngFor="let b of beneficiaries" [ngValue]="b.id">
-                    {{ b.name }}
-                </option>
-            </select>
+            <div class="beneficiary-select-wrapper">
+                <select formControlName="person_id" id="person_id">
+                    <option [ngValue]="null" disabled>-- Select Person --</option>
+                    <option *ngFor="let b of beneficiaries" [ngValue]="b.id">
+                        {{ b.name }}
+                    </option>
+                </select>
+                <button type="button" class="btn-add-new" (click)="toggleNewBeneficiaryInput()" [title]="showNewBeneficiaryInput ? 'Cancel' : 'Add new person'">
+                    {{ showNewBeneficiaryInput ? '×' : '+' }}
+                </button>
+            </div>
+            <div class="new-beneficiary-input" *ngIf="showNewBeneficiaryInput">
+                <input
+                    type="text"
+                    [(ngModel)]="newBeneficiaryName"
+                    [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter new person name"
+                    (keyup.enter)="createNewBeneficiary()"
+                />
+                <button
+                    type="button"
+                    class="btn btn-primary btn-small"
+                    (click)="createNewBeneficiary()"
+                    [disabled]="!newBeneficiaryName.trim() || creatingBeneficiary"
+                >
+                    {{ creatingBeneficiary ? 'Creating...' : 'Create' }}
+                </button>
+            </div>
             <div *ngIf="form.get('person_id')?.invalid && form.get('person_id')?.touched" class="error">
                 Person is required
             </div>

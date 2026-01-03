@@ -1,16 +1,17 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { TransactionService, Transaction, TransactionCreate, TransactionUpdate } from '../../core/services/transaction.service';
 import { ImageService } from '../../core/services/image.service';
 import { AuthService } from '../../core/services/auth.service';
+import { BeneficiaryService } from '../../core/services/beneficiary.service';
 import { Category, Beneficiary } from '../../shared/models/models';
 import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-transaction-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './transaction-form.component.html',
   styleUrls: ['./transaction-form.component.css']
 })
@@ -26,6 +27,7 @@ export class TransactionFormComponent implements OnInit, OnChanges {
   @Output() transactionCreated = new EventEmitter<Transaction>();
   @Output() transactionUpdated = new EventEmitter<Transaction>();
   @Output() editCancelled = new EventEmitter<void>();
+  @Output() beneficiaryCreated = new EventEmitter<Beneficiary>();
 
   transactionForm!: FormGroup;
   editMode = false;
@@ -38,11 +40,17 @@ export class TransactionFormComponent implements OnInit, OnChanges {
   uploadedImagePath: string | null = null;
   uploadingImage = false;
 
+  // New beneficiary creation
+  showNewBeneficiaryInput = false;
+  newBeneficiaryName = '';
+  creatingBeneficiary = false;
+
   constructor(
     private fb: FormBuilder,
     private transactionService: TransactionService,
     private imageService: ImageService,
-    private authService: AuthService
+    private authService: AuthService,
+    private beneficiaryService: BeneficiaryService
   ) {}
 
   ngOnInit(): void {
@@ -254,6 +262,42 @@ export class TransactionFormComponent implements OnInit, OnChanges {
   cancelEdit(): void {
     this.resetForm();
     this.editCancelled.emit();
+  }
+
+  // New beneficiary creation methods
+  toggleNewBeneficiaryInput(): void {
+    this.showNewBeneficiaryInput = !this.showNewBeneficiaryInput;
+    if (!this.showNewBeneficiaryInput) {
+      this.newBeneficiaryName = '';
+    }
+  }
+
+  createNewBeneficiary(): void {
+    if (!this.newBeneficiaryName.trim()) {
+      return;
+    }
+
+    this.creatingBeneficiary = true;
+    this.beneficiaryService.createBeneficiary(this.newBeneficiaryName.trim()).subscribe({
+      next: (newBeneficiary: Beneficiary) => {
+        // Add to local list and select it
+        this.beneficiaries = [...this.beneficiaries, newBeneficiary];
+        this.transactionForm.patchValue({ beneficiary_id: newBeneficiary.id });
+
+        // Emit event so parent can update its list
+        this.beneficiaryCreated.emit(newBeneficiary);
+
+        // Reset the new beneficiary input
+        this.newBeneficiaryName = '';
+        this.showNewBeneficiaryInput = false;
+        this.creatingBeneficiary = false;
+      },
+      error: (error: any) => {
+        console.error('Failed to create beneficiary', error);
+        this.errorMessage = 'Failed to create beneficiary. Please try again.';
+        this.creatingBeneficiary = false;
+      }
+    });
   }
 
   private resetForm(): void {

@@ -199,6 +199,13 @@ export class GiftOccasionDetailComponent implements OnInit {
         this.closeEntryForm();
     }
 
+    onBeneficiaryCreated(beneficiary: Beneficiary): void {
+        // Add the new beneficiary to our list if it's not already there
+        if (!this.beneficiaries.find(b => b.id === beneficiary.id)) {
+            this.beneficiaries = [...this.beneficiaries, beneficiary];
+        }
+    }
+
     // ============== Purchase Management ==============
 
     deleteEntry(entry: GiftEntry, event: Event): void {

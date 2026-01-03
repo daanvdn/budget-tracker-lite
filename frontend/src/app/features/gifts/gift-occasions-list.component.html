@@ -17,61 +17,89 @@
     </div>
 
     <div *ngIf="!loading && occasions.length > 0" class="occasions-list">
-        <div
-                (click)="viewOccasion(occasion)"
-                *ngFor="let occasion of occasions"
-                class="occasion-card"
-        >
-            <div class="occasion-header">
-                <span class="occasion-icon">{{ getOccasionIcon(occasion.occasion_type) }}</span>
-                <div class="occasion-title">
-                    <h3>{{ occasion.name }}</h3>
-                    <span *ngIf="occasion.occasion_date" class="occasion-date">
-            {{ formatDate(occasion.occasion_date) }}
-          </span>
+        <ng-container *ngFor="let monthGroup of occasionsGroupedByMonth">
+            <!-- Monthly Header (Clickable for collapse) -->
+            <div class="month-header clickable" (click)="toggleMonthCollapse(monthGroup.monthKey)">
+                <div class="month-collapse-indicator">
+                    <span class="collapse-icon" [class.collapsed]="isMonthCollapsed(monthGroup.monthKey)">▼</span>
                 </div>
-                <div class="occasion-actions">
-                    <button (click)="openEditDialog(occasion); $event.stopPropagation()" class="btn btn-icon"
-                            title="Edit">
-                        ✏️
-                    </button>
-                    <button (click)="deleteOccasion(occasion, $event)" class="btn btn-icon btn-danger" title="Delete">
-                        🗑️
-                    </button>
-                </div>
+                <div class="month-label">{{ monthGroup.monthLabel }}</div>
+                <div class="month-count">{{ monthGroup.occasions.length }} occasion{{ monthGroup.occasions.length !== 1 ? 's' : '' }}</div>
             </div>
 
-            <div *ngIf="occasion.person" class="occasion-person">
-                For: {{ occasion.person.name }}
-            </div>
+            <!-- Occasions for this month (collapsible) -->
+            <div class="month-occasions" [class.collapsed]="isMonthCollapsed(monthGroup.monthKey)">
+                <div
+                        (click)="viewOccasion(occasion)"
+                        *ngFor="let occasion of monthGroup.occasions"
+                        class="occasion-card"
+                >
+                    <div class="occasion-header">
+                        <span class="occasion-icon">{{ getOccasionIcon(occasion.occasion_type) }}</span>
+                        <div class="occasion-title">
+                            <h3>{{ occasion.name }}</h3>
+                            <span *ngIf="occasion.occasion_date" class="occasion-date">
+                {{ formatDate(occasion.occasion_date) }}
+              </span>
+                        </div>
+                        <div class="occasion-actions">
+                            <button (click)="openEditDialog(occasion); $event.stopPropagation()" class="btn btn-icon"
+                                    title="Edit">
+                                ✏️
+                            </button>
+                            <button (click)="deleteOccasion(occasion, $event)" class="btn btn-icon btn-danger" title="Delete">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
 
-            <div class="occasion-summary">
-                <div *ngIf="occasion.summary.total_received > 0" class="summary-item received">
-                    <span class="label">Received:</span>
-                    <span class="value">{{ formatCurrency(occasion.summary.total_received) }}</span>
-                </div>
-                <div *ngIf="occasion.summary.total_given > 0" class="summary-item given">
-                    <span class="label">Given:</span>
-                    <span class="value">{{ formatCurrency(occasion.summary.total_given) }}</span>
-                </div>
-                <div *ngIf="occasion.is_pool_account && occasion.summary.total_purchases > 0"
-                     class="summary-item spent">
-                    <span class="label">Spent:</span>
-                    <span class="value">{{ formatCurrency(occasion.summary.total_purchases) }}</span>
-                </div>
-                <div *ngIf="occasion.is_pool_account" class="summary-item balance">
-                    <span class="label">Balance:</span>
-                    <span [class.negative]="occasion.summary.balance < 0" [class.positive]="occasion.summary.balance >= 0"
-                          class="value">
-            {{ formatCurrency(occasion.summary.balance) }}
-          </span>
-                </div>
-            </div>
+                    <div *ngIf="occasion.person" class="occasion-person">
+                        For: {{ occasion.person.name }}
+                    </div>
 
-            <div class="occasion-tags">
-                <span *ngIf="occasion.is_pool_account" class="tag">Pool Account</span>
-                <span class="tag type-tag">{{ occasion.occasion_type }}</span>
+                    <div class="occasion-summary">
+                        <div *ngIf="occasion.summary.total_received > 0" class="summary-item received">
+                            <span class="label">Received:</span>
+                            <span class="value">{{ formatCurrency(occasion.summary.total_received) }}</span>
+                        </div>
+                        <div *ngIf="occasion.summary.total_given > 0" class="summary-item given">
+                            <span class="label">Given:</span>
+                            <span class="value">{{ formatCurrency(occasion.summary.total_given) }}</span>
+                        </div>
+                        <div *ngIf="occasion.is_pool_account && occasion.summary.total_purchases > 0"
+                             class="summary-item spent">
+                            <span class="label">Spent:</span>
+                            <span class="value">{{ formatCurrency(occasion.summary.total_purchases) }}</span>
+                        </div>
+                        <div *ngIf="occasion.is_pool_account" class="summary-item balance">
+                            <span class="label">Balance:</span>
+                            <span [class.negative]="occasion.summary.balance < 0" [class.positive]="occasion.summary.balance >= 0"
+                                  class="value">
+                {{ formatCurrency(occasion.summary.balance) }}
+              </span>
+                        </div>
+                    </div>
+
+                    <div class="occasion-tags">
+                        <span *ngIf="occasion.is_pool_account" class="tag">Pool Account</span>
+                        <span class="tag type-tag">{{ occasion.occasion_type }}</span>
+                    </div>
+                </div>
             </div>
+        </ng-container>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-controls">
+            <button class="btn btn-outline" (click)="goToFirstPage()" [disabled]="currentPage === 0">
+                ⟪ First
+            </button>
+            <button class="btn btn-outline" (click)="goToPreviousPage()" [disabled]="currentPage === 0">
+                ← Previous
+            </button>
+            <span class="page-indicator">Page {{ currentPage + 1 }}</span>
+            <button class="btn btn-outline" (click)="goToNextPage()" [disabled]="!hasMorePages">
+                Next →
+            </button>
         </div>
     </div>
 </div>
@@ -83,6 +111,7 @@
                 (cancelled)="closeFormDialog()"
                 (occasionCreated)="onOccasionCreated($event)"
                 (occasionUpdated)="onOccasionUpdated($event)"
+                (beneficiaryCreated)="onBeneficiaryCreated($event)"
                 [beneficiaries]="beneficiaries"
                 [currentUserId]="currentUserId"
                 [editingOccasion]="editingOccasion"
