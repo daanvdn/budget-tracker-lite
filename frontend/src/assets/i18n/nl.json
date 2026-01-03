@@ -200,6 +200,27 @@
     "next": "Volgende",
     "page": "Pagina"
   },
+  "enums": {
+    "occasionType": {
+      "birthday": "Verjaardag",
+      "holiday": "Feestdag",
+      "celebration": "Viering",
+      "other": "Overig"
+    },
+    "categoryType": {
+      "expense": "Uitgave",
+      "income": "Inkomen",
+      "both": "Beide"
+    },
+    "transactionType": {
+      "expense": "Uitgave",
+      "income": "Inkomen"
+    },
+    "giftDirection": {
+      "given": "Gegeven",
+      "received": "Ontvangen"
+    }
+  },
   "language": {
     "select": "Taal",
     "en": "English",

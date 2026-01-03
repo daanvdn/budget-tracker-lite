@@ -5,7 +5,7 @@ import {GiftOccasionService} from '../../core/services/gift-occasion.service';
 import {BeneficiaryService} from '../../core/services/beneficiary.service';
 import {Transaction} from '../../core/services/transaction.service';
 import {Beneficiary, GiftDirection, GiftEntry, GiftEntryCreate, GiftEntryUpdate} from '../../shared/models/models';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslateModule, TranslateService} from '@ngx-translate/core';
 
 @Component({
     selector: 'app-gift-entry-form',
@@ -41,7 +41,8 @@ export class GiftEntryFormComponent implements OnInit, OnChanges {
     constructor(
         private fb: FormBuilder,
         private giftOccasionService: GiftOccasionService,
-        private beneficiaryService: BeneficiaryService
+        private beneficiaryService: BeneficiaryService,
+        private translate: TranslateService
     ) {
     }
 
@@ -198,7 +199,7 @@ export class GiftEntryFormComponent implements OnInit, OnChanges {
     }
 
     formatDirection(direction: GiftDirection): string {
-        return direction === GiftDirection.RECEIVED ? 'Received' : 'Given';
+        return this.translate.instant(`enums.giftDirection.${direction}`);
     }
 
     formatDate(dateString: string): string {

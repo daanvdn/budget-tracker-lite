@@ -10,7 +10,7 @@ import {
   GiftOccasionWithSummary,
   OccasionType
 } from '../../shared/models/models';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslateModule, TranslateService} from '@ngx-translate/core';
 
 @Component({
     selector: 'app-gift-occasion-form',
@@ -42,7 +42,8 @@ export class GiftOccasionFormComponent implements OnInit, OnChanges {
     constructor(
         private fb: FormBuilder,
         private giftOccasionService: GiftOccasionService,
-        private beneficiaryService: BeneficiaryService
+        private beneficiaryService: BeneficiaryService,
+        private translate: TranslateService
     ) {
     }
 
@@ -183,7 +184,7 @@ export class GiftOccasionFormComponent implements OnInit, OnChanges {
     }
 
     formatOccasionType(type: OccasionType): string {
-        return type.charAt(0).toUpperCase() + type.slice(1);
+        return this.translate.instant(`enums.occasionType.${type}`);
     }
 
     private initForm(): void {

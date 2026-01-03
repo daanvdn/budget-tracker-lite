@@ -200,6 +200,27 @@
     "next": "Next",
     "page": "Page"
   },
+  "enums": {
+    "occasionType": {
+      "birthday": "Birthday",
+      "holiday": "Holiday",
+      "celebration": "Celebration",
+      "other": "Other"
+    },
+    "categoryType": {
+      "expense": "Expense",
+      "income": "Income",
+      "both": "Both"
+    },
+    "transactionType": {
+      "expense": "Expense",
+      "income": "Income"
+    },
+    "giftDirection": {
+      "given": "Given",
+      "received": "Received"
+    }
+  },
   "language": {
     "select": "Language",
     "en": "English",

@@ -82,7 +82,7 @@
 
                     <div class="occasion-tags">
                         <span *ngIf="occasion.is_pool_account" class="tag">{{ 'gifts.poolAccount' | translate }}</span>
-                        <span class="tag type-tag">{{ occasion.occasion_type }}</span>
+                        <span class="tag type-tag">{{ getTranslatedOccasionType(occasion.occasion_type) }}</span>
                     </div>
                 </div>
             </div>

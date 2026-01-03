@@ -39,7 +39,7 @@
 
       <ng-container matColumnDef="type">
         <th mat-header-cell *matHeaderCellDef>{{ 'common.type' | translate }}</th>
-        <td mat-cell *matCellDef="let category">{{ category.type }}</td>
+        <td mat-cell *matCellDef="let category">{{ getTranslatedCategoryType(category.type) }}</td>
       </ng-container>
 
       <ng-container matColumnDef="actions">

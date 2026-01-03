@@ -6,7 +6,7 @@ import {BeneficiaryService} from '../../core/services/beneficiary.service';
 import {AuthService} from '../../core/services/auth.service';
 import {Beneficiary, GiftOccasionWithSummary, OccasionType} from '../../shared/models/models';
 import {GiftOccasionFormComponent} from './gift-occasion-form.component';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslateModule, TranslateService} from '@ngx-translate/core';
 
 interface MonthGroup {
     monthKey: string;
@@ -42,7 +42,8 @@ export class GiftOccasionsListComponent implements OnInit {
         private giftOccasionService: GiftOccasionService,
         private beneficiaryService: BeneficiaryService,
         private authService: AuthService,
-        private router: Router
+        private router: Router,
+        private translate: TranslateService
     ) {
     }
 
@@ -218,6 +219,10 @@ export class GiftOccasionsListComponent implements OnInit {
             default:
                 return '🎁';
         }
+    }
+
+    getTranslatedOccasionType(type: OccasionType): string {
+        return this.translate.instant(`enums.occasionType.${type}`);
     }
 
     formatDate(dateString: string | undefined): string {

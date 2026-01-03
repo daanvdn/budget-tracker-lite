@@ -1,10 +1,10 @@
 <div class="category-list">
-  <h2>Categories</h2>
+  <h2>{{ 'categories.title' | translate }}</h2>
   <ul *ngIf="categories.length > 0">
     <li *ngFor="let category of categories">
-      {{ category.name }} ({{ category.type }})
+      {{ category.name }} ({{ getTranslatedCategoryType(category.type) }})
     </li>
   </ul>
-  <p *ngIf="categories.length === 0">No categories found.</p>
+  <p *ngIf="categories.length === 0">{{ 'categories.noCategoriesFound' | translate }}</p>
 </div>
 

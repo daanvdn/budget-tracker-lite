@@ -11,7 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CategoryService } from '../../core/services/category.service';
 import { Category, CategoryType } from '../../shared/models/models';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-categories',
@@ -42,7 +42,8 @@ export class CategoriesComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private categoryService: CategoryService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private translate: TranslateService
   ) {
     this.categoryForm = this.fb.group({
       name: ['', Validators.required],
@@ -52,6 +53,10 @@ export class CategoriesComponent implements OnInit {
 
   ngOnInit() {
     this.loadCategories();
+  }
+
+  getTranslatedCategoryType(type: CategoryType): string {
+    return this.translate.instant(`enums.categoryType.${type}`);
   }
 
   loadCategories() {

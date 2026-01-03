@@ -1,9 +1,9 @@
 <div class="user-list">
-    <h2>Users</h2>
+    <h2>{{ 'users.title' | translate }}</h2>
     <ul *ngIf="users.length > 0">
         <li *ngFor="let user of users">
             {{ user.name }} ({{ user.created_at | date:'short' }})
         </li>
     </ul>
-    <p *ngIf="users.length === 0">No users found.</p>
+    <p *ngIf="users.length === 0">{{ 'users.noUsersFound' | translate }}</p>
 </div>
