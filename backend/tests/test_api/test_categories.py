@@ -88,3 +88,18 @@ async def test_delete_category(authenticated_client, sample_category):
     # Verify it's deleted
     response = await authenticated_client.get(f"/api/categories/{sample_category.id}")
     assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_delete_category_with_transactions(authenticated_client, sample_data):
+    """Test that deleting a category with transactions returns 409 Conflict"""
+    # sample_data creates categories with transactions
+    category_with_transactions = sample_data["categories"][0]  # "Food" category has transactions
+
+    response = await authenticated_client.delete(f"/api/categories/{category_with_transactions.id}")
+    assert response.status_code == 409
+    assert "referenced by one or more transactions" in response.json()["detail"]
+
+    # Verify category still exists
+    response = await authenticated_client.get(f"/api/categories/{category_with_transactions.id}")
+    assert response.status_code == 200

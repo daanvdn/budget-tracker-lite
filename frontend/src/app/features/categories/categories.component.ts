@@ -115,7 +115,13 @@ export class CategoriesComponent implements OnInit {
           this.showSuccess('Category deleted successfully');
           this.loadCategories();
         },
-        error: (err) => this.showError('Failed to delete category')
+        error: (err) => {
+          if (err.status === 409) {
+            this.showError('Cannot delete category: it is still used by one or more transactions');
+          } else {
+            this.showError('Failed to delete category');
+          }
+        }
       });
     }
   }

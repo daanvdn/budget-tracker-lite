@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..auth.dependencies import get_current_active_user
 from ..database import get_db
 from ..models import Category as CategoryModel
+from ..models import Transaction as TransactionModel
 from ..models import User
 from ..schemas import Category, CategoryCreate, CategoryUpdate
 
@@ -84,6 +85,15 @@ async def delete_category(
     db_category = result.scalar_one_or_none()
     if not db_category:
         raise HTTPException(status_code=404, detail="Category not found")
+
+    # Check if any transactions use this category
+    transaction_result = await db.execute(
+        select(TransactionModel.id).where(TransactionModel.category_id == category_id).limit(1)
+    )
+    if transaction_result.scalar_one_or_none() is not None:
+        raise HTTPException(
+            status_code=409, detail="Cannot delete category: it is still referenced by one or more transactions"
+        )
 
     await db.delete(db_category)
     await db.commit()
