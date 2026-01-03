@@ -8,6 +8,8 @@ services:
       - "8001:8001"
     volumes:
       - ./data:/data
+    env_file:
+      - .env
     environment:
       - DATABASE_URL=sqlite+aiosqlite:////data/budget_tracker.db
       - UPLOAD_DIR=/data/uploads

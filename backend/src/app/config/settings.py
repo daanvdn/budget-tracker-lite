@@ -44,6 +44,11 @@ class Settings(BaseSettings):
 
     def model_post_init(self, context: Any, /) -> None:
         super().model_post_init(context)
+
+        # Warn if using default SECRET_KEY (should only happen in local dev)
+        if self.SECRET_KEY == "your-secret-key-change-in-production-use-openssl-rand-hex-32":
+            print("WARNING: Using default SECRET_KEY. Set SECRET_KEY env var in production!")
+
         if self.DEV_AUTH_BYPASS:
             print("WARNING: DEV_AUTH_BYPASS is ENABLED. This should only be used in local development environments.")
         # print absolute paths to upload dir and database file

@@ -154,7 +154,7 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Initializing database...")
     await init_db()
-    await seed_data()
+    # await seed_data()
     logger.info("Application startup complete!")
 
     yield

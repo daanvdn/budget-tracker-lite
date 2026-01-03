@@ -34,7 +34,7 @@ def check_database_state(db_path: str) -> str:
     Check the state of the database.
 
     Returns:
-        'new' - Database doesn't exist
+        'new' - Database doesn't exist or is empty (no tables)
         'stamp' - Database exists but no alembic tracking (needs stamping)
         'migrate' - Database has alembic tracking (normal migration)
     """
@@ -45,6 +45,14 @@ def check_database_state(db_path: str) -> str:
     cursor = conn.cursor()
 
     try:
+        # Check if there are any user tables at all (excluding sqlite internal tables)
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
+        tables = cursor.fetchall()
+
+        if not tables:
+            # Empty database file (no tables) - treat as new
+            return "new"
+
         # Check if alembic_version table exists
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='alembic_version'")
         has_alembic = cursor.fetchone() is not None
@@ -52,6 +60,14 @@ def check_database_state(db_path: str) -> str:
         # Check if transactions table exists (indicates existing database)
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='transactions'")
         has_transactions = cursor.fetchone() is not None
+
+        # Special case: alembic_version exists but base tables don't
+        # This can happen if a previous migration attempt failed partway through
+        # Treat as new database (will recreate schema and re-stamp)
+        if has_alembic and not has_transactions:
+            print("Warning: Corrupt state detected (alembic_version exists but base tables missing)")
+            print("Will recreate database schema...")
+            return "new"
 
         # Check if notes column already exists in transactions table
         has_notes_column = False
@@ -78,6 +94,33 @@ def run_command(cmd: list[str]) -> int:
     return subprocess.call(cmd)
 
 
+def create_base_schema(db_path: str) -> None:
+    """
+    Create the base database schema for a new database.
+
+    This creates all tables defined in the SQLAlchemy models.
+    The migrations then add/modify columns on top of this base schema.
+    """
+    print("Creating base database schema...")
+
+    # Import here to avoid circular imports and to ensure models are loaded
+    from sqlalchemy import create_engine  # noqa: I001
+    from app.database.session import Base  # noqa: I001
+
+    # Import all models to ensure they're registered with Base.metadata
+    from app import models  # noqa: F401
+
+    # Create sync engine for the database
+    db_url = f"sqlite:///{db_path}"
+    engine = create_engine(db_url)
+
+    # Create all tables
+    Base.metadata.create_all(bind=engine)
+    engine.dispose()
+
+    print("Base schema created successfully.")
+
+
 def main():
     print("=== Database Migration Check ===")
 
@@ -87,7 +130,22 @@ def main():
     state = check_database_state(db_path)
     print(f"Database state: {state}")
 
-    if state == "stamp_base":
+    if state == "new":
+        # New database - create base schema first, then stamp at head
+        # The models already include all columns (notes, tags, etc.)
+        # so we just need to create the schema and mark migrations as applied
+        print("New database detected. Creating base schema...")
+        create_base_schema(db_path)
+
+        # Stamp at head since our models include all the latest columns
+        print("Stamping database at head (all migrations considered applied)...")
+        result = run_command(["uv", "run", "alembic", "stamp", "head"])
+        if result != 0:
+            print("Warning: Failed to stamp database, continuing anyway...")
+        print("=== Database initialization complete ===")
+        return
+
+    elif state == "stamp_base":
         # Existing database without alembic tracking and without new columns
         # We need to stamp it at the revision BEFORE our migration
         print("Existing database detected without migration tracking.")
